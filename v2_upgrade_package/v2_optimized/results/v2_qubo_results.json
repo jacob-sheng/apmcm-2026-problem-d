@@ -1,0 +1,206 @@
+{
+  "Q2": {
+    "Q2_full_07": {
+      "spins": 17,
+      "nA_active": 9,
+      "nB_active": 7,
+      "bit_width": 8,
+      "dynamic_range": 7.01,
+      "max_abs_coeff": 125,
+      "SA": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_pair": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top10_hits": 10,
+        "runtime_sec": 6.288
+      },
+      "Tabu": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_pair": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top10_hits": 10,
+        "runtime_sec": 7.876
+      }
+    },
+    "Q2_blind_11": {
+      "spins": 12,
+      "nA_active": 7,
+      "nB_active": 4,
+      "bit_width": 8,
+      "dynamic_range": 6.89,
+      "max_abs_coeff": 115,
+      "SA": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_pair": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top10_hits": 8,
+        "runtime_sec": 6.026
+      },
+      "Tabu": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_pair": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top10_hits": 4,
+        "runtime_sec": 7.114
+      }
+    }
+  },
+  "Q3": {
+    "Q3_full_08_Model3A_SubmodularHOBO": {
+      "spins": 50,
+      "aux_vars": 21,
+      "aux_compression_vs_v1": 126.3,
+      "bit_width": 8,
+      "dynamic_range": 6.66,
+      "max_abs_coeff": 85,
+      "SA": {
+        "feasibility_pct": 90.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.1,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 10,
+        "runtime_sec": 6.764
+      },
+      "Tabu": {
+        "feasibility_pct": 86.67,
+        "mean_kA": 1.0,
+        "mean_kB": 1.133,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 12,
+        "runtime_sec": 6.858
+      }
+    },
+    "Q3_full_08_Model3B_CompactANOVA": {
+      "spins": 31,
+      "aux_vars": 0,
+      "anova_r2": 0.4713,
+      "bit_width": 6,
+      "dynamic_range": 4.95,
+      "max_abs_coeff": 93,
+      "SA": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 8,
+        "runtime_sec": 6.596
+      },
+      "Tabu": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.4071,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.1847,
+        "best_candidate": "CaNbNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 3,
+        "runtime_sec": 7.563
+      }
+    },
+    "Q3_blind_12_Model3A_SubmodularHOBO": {
+      "spins": 33,
+      "aux_vars": 13,
+      "aux_compression_vs_v1": 204.0,
+      "bit_width": 7,
+      "dynamic_range": 6.04,
+      "max_abs_coeff": 58,
+      "SA": {
+        "feasibility_pct": 86.67,
+        "mean_kA": 1.0,
+        "mean_kB": 1.133,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 13,
+        "runtime_sec": 6.289
+      },
+      "Tabu": {
+        "feasibility_pct": 96.67,
+        "mean_kA": 1.0,
+        "mean_kB": 1.033,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 14,
+        "runtime_sec": 5.91
+      }
+    },
+    "Q3_blind_12_Model3B_CompactANOVA": {
+      "spins": 24,
+      "aux_vars": 0,
+      "anova_r2": 0.5044,
+      "bit_width": 8,
+      "dynamic_range": 6.25,
+      "max_abs_coeff": 75,
+      "SA": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 14,
+        "runtime_sec": 6.089
+      },
+      "Tabu": {
+        "feasibility_pct": 100.0,
+        "mean_kA": 1.0,
+        "mean_kB": 1.0,
+        "mean_kX": 1.0,
+        "best_V_hat": 0.2224,
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0,
+        "best_candidate": "SrTaNO2",
+        "exact_best_formula": "SrTaO2N",
+        "top15_hits": 4,
+        "runtime_sec": 7.391
+      }
+    }
+  }
+}

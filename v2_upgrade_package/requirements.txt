@@ -1,0 +1,36 @@
+# 2026 APMCM Mathematical Modeling Environment
+# Core Numerical & Data Science
+numpy
+scipy
+pandas
+openpyxl
+xlrd
+
+# Statistics, Time Series & Machine Learning
+scikit-learn
+statsmodels
+lightgbm
+xgboost
+
+# Optimization, Operations Research & Symbolic Math
+pulp
+cvxpy
+networkx
+sympy
+
+# Image Processing & Computer Vision (APMCM Specialty)
+pillow
+opencv-python-headless
+scikit-image
+
+# Publication-Grade Visualization
+matplotlib
+seaborn
+
+# PDF / Document / Typesetting / Web Utilities
+typst
+pymupdf
+pypdf
+python-docx
+beautifulsoup4
+requests

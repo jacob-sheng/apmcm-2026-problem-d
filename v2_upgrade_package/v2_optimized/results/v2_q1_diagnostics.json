@@ -1,0 +1,154 @@
+{
+  "val_runtime_sec": 233.136,
+  "band_center_val_r2": 1.0,
+  "band_center_val_rmse_eV": 2.9010619952896e-07,
+  "component_val_metrics": {
+    "e_form_R2": 0.9191,
+    "e_form_RMSE": 0.2118,
+    "p_semi_ROC_AUC": 0.9849,
+    "p_semi_PR_AUC": 0.8193,
+    "p_semi_Brier": 0.01336,
+    "p_semi_ECE": 0.0058,
+    "gap_semi_R2": 0.7463,
+    "gap_semi_RMSE": 0.8123
+  },
+  "residual_diagnostics": {
+    "overall_bias": -0.076,
+    "overall_std": 4.0668,
+    "metal_rmse": 3.7187,
+    "metal_mae": 1.9146,
+    "semi_rmse": 9.5011,
+    "semi_mae": 6.3888,
+    "near_zero_Vlt1_mae": 2.6167
+  },
+  "calibration_curve": [
+    {
+      "bin_low": 0.0,
+      "bin_high": 0.1,
+      "mean_pred": 0.0058,
+      "obs_freq": 0.0043,
+      "count": 3735
+    },
+    {
+      "bin_low": 0.1,
+      "bin_high": 0.2,
+      "mean_pred": 0.1314,
+      "obs_freq": 0.1687,
+      "count": 83
+    },
+    {
+      "bin_low": 0.2,
+      "bin_high": 0.3,
+      "mean_pred": 0.2531,
+      "obs_freq": 0.4762,
+      "count": 21
+    },
+    {
+      "bin_low": 0.3,
+      "bin_high": 0.4,
+      "mean_pred": 0.3223,
+      "obs_freq": 0.5714,
+      "count": 7
+    },
+    {
+      "bin_low": 0.4,
+      "bin_high": 0.5,
+      "mean_pred": 0.4224,
+      "obs_freq": 0.625,
+      "count": 16
+    },
+    {
+      "bin_low": 0.5,
+      "bin_high": 0.6,
+      "mean_pred": 0.5624,
+      "obs_freq": 0.5,
+      "count": 18
+    },
+    {
+      "bin_low": 0.6,
+      "bin_high": 0.7,
+      "mean_pred": 0.624,
+      "obs_freq": 0.4,
+      "count": 5
+    },
+    {
+      "bin_low": 0.7,
+      "bin_high": 0.8,
+      "mean_pred": 0.7469,
+      "obs_freq": 0.8462,
+      "count": 13
+    },
+    {
+      "bin_low": 0.8,
+      "bin_high": 0.9,
+      "mean_pred": 0.8482,
+      "obs_freq": 0.8235,
+      "count": 17
+    },
+    {
+      "bin_low": 0.9,
+      "bin_high": 1.0,
+      "mean_pred": 0.9563,
+      "obs_freq": 0.9444,
+      "count": 54
+    }
+  ],
+  "ensemble_meta": {
+    "stage0_oof_metrics": {
+      "s0_a_lat": 0.9626,
+      "s0_abs_mub": 0.627,
+      "s0_fermi": 0.9381,
+      "s0_p_mag_roc_auc": 0.8598
+    },
+    "weights_e_form": {
+      "CatBoost": 0.2259,
+      "LightGBM": 0.3791,
+      "XGBoost": 0.0201,
+      "ExtraTrees": 0.3748
+    },
+    "weights_p_semi": {
+      "CatBoost": 0.2696,
+      "LightGBM": 0.1102,
+      "XGBoost": 0.1313,
+      "ExtraTrees": 0.4888
+    },
+    "weights_gap_semi": {
+      "CatBoost": 0.4876,
+      "LightGBM": 0.1865,
+      "XGBoost": 0.0,
+      "ExtraTrees": 0.3259
+    },
+    "oof_sigma_e_form": 0.2326,
+    "oof_sigma_gap_semi": 0.7213
+  },
+  "metrics_table": [
+    {
+      "model": "v2_Direct_4FamPhys",
+      "RMSE": 4.1709,
+      "MAE": 2.2457,
+      "R2": 0.8558,
+      "Spearman": 0.9469,
+      "Rec@50(V<0.5)": 0.6667,
+      "Rec@75(V<0.5)": 1.0,
+      "Rec@100(V<0.5)": 1.0,
+      "EF@50(V<0.5)": 52.92,
+      "Rec@100(V<1.0)": 0.963,
+      "EF@100(V<1.0)": 38.22,
+      "Top50_Mean_V": 6.6331
+    },
+    {
+      "model": "v2_PhysHurdle_Bayes",
+      "RMSE": 4.0675,
+      "MAE": 2.0735,
+      "R2": 0.8629,
+      "Spearman": 0.9532,
+      "Rec@50(V<0.5)": 0.8333,
+      "Rec@75(V<0.5)": 1.0,
+      "Rec@100(V<0.5)": 1.0,
+      "EF@50(V<0.5)": 66.15,
+      "Rec@100(V<1.0)": 1.0,
+      "EF@100(V<1.0)": 39.69,
+      "Top50_Mean_V": 6.1764
+    }
+  ]
+}
