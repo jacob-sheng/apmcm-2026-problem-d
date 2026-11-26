@@ -1,0 +1,36 @@
+# === Secrets, credentials, caches & runtime artifacts ===
+.env
+**/.env*
+**/checkpoints/
+**/.kaiwu/
+**/__pycache__/
+**/.pytest_cache/
+**/catboost_info/
+*.py[cod]
+**/.venv*/
+**/tools/
+**/wsl_stage/
+**/kaiwu-coding-skill/
+
+# === OS & Office temp lock files ===
+~$*.docx
+~$*.xlsx
+.DS_Store
+Thumbs.db
+
+# === Oversized manual & unselected Problem A/B/C materials ===
+亚太地区大学生数学建模竞赛参赛手册.pdf
+01_2026赛题与数据集/Problem_A_洪涝遥感识别与应急救援/
+01_2026赛题与数据集/Problem_B_转炉炼钢双模态时序融合/
+01_2026赛题与数据集/Problem_C_非洲企鹅声学通信与回放响应/
+
+# === Exclude past papers except Problem D QUBO references ===
+03_往年真题与优秀论文拆解/*
+!03_往年真题与优秀论文拆解/2024_D题优秀论文_云计算资源预测与QUBO量子求解.pdf
+!03_往年真题与优秀论文拆解/2025_D题优秀论文_机组组合问题量子优化.pdf
+
+# === Large binary archives, media & numpy dumps ===
+*.tar
+*.7z
+*.mp4
+*.npz
