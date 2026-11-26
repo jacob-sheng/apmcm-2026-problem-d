@@ -1,0 +1,48 @@
+{
+  "butler_ginley_physics": {
+    "wA_vs_wB_pearson_r": 1.0,
+    "wA_minus_wB_std": 0.0,
+    "log_mulliken_vs_wA_pearson_r": 0.9183,
+    "mulliken_vs_wA_spearman_rho": 0.9295
+  },
+  "mondrian_conformal_03val": {
+    "empirical_coverage_90_pct": 89.95,
+    "empirical_coverage_95_pct": 95.02,
+    "metal_stratum_q90_radius": 4.386,
+    "metal_stratum_q95_radius": 7.097,
+    "semi_stratum_q90_radius": 12.596,
+    "semi_stratum_q95_radius": 19.515
+  },
+  "holdout_04_expected_yield": {
+    "total_compounds": 3703,
+    "known_true_targets": 19,
+    "sum_P_hit_all_3703": 10.28,
+    "sum_P_hit_sd": 2.3,
+    "expected_hits_top10_by_V": 5.09,
+    "expected_hits_top20_by_V": 7.86,
+    "expected_hits_top30_by_V": 8.39,
+    "expected_hits_top50_by_V": 9.31,
+    "expected_hits_top100_by_V": 10.2,
+    "expected_hits_top20_by_Phit": 9.01,
+    "expected_hits_top30_by_Phit": 9.82,
+    "expected_hits_top50_by_Phit": 10.15,
+    "pct_yield_captured_at_K30": 81.6,
+    "pct_yield_captured_at_K50": 90.5,
+    "anion_expected_hits": {
+      "FNO": 0.02,
+      "FO2": 0.86,
+      "N2O": 0.09,
+      "N3": 0.0,
+      "NO2": 4.38,
+      "O2S": 0.43,
+      "O3": 4.49
+    },
+    "anion_top30_counts": {
+      "NO2": 9,
+      "O3": 9,
+      "O2S": 8,
+      "FO2": 2,
+      "N2O": 2
+    }
+  }
+}

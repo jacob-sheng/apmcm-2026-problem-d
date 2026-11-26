@@ -1,0 +1,145 @@
+{
+  "q1_metrics": [
+    {
+      "model": "v1_Direct_LGBM_V",
+      "RMSE": 4.5568,
+      "MAE": 2.5383,
+      "R2": 0.8279,
+      "Spearman": 0.9365,
+      "Rec@50(V<0.5)": 0.5,
+      "Rec@75(V<0.5)": 0.6667,
+      "Rec@100(V<0.5)": 0.7222,
+      "EF@50(V<0.5)": 39.69,
+      "Rec@100(V<1.0)": 0.6296,
+      "EF@100(V<1.0)": 24.99,
+      "Top50_Mean_V": 9.9642
+    },
+    {
+      "model": "v1_Direct_LGBM_log1pV",
+      "RMSE": 4.6942,
+      "MAE": 2.7469,
+      "R2": 0.8174,
+      "Spearman": 0.9292,
+      "Rec@50(V<0.5)": 0.7222,
+      "Rec@75(V<0.5)": 0.7222,
+      "Rec@100(V<0.5)": 0.8889,
+      "EF@50(V<0.5)": 57.33,
+      "Rec@100(V<1.0)": 0.7407,
+      "EF@100(V<1.0)": 29.4,
+      "Top50_Mean_V": 8.3745
+    },
+    {
+      "model": "v1_OneHot_FM_k8",
+      "RMSE": 4.9489,
+      "MAE": 2.8536,
+      "R2": 0.797,
+      "Spearman": 0.9217,
+      "Rec@50(V<0.5)": 0.3333,
+      "Rec@75(V<0.5)": 0.3333,
+      "Rec@100(V<0.5)": 0.4444,
+      "EF@50(V<0.5)": 26.46,
+      "Rec@100(V<1.0)": 0.3704,
+      "EF@100(V<1.0)": 14.7,
+      "Top50_Mean_V": 12.1495
+    }
+  ],
+  "q1_runtime_sec": 2.772,
+  "q2_results": {
+    "Q2_full_07_v1_Float_SA": {
+      "spins": 105,
+      "raw_bit_width": 999,
+      "used_bit_width": 999,
+      "dynamic_range": 31.78,
+      "feasibility_pct": 100.0,
+      "mean_kA": 1.0,
+      "mean_kB": 1.0,
+      "best_score": 1.5737,
+      "exact_min_score": 1.5737,
+      "gap_to_opt": 0.0,
+      "top10_hits": 9,
+      "runtime_sec": 2.518
+    },
+    "Q2_full_07_v1_Naive8bit_SA": {
+      "spins": 105,
+      "raw_bit_width": 999,
+      "used_bit_width": 8,
+      "dynamic_range": 6.99,
+      "feasibility_pct": 0.0,
+      "mean_kA": 0.0,
+      "mean_kB": 0.0,
+      "best_score": null,
+      "exact_min_score": 1.5737,
+      "gap_to_opt": null,
+      "top10_hits": 0,
+      "runtime_sec": 3.325
+    },
+    "Q2_blind_11_v1_Float_SA": {
+      "spins": 105,
+      "raw_bit_width": 999,
+      "used_bit_width": 999,
+      "dynamic_range": 24.2,
+      "feasibility_pct": 100.0,
+      "mean_kA": 1.0,
+      "mean_kB": 1.0,
+      "best_score": 2.9005,
+      "exact_min_score": 2.9005,
+      "gap_to_opt": 0.0,
+      "top10_hits": 6,
+      "runtime_sec": 2.267
+    },
+    "Q2_blind_11_v1_Naive8bit_SA": {
+      "spins": 105,
+      "raw_bit_width": 999,
+      "used_bit_width": 8,
+      "dynamic_range": 6.99,
+      "feasibility_pct": 0.0,
+      "mean_kA": 0.0,
+      "mean_kB": 0.0,
+      "best_score": null,
+      "exact_min_score": 2.9005,
+      "gap_to_opt": null,
+      "top10_hits": 0,
+      "runtime_sec": 3.579
+    }
+  },
+  "q3_results": {
+    "Q3_full_08_v1_FM107_Float_SA": {
+      "spins": 108,
+      "aux_vars": 0,
+      "raw_bit_width": 999,
+      "used_bit_width": 999,
+      "dynamic_range": 34.84,
+      "feasibility_pct": 100.0,
+      "mean_kA": 1.0,
+      "mean_kB": 1.0,
+      "mean_kX": 1.0,
+      "best_score": 6.2393,
+      "exact_min_score": 5.4801,
+      "gap_to_opt": 0.7593,
+      "top15_hits": 2,
+      "runtime_sec": 2.352
+    },
+    "Q3_full_08_v1_FM107_Naive8bit_SA": {
+      "spins": 108,
+      "aux_vars": 0,
+      "raw_bit_width": 999,
+      "used_bit_width": 8,
+      "dynamic_range": 7.0,
+      "feasibility_pct": 0.0,
+      "mean_kA": 2.0,
+      "mean_kB": 2.0,
+      "mean_kX": 1.0,
+      "best_score": null,
+      "exact_min_score": 5.4801,
+      "gap_to_opt": null,
+      "top15_hits": 0,
+      "runtime_sec": 2.944
+    },
+    "Q3_v1_NaiveRosenberg_Structure": {
+      "base_vars": 107,
+      "aux_vars_AB_pairing": 2652,
+      "total_spins_AB_pairing": 2760,
+      "note": "Pairing (a_i, b_j) requires 2,652 auxiliary qubits (2,760 spins) before pruning, exceeding 1000-qubit SPQC capacity."
+    }
+  }
+}

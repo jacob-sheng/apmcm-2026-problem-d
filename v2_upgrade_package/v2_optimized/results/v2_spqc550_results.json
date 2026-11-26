@@ -1,0 +1,585 @@
+{
+  "tasks": {
+    "apmcm26_v2_q2_blind_12": {
+      "task_name": "apmcm26_v2_q2_blind_12",
+      "label": "v2 Q2 Blind (11) Active-Subspace",
+      "scope": "Q2_blind_11",
+      "aux_vars": 0,
+      "hardware_spec": {
+        "spins": 12,
+        "min_val": -115,
+        "max_val": 4,
+        "bit_width": 8,
+        "dynamic_range": 6.895,
+        "sha256": "c5854a58cdff0d9aa66467288c39926ec1ab01b9b4871c5a56d52786a000b7bd"
+      },
+      "classical_SA": {
+        "n_samples": 50,
+        "feasible_count": 50,
+        "feasible_rate_pct": 100.0,
+        "best_ising_energy": -998.0,
+        "best_feasible": {
+          "formula": "SrTaO2N",
+          "V_hat": 0.2224,
+          "pool_rank": 1,
+          "ising_energy": -998.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": -0.0,
+        "unique_topK_hits": [
+          "BaTaO2N",
+          "CaTaO2N",
+          "LaTiO2N",
+          "SrTaO2N"
+        ],
+        "unique_topK_count": 4,
+        "top_k_target": 10,
+        "runtime_sec": 4.457
+      },
+      "classical_Tabu": {
+        "n_samples": 30,
+        "feasible_count": 30,
+        "feasible_rate_pct": 100.0,
+        "best_ising_energy": -998.0,
+        "best_feasible": {
+          "formula": "SrTaO2N",
+          "V_hat": 0.2224,
+          "pool_rank": 1,
+          "ising_energy": -998.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": -0.0,
+        "unique_topK_hits": [
+          "BaTaO2N",
+          "CaTaO2N",
+          "LaTiO2N",
+          "SrTaO2N"
+        ],
+        "unique_topK_count": 4,
+        "top_k_target": 10,
+        "runtime_sec": 5.019
+      },
+      "spqc550": {
+        "n_samples": 10,
+        "feasible_count": 3,
+        "feasible_rate_pct": 30.0,
+        "best_ising_energy": -998.0,
+        "best_feasible": {
+          "formula": "SrTaO2N",
+          "V_hat": 0.2224,
+          "pool_rank": 1,
+          "ising_energy": -998.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": -0.0,
+        "unique_topK_hits": [
+          "CaTaO2N",
+          "SrTaO2N",
+          "YTiO2N"
+        ],
+        "unique_topK_count": 3,
+        "top_k_target": 10,
+        "samples": [
+          {
+            "sample_idx": 0,
+            "ising_energy": -998.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "SrTaO2N",
+            "V_hat": 0.2224,
+            "pool_rank": 1
+          },
+          {
+            "sample_idx": 1,
+            "ising_energy": -998.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "CaTaO2N",
+            "V_hat": 0.2305,
+            "pool_rank": 2
+          },
+          {
+            "sample_idx": 2,
+            "ising_energy": -990.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "YTiO2N",
+            "V_hat": 0.3702,
+            "pool_rank": 6
+          },
+          {
+            "sample_idx": 3,
+            "ising_energy": -958.0,
+            "kA": 2,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 4,
+            "ising_energy": -950.0,
+            "kA": 2,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 5,
+            "ising_energy": -918.0,
+            "kA": 1,
+            "kB": 2,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 6,
+            "ising_energy": -894.0,
+            "kA": 0,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 7,
+            "ising_energy": -806.0,
+            "kA": 2,
+            "kB": 2,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 8,
+            "ising_energy": -774.0,
+            "kA": 3,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 9,
+            "ising_energy": -766.0,
+            "kA": 3,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          }
+        ],
+        "hardware_runtime_sec": 82.73
+      }
+    },
+    "apmcm26_v2_q3_anova_24": {
+      "task_name": "apmcm26_v2_q3_anova_24",
+      "label": "v2 Q3 Blind (12) Compact ANOVA (Model 3B)",
+      "scope": "Q3_blind_12",
+      "aux_vars": 0,
+      "hardware_spec": {
+        "spins": 24,
+        "min_val": -75,
+        "max_val": 1,
+        "bit_width": 8,
+        "dynamic_range": 6.248,
+        "sha256": "90b005d13fad22f249a3fe629930159f74193b2db6c2d5d9c329e04dcede06d8"
+      },
+      "classical_SA": {
+        "n_samples": 50,
+        "feasible_count": 50,
+        "feasible_rate_pct": 100.0,
+        "best_ising_energy": -1308.0,
+        "best_feasible": {
+          "formula": "LaTiO2N",
+          "V_hat": 0.2512,
+          "pool_rank": 3,
+          "ising_energy": -1308.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0288,
+        "unique_topK_hits": [
+          "BaTaO2N",
+          "LaTiO2N",
+          "SrSnO3",
+          "YTiO2N"
+        ],
+        "unique_topK_count": 4,
+        "top_k_target": 15,
+        "runtime_sec": 4.605
+      },
+      "classical_Tabu": {
+        "n_samples": 30,
+        "feasible_count": 30,
+        "feasible_rate_pct": 100.0,
+        "best_ising_energy": -1308.0,
+        "best_feasible": {
+          "formula": "LaTiO2N",
+          "V_hat": 0.2512,
+          "pool_rank": 3,
+          "ising_energy": -1308.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0288,
+        "unique_topK_hits": [
+          "LaTiO2N"
+        ],
+        "unique_topK_count": 1,
+        "top_k_target": 15,
+        "runtime_sec": 5.869
+      },
+      "spqc550": {
+        "n_samples": 10,
+        "feasible_count": 2,
+        "feasible_rate_pct": 20.0,
+        "best_ising_energy": -1308.0,
+        "best_feasible": {
+          "formula": "LaTiO2F",
+          "V_hat": 13.7991,
+          "pool_rank": 236,
+          "ising_energy": -1308.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 13.5767,
+        "unique_topK_hits": [],
+        "unique_topK_count": 0,
+        "top_k_target": 15,
+        "samples": [
+          {
+            "sample_idx": 0,
+            "ising_energy": -1308.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "LaTiO2F",
+            "V_hat": 13.7991,
+            "pool_rank": 236
+          },
+          {
+            "sample_idx": 1,
+            "ising_energy": -1300.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "YTiO2F",
+            "V_hat": 14.8382,
+            "pool_rank": 307
+          },
+          {
+            "sample_idx": 2,
+            "ising_energy": -1284.0,
+            "kA": 2,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 3,
+            "ising_energy": -1276.0,
+            "kA": 0,
+            "kB": 1,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 4,
+            "ising_energy": -1252.0,
+            "kA": 0,
+            "kB": 0,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 5,
+            "ising_energy": -372.0,
+            "kA": 5,
+            "kB": 4,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 6,
+            "ising_energy": 828.0,
+            "kA": 6,
+            "kB": 7,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 7,
+            "ising_energy": 852.0,
+            "kA": 6,
+            "kB": 7,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 8,
+            "ising_energy": 3588.0,
+            "kA": 10,
+            "kB": 9,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 9,
+            "ising_energy": 3692.0,
+            "kA": 11,
+            "kB": 8,
+            "kX": 3,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          }
+        ],
+        "hardware_runtime_sec": 42.91
+      }
+    },
+    "apmcm26_v2_q3_submod_33": {
+      "task_name": "apmcm26_v2_q3_submod_33",
+      "label": "v2 Q3 Blind (12) Submodular HOBO (Model 3A)",
+      "scope": "Q3_blind_12",
+      "aux_vars": 13,
+      "hardware_spec": {
+        "spins": 33,
+        "min_val": -58,
+        "max_val": 8,
+        "bit_width": 7,
+        "dynamic_range": 6.044,
+        "sha256": "c50b5bd420b82dc683aa8d076219c0cc09c568ef77089f28e967afb86ee69662"
+      },
+      "classical_SA": {
+        "n_samples": 50,
+        "feasible_count": 36,
+        "feasible_rate_pct": 72.0,
+        "best_ising_energy": -878.0,
+        "best_feasible": {
+          "formula": "SrTaO2N",
+          "V_hat": 0.2224,
+          "pool_rank": 1,
+          "ising_energy": -878.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": -0.0,
+        "unique_topK_hits": [
+          "BaTaO2N",
+          "CaGeO3",
+          "CaTaO2N",
+          "KNbO3",
+          "LaTiO2N",
+          "RbNbO3",
+          "SrGeO3",
+          "SrNbO2N",
+          "SrSnO3",
+          "SrTaO2N"
+        ],
+        "unique_topK_count": 10,
+        "top_k_target": 15,
+        "runtime_sec": 4.958
+      },
+      "classical_Tabu": {
+        "n_samples": 30,
+        "feasible_count": 25,
+        "feasible_rate_pct": 83.33,
+        "best_ising_energy": -878.0,
+        "best_feasible": {
+          "formula": "SrTaO2N",
+          "V_hat": 0.2224,
+          "pool_rank": 1,
+          "ising_energy": -878.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": -0.0,
+        "unique_topK_hits": [
+          "BaTaO2N",
+          "CaTaO2N",
+          "LaTiO2N",
+          "SrNbO2N",
+          "SrTaO2N",
+          "YTiO2N"
+        ],
+        "unique_topK_count": 6,
+        "top_k_target": 15,
+        "runtime_sec": 4.684
+      },
+      "spqc550": {
+        "n_samples": 10,
+        "feasible_count": 4,
+        "feasible_rate_pct": 40.0,
+        "best_ising_energy": -878.0,
+        "best_feasible": {
+          "formula": "CaTaO2N",
+          "V_hat": 0.2305,
+          "pool_rank": 2,
+          "ising_energy": -878.0
+        },
+        "exact_min_V_hat": 0.2224,
+        "gap_to_opt": 0.0081,
+        "unique_topK_hits": [
+          "CaTaO2N"
+        ],
+        "unique_topK_count": 1,
+        "top_k_target": 15,
+        "samples": [
+          {
+            "sample_idx": 0,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "CaTaO2N",
+            "V_hat": 0.2305,
+            "pool_rank": 2
+          },
+          {
+            "sample_idx": 1,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "CaTaO2N",
+            "V_hat": 0.2305,
+            "pool_rank": 2
+          },
+          {
+            "sample_idx": 2,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 2,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 3,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 2,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 4,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "CaTaO2N",
+            "V_hat": 0.2305,
+            "pool_rank": 2
+          },
+          {
+            "sample_idx": 5,
+            "ising_energy": -878.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 1,
+            "feasible": true,
+            "formula": "CaTaO2N",
+            "V_hat": 0.2305,
+            "pool_rank": 2
+          },
+          {
+            "sample_idx": 6,
+            "ising_energy": -854.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 2,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 7,
+            "ising_energy": -838.0,
+            "kA": 1,
+            "kB": 1,
+            "kX": 2,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 8,
+            "ising_energy": -814.0,
+            "kA": 0,
+            "kB": 0,
+            "kX": 1,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          },
+          {
+            "sample_idx": 9,
+            "ising_energy": -814.0,
+            "kA": 0,
+            "kB": 1,
+            "kX": 2,
+            "feasible": false,
+            "formula": "INFEASIBLE",
+            "V_hat": null,
+            "pool_rank": null
+          }
+        ],
+        "hardware_runtime_sec": 12.1
+      }
+    }
+  }
+}
