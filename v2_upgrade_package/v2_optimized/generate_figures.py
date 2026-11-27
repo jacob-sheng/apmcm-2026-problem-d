@@ -241,7 +241,7 @@ def fig02_residual_and_calibration():
     of = [c["obs_freq"] for c in cal]
     cnt = [c["count"] for c in cal]
     ax.plot([0, 1], [0, 1], "--", color=SLATE, linewidth=1.3, label="Perfect Calibration")
-    ax.plot(mp, of, "o-", color=TEAL, linewidth=2.2, markersize=6.5, label="Fold-Isolated Calibrated Ensemble")
+    ax.plot(mp, of, "o-", color=TEAL, linewidth=2.2, markersize=6.5, label="Base-Isolated + OOF-Calibrated Ensemble")
     for x0, y0, n0 in zip(mp, of, cnt):
         if n0 >= 10:
             dx = 14 if x0 < 0.06 else (-12 if x0 > 0.90 else 0)
@@ -256,7 +256,7 @@ def fig02_residual_and_calibration():
             bbox=dict(boxstyle="round,pad=0.35", facecolor="#F4F9F9", edgecolor=TEAL, alpha=0.95))
     ax.set_xlabel("Predicted Semiconductor Probability P(gap > 0)")
     ax.set_ylabel("Observed Empirical Frequency")
-    ax.set_title("(c) Hurdle Classifier Reliability (03_val, Fold-Isolated)")
+    ax.set_title("(c) Hurdle Classifier Reliability (03_val)")
     ax.set_xlim(-0.04, 1.04)
     ax.set_ylim(-0.04, 1.08)
     ax.legend(loc="lower right", fontsize=8.0)
@@ -477,10 +477,10 @@ def fig05_q3_compression_and_cost():
     ex = np.arange(len(enc_order))
     bw = 0.19
     series = [
-        ("Q3_full_08", "SA", -1.5 * bw, NAVY, "Full 08 SA (50 shots)"),
-        ("Q3_full_08", "Tabu", -0.5 * bw, BLUE, "Full 08 Tabu (50 shots)"),
-        ("Q3_blind_12", "SA", 0.5 * bw, TEAL, "Blind 12 SA (50 shots)"),
-        ("Q3_blind_12", "Tabu", 1.5 * bw, ORANGE, "Blind 12 Tabu (50 shots)"),
+        ("Q3_full_08", "SA", -1.5 * bw, NAVY, "Full 08 SA (50 runs)"),
+        ("Q3_full_08", "Tabu", -0.5 * bw, BLUE, "Full 08 Tabu (50 runs)"),
+        ("Q3_blind_12", "SA", 0.5 * bw, TEAL, "Blind 12 SA (50 runs)"),
+        ("Q3_blind_12", "Tabu", 1.5 * bw, ORANGE, "Blind 12 Tabu (50 runs)"),
     ]
     for inst, slv, dx, col, lbl in series:
         vals = [lookup_eb[(inst, ek, slv)]["topk_hits"] for ek, _ in enc_order]
@@ -493,7 +493,7 @@ def fig05_q3_compression_and_cost():
     ax.set_xticks(ex)
     ax.set_xticklabels([lbl for _, lbl in enc_order], fontsize=8.2)
     ax.set_ylabel("Unique Top-15 Hits (/15) & Strict Feas (%)")
-    ax.set_title("(b) Equal-Budget 50-Shot Solver Top-15 Capture (Q3)")
+    ax.set_title("(b) Equal-Budget 50-Run Solver Top-15 Capture (Q3)")
     ax.set_ylim(0, 17.5)
     ax.legend(loc="upper left", ncol=2, fontsize=7.4, frameon=True)
 
@@ -823,7 +823,7 @@ def fig07_spqc550_real_hardware():
     ax.set_xticks([0, 1, 2, 3])
     ax.set_xticklabels([t[1] for t in t_keys], fontsize=8.4, fontweight="bold")
     ax.set_ylabel("Ising Energy Excess (E - E_cert + 1, Log Scale)")
-    ax.set_title("(b) v3 Raw Energy vs Certified Ground State (10 Shots/Task)")
+    ax.set_title("(b) v3 Raw Energy vs Certified Ground State (10 Records/Task)")
     ax.set_ylim(0.6, 450)
     ax.annotate("3A-Comp: 5x GS\n(ΔE_cert=0),\n9/10 strict feas", xy=(1, 1.0), xytext=(0.48, 36.0),
                 arrowprops=dict(arrowstyle="->", color=TEAL, lw=1.2), fontsize=7.5, fontweight="bold", color=TEAL,
@@ -926,7 +926,7 @@ def schematic01_pipeline_architecture():
             "End-to-End Physics-Coupled Surrogate, Exact 8-Bit QUBO/Ising Compilation & Hardware Verification Pipeline",
             ha="center", va="center", fontsize=12.6, fontweight="bold", color=NAVY)
     ax.text(0.5, 0.915,
-            "Strict (A,B)-Pair Fold Isolation  |  Zero Leakage on 04_holdout  |  Global Ground-State Certification & Section 9.2 Verification",
+            "Outer-Fold Base Isolation  |  Zero Leakage on 04_holdout  |  Global Ground-State Certification & Exact Ising Recovery",
             ha="center", va="center", fontsize=9.2, color=SLATE)
 
     # Top Row: Stages 1 -> 2 -> 3
@@ -934,7 +934,7 @@ def schematic01_pipeline_architecture():
     y_top = 0.54
     _draw_box(ax, 0.03, y_top, w, h, "1. Dataset Audit & Topology", [
         "Full Grid: 52(A) x 52(B) x 7(X) = 18,928",
-        "Dual SHA-256: 9/9 CRLF-Normalized",
+        "SHA-256: 9/9 CRLF-Norm. (1/9 raw LF)",
         "02_train: 1,608 pairs (11,256 rows)",
         "03_val:     567 pairs (3,969 rows)",
         "04_holdout: 529 pairs (3,703 rows)",
@@ -942,14 +942,14 @@ def schematic01_pipeline_architecture():
         "Hinge V=0 (19) vs Strict (15) targets",
     ], fc="#F3F7FA", ec=NAVY, title_fc=NAVY)
 
-    _draw_box(ax, 0.362, y_top, w, h, "2. Fold-Isolated Q1 Surrogate", [
+    _draw_box(ax, 0.362, y_top, w, h, "2. Outer-Isolated Base + Meta Hurdle", [
         "Composition-Only + Periodic Constants",
-        "Butler-Ginley Ridge E_c + Bartel tau",
         "Inside 5-Fold (A,B)-GroupKFold:",
-        "  • Stage-0 DFT (a_lat, E_F, |mu_B|)",
-        "  • 4-Family Hurdle (CB+LGBM+XGB+ET)",
-        "  • Isotonic Calib + Gaussian Hinge V_hat",
-        "+100 Isolation Test: max delta < 1e-12",
+        "  • Ridge E_c, Stage-0 DFT, 4-Fam Base",
+        "Pooled-OOF Meta-Layer:",
+        "  • Simplex Weights + Isotonic + Sigma",
+        "Gaussian Hinge V_hat -> 03_val Benchmark",
+        "Base-Path +100 Test: max delta < 1e-12",
     ], fc="#F1FAF6", ec=TEAL, title_fc=TEAL)
 
     _draw_box(ax, 0.695, y_top, w, h, "3. Subspace Pruning & Masking", [
@@ -976,9 +976,9 @@ def schematic01_pipeline_architecture():
         "Q3 Model 3A-Comp: (A,X)-B, 0 aux",
         "Q3 Model 3A-HOBO: Cumul. P_aux + P_block",
         "Q3 Model 3B-ANOVA: Uniform 8x scaling",
-        "Section 9.2 Ising: x^T Q x = -s^T H s + C",
+        "Algebraic Ising: x^T Q x = -s^T H s + C",
         "Int8 Hardware Gate: H_ij in [-127, 127]",
-        "Closed-Loop: Real 8-Bit Masked QUBO",
+        "Closed-Loop: Hybrid Top-20 + 8-Bit QUBO",
     ], fc="#F5F3FA", ec=PURPLE, title_fc=PURPLE)
 
     _draw_box(ax, 0.362, y_bot, w, h, "5. Global Ground-State Certificate", [
@@ -992,13 +992,13 @@ def schematic01_pipeline_architecture():
     ], fc="#F3F7FA", ec=BLUE, title_fc=BLUE)
 
     _draw_box(ax, 0.695, y_bot, w, h, "6. Multi-Solver & SPQC-550 Audit", [
-        "Equal-Budget Classical SA & Tabu (50 shots)",
-        "Real SPQC-550 CIM (10 shots/task, >=5 cr left)",
+        "Fixed-Budget Classical SA & Tabu (50 runs)",
+        "Real SPQC-550 CIM (OPTIMIZATION, 10 rec)",
         "Independent Raw-Spin Decode:",
         "  1. One-hot (k_A=k_B=k_X=1)",
         "  2. Pool eligibility & A != B",
         "  3. Auxiliary relation y_ik = a_i * c_k",
-        "Bit-Exact SHA-256 & Energy Recovery",
+        "Bit-Exact SHA-256 & Per-Record Audit",
     ], fc="#F1FAF6", ec=TEAL, title_fc=NAVY)
 
     _draw_arrow(ax, 0.305, y_bot + h / 2, 0.362, y_bot + h / 2, color=PURPLE)
@@ -1010,7 +1010,7 @@ def schematic01_pipeline_architecture():
     ax.add_patch(gov)
     ax.text(0.5, 0.064,
             "Automated Verification Gate (verify_all_review_gates.py):\n"
-            "Dual Checksums  •  Outer-Fold Isolation (<1e-12)  •  200 Group-Disjoint Conformal Splits  •  0 Illegal GS  •  Bit-Exact Section 9.2 H Recovery",
+            "CRLF Checksums (9/9)  •  Base-Fold Isolation (<1e-12)  •  200 Disjoint Conformal Splits  •  0 Illegal GS  •  Bit-Exact H & Record Audit",
             ha="center", va="center", fontsize=8.0, fontweight="bold", color=NAVY, linespacing=1.35, zorder=5)
 
     _save_schematic(fig, "schematic01_pipeline_architecture")
@@ -1126,10 +1126,10 @@ def schematic03_qubo_ising_compilation():
     ax.axis("off")
 
     ax.text(0.5, 0.96,
-            "Q3 Multi-Anion QUBO-to-8-Bit Ising Compilation, Section 9.2 Recovery & Global Ground-State Certification",
+            "Q3 Multi-Anion QUBO-to-8-Bit Ising Compilation, Algebraic Recovery & Global Ground-State Certification",
             ha="center", va="center", fontsize=12.4, fontweight="bold", color=NAVY)
     ax.text(0.5, 0.918,
-            "Three Active-Subspace QUBO Encodings  ->  Exact Int8 [-127, 127] Ising Mapping  ->  Analytic Enumeration & Hardware Verification",
+            "Three Active-Subspace QUBO Encodings  ->  Exact Int8 [-127, 127] Ising Mapping  ->  Analytic Elimination & Hardware Verification",
             ha="center", va="center", fontsize=9.1, color=SLATE)
 
     # Top row: 3 Q3 encodings
@@ -1141,7 +1141,7 @@ def schematic03_qubo_ising_compilation():
         "Exact 3-body lookup: T_bar(u_{ik}, b_j)",
         "0 auxiliary variables (strict y=a*c N/A)",
         "Blind 12: 18 spins | Full 08: 26 spins",
-        "Illegal GS = 0 | Top-1 Regret = 0.0000",
+        "Illegal GS = 0 | GS Set Contains Opt",
     ], fc="#F1FAF6", ec=TEAL, title_fc=TEAL)
 
     _draw_box(ax, 0.357, y1, w, h, "Model 3A-HOBO (Asym. A-X Reduction)", [
@@ -1158,13 +1158,13 @@ def schematic03_qubo_ising_compilation():
         "  + f_{AB} + f_{AX} + f_{BX} (no 3-body)",
         "Uniform 8x Scaling across diag & off-diag",
         "Blind 12: 25 spins | Full 08: 33 spins",
-        "Non-degenerate: 6 distinct legal levels",
+        "Spectrum: 6 distinct legal energy levels",
         "Explicit 3-Layer Error Decomposition",
     ], fc="#FFF8F1", ec=ORANGE, title_fc=ORANGE)
 
-    # Middle Box: Section 9.2 Ising Transformation & Int8 Gate
+    # Middle Box: Exact Algebraic Ising Transformation & Int8 Gate
     y2, h2 = 0.345, 0.205
-    _draw_box(ax, 0.08, y2, 0.84, h2, "Exact Section 9.2 QUBO-to-Ising Mapping & SPQC-550 Int8 Dynamic-Range Gate", [
+    _draw_box(ax, 0.08, y2, 0.84, h2, "Exact Algebraic QUBO-to-Ising Mapping & SPQC-550 Int8 Dynamic-Range Gate", [
         "Binary-to-Spin:  x_i = (1 + s_i * s_ref) / 2,   s_i, s_ref in {-1, +1}   |   Minimization:  E(s) = -s^T H s",
         "Exact Couplings:  H_{ij} = -Q_{ij}/4 (i != j),   H_{i,ref} = -(1/4) sum_j Q_{ij},   H_{ii} = 0,   C = (1/4)(sum_{ij} Q_{ij} + tr Q)",
         "Identity:  x^T Q x = -s^T H s + C   (Bit-exact int64 matrix SHA-256 & energy diff = 0 across all test vectors)",
@@ -1189,7 +1189,7 @@ def schematic03_qubo_ising_compilation():
         "1. Sort returned spins s by E(s) = -s^T H s (fixes unsorted SA heap order)",
         "2. Decode x = ((s[:-1] * s[-1]) + 1) // 2 and audit 3 independent gates:",
         "     one-hot (k_A=k_B=k_X=1)  •  pool & A != B  •  aux consistency (y_ik = a_i * c_k)",
-        "3. Separate unique feasible candidates vs duplicate shots; track cloud_roundtrip_wall_sec",
+        "3. Separate unique feasible candidates vs duplicate records; track cloud_roundtrip_wall_sec",
     ], fc="#F1FAF6", ec=TEAL, title_fc=TEAL, fontsize_t=9.3, fontsize_b=7.7)
 
     _draw_arrow(ax, 0.35, y2, 0.26, y3 + h3, color=PURPLE)

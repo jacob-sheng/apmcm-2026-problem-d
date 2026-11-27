@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-27T10:55:42.845705</dc:date>
+    <dc:date>2026-11-27T13:55:54.118320</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -33,7 +33,7 @@ z
     <text style="font-weight: 700; font-size: 12.6px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1b4965" x="453.6" y="27.481354" transform="rotate(-0 453.6 27.481354)">End-to-End Physics-Coupled Surrogate, Exact 8-Bit QUBO/Ising Compilation &amp; Hardware Verification Pipeline</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 9.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #6c757d" x="453.6" y="45.445052" transform="rotate(-0 453.6 45.445052)">Strict (A,B)-Pair Fold Isolation  |  Zero Leakage on 04_holdout  |  Global Ground-State Certification &amp; Section 9.2 Verification</text>
+    <text style="font-size: 9.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #6c757d" x="453.6" y="45.445052" transform="rotate(-0 453.6 45.445052)">Outer-Fold Base Isolation  |  Zero Leakage on 04_holdout  |  Global Ground-State Certification &amp; Exact Ising Recovery</text>
    </g>
    <g id="patch_2">
     <path d="M 39.3408 206.074368 
@@ -46,7 +46,7 @@ Q 23.2704 65.345472 23.2704 72.929664
 L 23.2704 198.490176 
 Q 23.2704 206.074368 39.3408 206.074368 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f3f7fa; stroke: #1b4965; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f3f7fa; stroke: #1b4965; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 335.7504 206.074368 
@@ -59,7 +59,7 @@ Q 319.68 65.345472 319.68 72.929664
 L 319.68 198.490176 
 Q 319.68 206.074368 335.7504 206.074368 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f1faf6; stroke: #1b9e77; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f1faf6; stroke: #1b9e77; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 633.0528 206.074368 
@@ -72,7 +72,7 @@ Q 616.9824 65.345472 616.9824 72.929664
 L 616.9824 198.490176 
 Q 616.9824 206.074368 633.0528 206.074368 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #fff8f1; stroke: #d95f02; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #fff8f1; stroke: #d95f02; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 39.3408 372.505248 
@@ -85,7 +85,7 @@ Q 23.2704 231.776352 23.2704 239.360544
 L 23.2704 364.921056 
 Q 23.2704 372.505248 39.3408 372.505248 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f5f3fa; stroke: #7570b3; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f5f3fa; stroke: #7570b3; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 335.7504 372.505248 
@@ -98,7 +98,7 @@ Q 319.68 231.776352 319.68 239.360544
 L 319.68 364.921056 
 Q 319.68 372.505248 335.7504 372.505248 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f3f7fa; stroke: #2b7bba; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f3f7fa; stroke: #2b7bba; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_7">
     <path d="M 633.0528 372.505248 
@@ -111,7 +111,7 @@ Q 616.9824 231.776352 616.9824 239.360544
 L 616.9824 364.921056 
 Q 616.9824 372.505248 633.0528 372.505248 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f1faf6; stroke: #1b9e77; stroke-width: 1.4; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f1faf6; stroke: #1b9e77; stroke-width: 1.4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_8">
     <path d="M 37.5552 421.381152 
@@ -124,7 +124,7 @@ Q 26.8416 381.774816 26.8416 386.830944
 L 26.8416 416.325024 
 Q 26.8416 421.381152 37.5552 421.381152 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #f8f9fa; stroke: #6c757d; stroke-width: 1.1; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #f8f9fa; stroke: #6c757d; stroke-width: 1.1; stroke-linejoin: miter"/>
    </g>
    <g id="patch_9">
     <path d="M 36.6624 106.805722 
@@ -137,7 +137,7 @@ Q 23.2704 65.345472 23.2704 71.665632
 L 23.2704 100.485562 
 Q 23.2704 106.805722 36.6624 106.805722 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #1b4965; stroke: #1b4965; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #1b4965; stroke: #1b4965; stroke-linejoin: miter"/>
    </g>
    <g id="patch_10">
     <path d="M 333.072 106.805722 
@@ -150,7 +150,7 @@ Q 319.68 65.345472 319.68 71.665632
 L 319.68 100.485562 
 Q 319.68 106.805722 333.072 106.805722 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #1b9e77; stroke: #1b9e77; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #1b9e77; stroke: #1b9e77; stroke-linejoin: miter"/>
    </g>
    <g id="patch_11">
     <path d="M 630.3744 106.805722 
@@ -163,7 +163,7 @@ Q 616.9824 65.345472 616.9824 71.665632
 L 616.9824 100.485562 
 Q 616.9824 106.805722 630.3744 106.805722 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #d95f02; stroke: #d95f02; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #d95f02; stroke: #d95f02; stroke-linejoin: miter"/>
    </g>
    <g id="patch_12">
     <path d="M 36.6624 273.236602 
@@ -176,7 +176,7 @@ Q 23.2704 231.776352 23.2704 238.096512
 L 23.2704 266.916442 
 Q 23.2704 273.236602 36.6624 273.236602 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #7570b3; stroke: #7570b3; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #7570b3; stroke: #7570b3; stroke-linejoin: miter"/>
    </g>
    <g id="patch_13">
     <path d="M 333.072 273.236602 
@@ -189,7 +189,7 @@ Q 319.68 231.776352 319.68 238.096512
 L 319.68 266.916442 
 Q 319.68 273.236602 333.072 273.236602 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #2b7bba; stroke: #2b7bba; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #2b7bba; stroke: #2b7bba; stroke-linejoin: miter"/>
    </g>
    <g id="patch_14">
     <path d="M 630.3744 273.236602 
@@ -202,14 +202,14 @@ Q 616.9824 231.776352 616.9824 238.096512
 L 616.9824 266.916442 
 Q 616.9824 273.236602 630.3744 273.236602 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #1b4965; stroke: #1b9e77; stroke-linejoin: miter"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #1b4965; stroke: #1b9e77; stroke-linejoin: miter"/>
    </g>
    <g id="text_3">
     <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="156.744" y="88.605487" transform="rotate(-0 156.744 88.605487)">1. Dataset Audit &amp; Topology</text>
    </g>
    <g id="text_4">
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(80.569344 124.580518)">Full Grid: 52(A) x 52(B) x 7(X) = 18,928</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(87.176906 134.080453)">Dual SHA-256: 9/9 CRLF-Normalized</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(83.021313 134.080453)">SHA-256: 9/9 CRLF-Norm. (1/9 raw LF)</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(88.80293 143.580388)">02_train: 1,608 pairs (11,256 rows)</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(93.28457 153.294479)">03_val:     567 pairs (3,969 rows)</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(89.272148 163.008571)">04_holdout: 529 pairs (3,703 rows)</text>
@@ -217,16 +217,16 @@ z
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(85.840234 182.436754)">Hinge V=0 (19) vs Strict (15) targets</text>
    </g>
    <g id="text_5">
-    <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="453.1536" y="88.605487" transform="rotate(-0 453.1536 88.605487)">2. Fold-Isolated Q1 Surrogate</text>
+    <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="453.1536" y="88.641816" transform="rotate(-0 453.1536 88.641816)">2. Outer-Isolated Base + Meta Hurdle</text>
    </g>
    <g id="text_6">
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(377.396428 124.664857)">Composition-Only + Periodic Constants</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(383.387991 134.164792)">Butler-Ginley Ridge E_c + Bartel tau</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(392.943209 143.878883)">Inside 5-Fold (A,B)-GroupKFold:</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(385.293741 153.424296)">  • Stage-0 DFT (a_lat, E_F, |mu_B|)</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(373.652303 163.138388)">  • 4-Family Hurdle (CB+LGBM+XGB+ET)</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(373.500709 172.638323)">  • Isotonic Calib + Gaussian Hinge V_hat</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(377.586522 182.352414)">+100 Isolation Test: max delta &lt; 1e-12</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(377.396428 124.794674)">Composition-Only + Periodic Constants</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(392.943209 134.294609)">Inside 5-Fold (A,B)-GroupKFold:</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(377.556444 143.794544)">  • Ridge E_c, Stage-0 DFT, 4-Fam Base</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(406.470545 153.508636)">Pooled-OOF Meta-Layer:</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(376.809905 163.008571)">  • Simplex Weights + Isotonic + Sigma</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(368.212373 172.508506)">Gaussian Hinge V_hat -&gt; 03_val Benchmark</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(374.665936 182.222597)">Base-Path +100 Test: max delta &lt; 1e-12</text>
    </g>
    <g id="text_7">
     <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="750.456" y="88.605487" transform="rotate(-0 750.456 88.605487)">3. Subspace Pruning &amp; Masking</text>
@@ -245,7 +245,7 @@ z
 L 750.0096 219.97872 
 L 156.2976 219.97872 
 L 156.2976 230.933664 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: square"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: square"/>
    </g>
    <g id="text_9">
     <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="156.744" y="255.072696" transform="rotate(-0 156.744 255.072696)">4. Exact 8-Bit QUBO Compilation</text>
@@ -255,9 +255,9 @@ L 156.2976 230.933664
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(90.524 300.832567)">Q3 Model 3A-Comp: (A,X)-B, 0 aux</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(70.591828 310.332502)">Q3 Model 3A-HOBO: Cumul. P_aux + P_block</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(78.926477 320.046594)">Q3 Model 3B-ANOVA: Uniform 8x scaling</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(76.285617 329.546529)">Section 9.2 Ising: x^T Q x = -s^T H s + C</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(79.847469 329.546529)">Algebraic Ising: x^T Q x = -s^T H s + C</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(81.980008 339.046464)">Int8 Hardware Gate: H_ij in [-127, 127]</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(83.735969 348.760555)">Closed-Loop: Real 8-Bit Masked QUBO</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(76.676031 348.760555)">Closed-Loop: Hybrid Top-20 + 8-Bit QUBO</text>
    </g>
    <g id="text_11">
     <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="453.1536" y="255.072696" transform="rotate(-0 453.1536 255.072696)">5. Global Ground-State Certificate</text>
@@ -275,72 +275,72 @@ L 156.2976 230.933664
     <text style="font-weight: 700; font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="750.456" y="255.072696" transform="rotate(-0 750.456 255.072696)">6. Multi-Solver &amp; SPQC-550 Audit</text>
    </g>
    <g id="text_14">
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(665.195945 291.225554)">Equal-Budget Classical SA &amp; Tabu (50 shots)</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(659.541859 300.725489)">Real SPQC-550 CIM (10 shots/task, &gt;=5 cr left)</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(667.813344 291.225554)">Fixed-Budget Classical SA &amp; Tabu (50 runs)</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(666.893555 300.725489)">Real SPQC-550 CIM (OPTIMIZATION, 10 rec)</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(689.805266 310.225424)">Independent Raw-Spin Decode:</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(690.847172 319.725359)">  1. One-hot (k_A=k_B=k_X=1)</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(698.521305 329.439451)">  2. Pool eligibility &amp; A != B</text>
     <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(680.041305 338.939386)">  3. Auxiliary relation y_ik = a_i * c_k</text>
-    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(677.296375 348.653477)">Bit-Exact SHA-256 &amp; Energy Recovery</text>
+    <text style="font-size: 7.7px; font-family: 'DejaVu Sans'; fill: #1a1a1a" transform="translate(677.952078 348.653477)">Bit-Exact SHA-256 &amp; Per-Record Audit</text>
    </g>
    <g id="text_15">
     <text style="font-weight: 700; font-size: 8px; font-family: 'DejaVu Sans'; fill: #1b4965" transform="translate(323.5225 398.707953)">Automated Verification Gate (verify_all_review_gates.py):</text>
-    <text style="font-weight: 700; font-size: 8px; font-family: 'DejaVu Sans'; fill: #1b4965" transform="translate(137.225 408.800515)">Dual Checksums  •  Outer-Fold Isolation (&lt;1e-12)  •  200 Group-Disjoint Conformal Splits  •  0 Illegal GS  •  Bit-Exact Section 9.2 H Recovery</text>
+    <text style="font-weight: 700; font-size: 8px; font-family: 'DejaVu Sans'; fill: #1b4965" transform="translate(154.885625 408.800515)">CRLF Checksums (9/9)  •  Base-Fold Isolation (&lt;1e-12)  •  200 Disjoint Conformal Splits  •  0 Illegal GS  •  Bit-Exact H &amp; Record Audit</text>
    </g>
    <g id="patch_15">
     <path d="M 281.501193 135.70992 
 Q 304.946212 135.70992 326.836311 135.70992 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #1b4965; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #1b4965; stroke-width: 1.6; stroke-linecap: round"/>
     <path d="M 320.836311 132.10992 
 L 326.836311 135.70992 
 L 320.836311 139.30992 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #1b4965; stroke: #1b4965; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #1b4965; stroke: #1b4965; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="patch_16">
     <path d="M 577.914226 135.70992 
 Q 601.803948 135.70992 624.138749 135.70992 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #1b9e77; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #1b9e77; stroke-width: 1.6; stroke-linecap: round"/>
     <path d="M 618.138749 132.10992 
 L 624.138749 135.70992 
 L 618.138749 139.30992 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #1b9e77; stroke: #1b9e77; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #1b9e77; stroke: #1b9e77; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="patch_17">
     <path d="M 156.2976 228.297075 
 Q 156.2976 231.566619 156.2976 233.281242 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: round"/>
     <path d="M 159.8976 227.281242 
 L 156.2976 233.281242 
 L 152.6976 227.281242 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #d95f02; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #d95f02; stroke: #d95f02; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="patch_18">
     <path d="M 281.501193 302.1408 
 Q 304.946212 302.1408 326.836311 302.1408 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #7570b3; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #7570b3; stroke-width: 1.6; stroke-linecap: round"/>
     <path d="M 320.836311 298.5408 
 L 326.836311 302.1408 
 L 320.836311 305.7408 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #7570b3; stroke: #7570b3; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #7570b3; stroke: #7570b3; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="patch_19">
     <path d="M 577.914226 302.1408 
 Q 601.803948 302.1408 624.138749 302.1408 
-" clip-path="url(#pfe7202d0b1)" style="fill: none; stroke: #2b7bba; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: none; stroke: #2b7bba; stroke-width: 1.6; stroke-linecap: round"/>
     <path d="M 618.138749 298.5408 
 L 624.138749 302.1408 
 L 618.138749 305.7408 
 z
-" clip-path="url(#pfe7202d0b1)" style="fill: #2b7bba; stroke: #2b7bba; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#pc109cd3a16)" style="fill: #2b7bba; stroke: #2b7bba; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="pfe7202d0b1">
+  <clipPath id="pc109cd3a16">
    <rect x="7.2" y="7.2" width="892.8" height="421.344"/>
   </clipPath>
  </defs>

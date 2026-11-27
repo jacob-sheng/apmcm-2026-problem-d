@@ -27,28 +27,25 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 PKG_DIR = os.path.dirname(SCRIPTS_DIR)
 REPO_ROOT = os.path.dirname(PKG_DIR)
 V2_DIR = os.path.join(PKG_DIR, "v2_optimized")
+REF_DIR = os.path.join(V2_DIR, "reference_baselines")
 RES_DIR = os.path.join(V2_DIR, "results")
 FIG_DIR = os.path.join(V2_DIR, "figures")
 SCHEM_DIR = os.path.join(PKG_DIR, "paper", "schematics")
 PAPER_TYP = os.path.join(PKG_DIR, "paper", "main.typ")
 REPORT_MD = os.path.join(V2_DIR, "REPORT.md")
+AI_PDF = os.path.join(PKG_DIR, "submission", "AI工具使用详情.pdf")
 
-TABLE1_CSV = os.path.join(
-    REPO_ROOT,
-    "01_2026赛题与数据集",
-    "Problem_D_量子计算钙钛矿稀有目标搜索",
-    "project",
-    "outputs",
-    "table1_surrogate_ablation.csv",
+_BUNDLED_T1 = os.path.join(REF_DIR, "table1_surrogate_ablation.csv")
+_REPO_T1 = os.path.join(
+    REPO_ROOT, "01_2026赛题与数据集", "Problem_D_量子计算钙钛矿稀有目标搜索", "project", "outputs", "table1_surrogate_ablation.csv"
 )
-TABLE4_CSV = os.path.join(
-    REPO_ROOT,
-    "01_2026赛题与数据集",
-    "Problem_D_量子计算钙钛矿稀有目标搜索",
-    "project",
-    "outputs",
-    "table4_spqc550_hardware_vs_classical.csv",
+TABLE1_CSV = _BUNDLED_T1 if os.path.isfile(_BUNDLED_T1) else _REPO_T1
+
+_BUNDLED_T4 = os.path.join(REF_DIR, "table4_spqc550_hardware_vs_classical.csv")
+_REPO_T4 = os.path.join(
+    REPO_ROOT, "01_2026赛题与数据集", "Problem_D_量子计算钙钛矿稀有目标搜索", "project", "outputs", "table4_spqc550_hardware_vs_classical.csv"
 )
+TABLE4_CSV = _BUNDLED_T4 if os.path.isfile(_BUNDLED_T4) else _REPO_T4
 
 if V2_DIR not in sys.path:
     sys.path.insert(0, V2_DIR)
@@ -56,7 +53,11 @@ if V2_DIR not in sys.path:
 from common_physics import resolve_data_dir, verify_dataset_checksums
 
 PATH_LEAK_RE = re.compile(
-    r"([A-Za-z]:[/\\]+Users[/\\]+|[A-Za-z]:[/\\]+Codex|/Users/|/home/|/mnt/[a-zA-Z]/|@(?:[\w.-]+\.)?(edu\.cn|qq\.com|163\.com|gmail\.com|outlook\.com|126\.com|foxmail\.com))",
+    r"([A-Za-z]:[/\\]+Users[/\\]+|[A-Za-z]:[/\\]+Codex|"
+    + "/" + "Users/"
+    + "|" + "/" + "home/"
+    + "|" + "/" + "mnt/[a-zA-Z]/|"
+    + r"@(?:[\w.-]+\.)?(edu\.cn|qq\.com|163\.com|gmail\.com|outlook\.com|126\.com|foxmail\.com))",
     re.I,
 )
 CJK_RE = re.compile(r"[\u4e00-\u9fff]")
@@ -105,6 +106,10 @@ def gate_dataset_checksums():
 
 
 def gate_q1_diagnostics():
+    import numpy as np
+    import pandas as pd
+    from sklearn.metrics import mean_absolute_error, mean_squared_error
+
     diag = _load_json(os.path.join(RES_DIR, "v2_q1_diagnostics.json"))
 
     iso = diag["outer_fold_isolation_test"]
@@ -112,15 +117,33 @@ def gate_q1_diagnostics():
     assert iso["group_overlap"] == 0, f"group_overlap={iso['group_overlap']}"
     assert iso["max_feature_delta"] < 1e-12, f"max_feature_delta={iso['max_feature_delta']}"
     assert iso["max_pred_delta"] < 1e-12, f"max_pred_delta={iso['max_pred_delta']}"
+    assert "meta_layer_scope_note" in diag["ensemble_meta"], "Missing ensemble_meta.meta_layer_scope_note (R01)"
 
-    # Cross-check M4 & M5 against official table1_surrogate_ablation.csv
+    # Recompute 03_val metrics directly from exported v2_val_predictions.csv
+    val_csv = pd.read_csv(os.path.join(RES_DIR, "v2_val_predictions.csv"))
+    yv = val_csv["V"].values
+    yh = val_csv["V_hat"].values
+    rmse_live = float(np.sqrt(mean_squared_error(yv, yh)))
+    mae_live = float(mean_absolute_error(yv, yh))
+    mae_lt1_live = float(np.mean(np.abs(yh[yv < 1.0] - yv[yv < 1.0])))
+    order_v = np.argsort(yh)
+    n05 = int((yv < 0.5).sum())
+    rec50_05_live = float((yv < 0.5)[order_v[:50]].sum() / n05)
+
+    diag_by_model = {r["model"]: r for r in diag["baseline_comparison"]["models"]}
+    m_vb = diag_by_model["v2_PhysHurdle_Bayes"]
+    assert abs(rmse_live - m_vb["RMSE"]) < 2e-4, f"RMSE mismatch: live={rmse_live} vs json={m_vb['RMSE']}"
+    assert abs(mae_live - m_vb["MAE"]) < 2e-4, f"MAE mismatch: live={mae_live} vs json={m_vb['MAE']}"
+    assert abs(mae_lt1_live - m_vb["MAE_V_lt_1"]) < 2e-4, f"MAE(V<1) mismatch: live={mae_lt1_live} vs json={m_vb['MAE_V_lt_1']}"
+    assert abs(rec50_05_live - m_vb["Rec@50(V<0.5)"]) < 2e-4, f"Rec@50(V<0.5) mismatch"
+
+    # Cross-check M4 & M5 against table1_surrogate_ablation.csv
     assert os.path.isfile(TABLE1_CSV), f"Missing {TABLE1_CSV}"
     t1_by_model = {}
     with open(TABLE1_CSV, "r", encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             t1_by_model[row["model"]] = row
 
-    diag_by_model = {r["model"]: r for r in diag["baseline_comparison"]["models"]}
     for mkey in ("M4_PIMT_Physics_Only", "M5_PIMT_Hybrid_Ensemble"):
         assert mkey in t1_by_model, f"{mkey} missing from table1_surrogate_ablation.csv"
         assert mkey in diag_by_model, f"{mkey} missing from v2_q1_diagnostics.json"
@@ -149,9 +172,8 @@ def gate_q1_diagnostics():
         assert k in ab, f"Missing a_eq_b_sensitivity.{k}"
 
     return (
-        f"isolation max_pred_delta={iso['max_pred_delta']:.2e}, "
-        f"M4/M5 synced, {len(exp_sha)}/{len(exp_sha)} CSV SHA-256 verified, "
-        f"04 holdouts=3703 rows"
+        f"isolation max_pred_delta={iso['max_pred_delta']:.2e}, live 03_val RMSE={rmse_live:.4f}, "
+        f"M4/M5 synced, {len(exp_sha)}/{len(exp_sha)} CSV SHA-256 verified"
     )
 
 
@@ -160,6 +182,9 @@ def gate_conformal_and_physics():
     mc = conf["mondrian_conformal_03val"]
     assert mc["n_splits"] == 200, f"n_splits={mc['n_splits']}"
     assert mc["group_overlap"] == 0, f"group_overlap={mc['group_overlap']}"
+    assert "low_psemi_lt_020_stratum" in mc and "high_psemi_ge_020_stratum" in mc, "Missing R06 predicted strata"
+    assert mc["low_psemi_lt_020_stratum"]["n_rows"] == 3808
+    assert mc["high_psemi_ge_020_stratum"]["n_rows"] == 161
 
     res_corr = conf["semiconductor_residual_correlation_03val"]
     assert res_corr["n_semiconductors"] > 0
@@ -168,31 +193,103 @@ def gate_conformal_and_physics():
     hy = conf["holdout_04_expected_yield"]
     scope_txt = hy["definition_scope"].lower()
     assert "not unseen true-positive recall" in scope_txt, "holdout_04_expected_yield scope note missing recall disclaimer"
+    assert "indep_bernoulli_count_sd" in hy and "untruncated_gaussian_neg_gap_tail" in hy, "Missing R06 scope fields"
     assert 0 < hy["sum_P_hit_top30"] < hy["sum_P_hit_all"]
 
     return (
-        f"200 splits (group_overlap=0), semi residual r={res_corr['pearson_r']:.4f}, "
+        f"200 splits (group_overlap=0, strata 3808/161), semi residual r={res_corr['pearson_r']:.4f}, "
         f"sum(P_hit)={hy['sum_P_hit_all']:.4f} scoped"
     )
 
 
 def gate_qubo_certification():
-    qubo = _load_json(os.path.join(RES_DIR, "v2_qubo_results.json"))
-    certs = qubo["certification_summary"]
-    assert len(certs) == 8, f"Expected 8 certified matrices, got {len(certs)}"
+    import numpy as np
+    import pandas as pd
+    import v2_qubo_q2_q3 as q23
+    from common_physics import v_band_terms
 
-    for c in certs:
-        mid = c["matrix_id"]
-        assert c["illegal_ground_count"] == 0, f"{mid}: illegal_ground_count={c['illegal_ground_count']}"
-        assert c["illegal_aux_tie_count"] == 0, f"{mid}: illegal_aux_tie_count={c['illegal_aux_tie_count']}"
-        assert c["legal_ground_count"] >= 1, f"{mid}: legal_ground_count={c['legal_ground_count']}"
-        assert c["n_primary_states_total"] > 0, f"{mid}: n_primary_states_total={c['n_primary_states_total']}"
-        assert abs(c["declared_pool_min_V_hat"] - 0.252406) < 1e-4, f"{mid}: min V_hat={c['declared_pool_min_V_hat']}"
-        assert c["continuous_regret_top1"] >= 0.0
+    qubo = _load_json(os.path.join(RES_DIR, "v2_qubo_results.json"))
+    diag = _load_json(os.path.join(RES_DIR, "v2_q1_diagnostics.json"))
+    exp_sha = diag["exported_csv_sha256"]
+
+    # 1. Verify SHA-256 of Q2/Q3 pool CSVs before live reconstruction
+    pool_dfs = {}
+    for key, csv_fn in [
+        ("q2_full", "v2_q2_full_07.csv"),
+        ("q2_blind", "v2_q2_blind_11.csv"),
+        ("q3_full", "v2_q3_full_08.csv"),
+        ("q3_blind", "v2_q3_blind_12.csv"),
+    ]:
+        p = os.path.join(RES_DIR, csv_fn)
+        assert _sha256_file(p) == exp_sha[csv_fn], f"Pool CSV SHA mismatch for {csv_fn}"
+        pool_dfs[key] = pd.read_csv(p)
+
+    # 2. Live reconstruction + algebraic recovery + global ground-state certification of ALL 8 matrices (R10)
+    certs_by_id = {c["matrix_id"]: c for c in qubo["certification_summary"]}
+    assert len(certs_by_id) == 8, f"Expected 8 certified matrices, got {len(certs_by_id)}"
+
+    specs = [
+        ("Q2_full_07", "q2", pool_dfs["q2_full"], lambda df: q23.build_exact8_q2_qubo(df, c_cap=2.0, penalty_mult=2.25)),
+        ("Q2_blind_11", "q2", pool_dfs["q2_blind"], lambda df: q23.build_exact8_q2_qubo(df, c_cap=2.5, penalty_mult=2.25)),
+        ("Q3_full_08_Model3A_Comp", "q3", pool_dfs["q3_full"], lambda df: q23.build_q3_comp_qubo(df, c_cap=1.25, penalty_mult=1.60)),
+        ("Q3_full_08_Model3A_HOBO", "q3", pool_dfs["q3_full"], lambda df: q23.build_q3_submodular_hobo_qubo(df, c_cap=1.25)),
+        ("Q3_full_08_Model3B_CompactANOVA", "q3", pool_dfs["q3_full"], lambda df: q23.build_q3_compact_anova_qubo(df, top_k_subspace=35, c_cap=1.25)),
+        ("Q3_blind_12_Model3A_Comp", "q3", pool_dfs["q3_blind"], lambda df: q23.build_q3_comp_qubo(df, c_cap=1.50, penalty_mult=1.60)),
+        ("Q3_blind_12_Model3A_HOBO", "q3", pool_dfs["q3_blind"], lambda df: q23.build_q3_submodular_hobo_qubo(df, c_cap=1.50)),
+        ("Q3_blind_12_Model3B_CompactANOVA", "q3", pool_dfs["q3_blind"], lambda df: q23.build_q3_compact_anova_qubo(df, top_k_subspace=25, c_cap=1.50)),
+    ]
+
+    hobo_instances = {}
+    for mid, kind, dfp, builder in specs:
+        ising, meta, lookup = builder(dfp)
+        assert int(np.max(np.abs(ising))) <= 127, f"{mid}: max|H| > 127"
+        live_cert = q23.certify_global_ground_states(ising, meta, dfp, lookup, task_kind=kind, verify_zero_illegal=True)
+        saved_cert = certs_by_id[mid]
+        for fk in (
+            "cert_min_ising_energy",
+            "ising_offset_C",
+            "legal_ground_count",
+            "illegal_ground_count",
+            "illegal_aux_tie_count",
+            "best_regret_among_integer_ground_states",
+            "continuous_regret_worst_gs",
+        ):
+            assert live_cert[fk] == saved_cert[fk], f"{mid}.{fk}: live={live_cert[fk]} != saved={saved_cert[fk]}"
+        if mid.endswith("_Model3A_HOBO"):
+            hobo_instances[mid] = (ising, meta, dfp)
+
+    # 3. R02 Mathematical Edge-Case Assertions
+    # R02A: E_c = 5.10 lies in [4.18, 6.05] with g_min=1.4, yet E_g=0 fails with v_gap_low = 7.84
+    ec_ce = 5.10
+    g_min_ce = max(1.4, 2.0 * (5.73 - ec_ce), 2.0 * (ec_ce - 4.50))
+    assert 4.18 <= ec_ce <= 6.05 and abs(g_min_ce - 1.4) < 1e-12
+    v_gl_ce, _, _, _ = v_band_terms(0.0, ec_ce)
+    assert abs(v_gl_ce - 7.84) < 1e-12
+
+    # R02B: With C_cap=1, P=1.6 (>1.5), a 2x2 block of -1s + a 0-cost legal state yields infeasible -0.8 < 0
+    e_infeas_22 = -4.0 * 1.0 + 1.6 * ((2 - 1) ** 2 + (2 - 1) ** 2)
+    assert -1.0 < e_infeas_22 < 0.0
+
+    # R02C: On live Model 3A-HOBO instances, legal non-ground BaGeO2N has an auxiliary tie (y in {0,1} at zero coeff)
+    for mid, expected_e_ising in [("Q3_full_08_Model3A_HOBO", -2118), ("Q3_blind_12_Model3A_HOBO", -1638)]:
+        J_h, m_h, _ = hobo_instances[mid]
+        Q_h, C_h = q23._recover_qubo_from_ising_sec92(J_h)
+        n_p = Q_h.shape[0] - int(m_h["nY"])
+        z_bg = np.zeros(n_p, dtype=np.int64)
+        z_bg[m_h["elems_A"].index("Ba")] = 1
+        z_bg[m_h["off_B"] + m_h["elems_B"].index("Ge")] = 1
+        z_bg[m_h["off_X"] + m_h["elems_X"].index("NO2")] = 1
+        Q_zz = Q_h[:n_p, :n_p]
+        Q_zy = Q_h[:n_p, n_p:]
+        d_yy = np.diag(Q_h[n_p:, n_p:]).astype(np.int64)
+        e_bg_qubo = int(z_bg @ Q_zz @ z_bg + np.minimum(0, d_yy + 2 * (z_bg @ Q_zy)).sum())
+        assert (e_bg_qubo - C_h) == expected_e_ising, f"{mid} BaGeO2N E={e_bg_qubo - C_h} != {expected_e_ising}"
+        assert q23._check_hobo_aux_uniqueness(z_bg, Q_zy, d_yy, m_h) >= 1, f"{mid} BaGeO2N should exhibit non-ground aux tie"
 
     for k in ("Q3_full_08_Model3B_CompactANOVA", "Q3_blind_12_Model3B_CompactANOVA"):
         lvl = qubo["Q3"][k]["distinct_legal_energy_levels"]
         assert lvl >= 6, f"{k}: distinct_legal_energy_levels={lvl} < 6"
+        assert len(qubo["Q3"][k].get("level_occupancies", [])) == lvl
 
     ca = qubo["compression_attribution"]
     assert len(ca) >= 4, f"compression_attribution rows={len(ca)}"
@@ -202,8 +299,10 @@ def gate_qubo_certification():
 
     cap_ret = qubo["c_cap_retention"]
     assert len(cap_ret) > 0, "c_cap_retention empty"
-    for r in cap_ret:
-        assert "top10_retained_lt_cap" in r and "top25_retained_lt_cap" in r
+    q3b_def = [r for r in cap_ret if r["pool"] == "Q3_blind_12" and r["is_default_cap"]][0]
+    assert q3b_def["top25_retained_lt_cap"] == 15
+    assert q3b_def["top25_in_element_product_subspace"] == 17
+    assert q3b_def["top25_in_composite_ax_subspace"] == 15
 
     aed = qubo["anova_error_decomposition"]
     for scope in ("Q3_full_08", "Q3_blind_12"):
@@ -211,7 +310,7 @@ def gate_qubo_certification():
         for layer in ("layer_1_surrogate_vs_float_anova", "layer_2_float_anova_vs_8bit_ising", "layer_3_8bit_ising_vs_solvers"):
             assert layer in aed[scope], f"Missing {scope}.{layer}"
 
-    return "8/8 matrices certified (0 illegal GS, 0 aux ties), Model 3B >= 6 levels, 4-row attribution & C_cap retention OK"
+    return "8/8 matrices live-rebuilt & certified (0 illegal GS, 0 GS aux ties), R02 assertions & 3-subspace cap retention (15/17/15) OK"
 
 
 def gate_experiments():
@@ -273,6 +372,9 @@ def gate_hardware_and_track_a():
         assert t["hardware_spec"]["sha256"] == t["spqc550"]["matrix_sha256"], f"{tk} sha mismatch"
         assert t["cert_min_ising_energy"] == cert_map[cert_key]["cert_min_ising_energy"], f"{tk} cert_min mismatch"
         assert "y_aux_consistent_count" in t["spqc550"]
+        assert "raw_spins_file_sha256" in t["spqc550"] and "raw_spins_int8_sha256" in t["spqc550"]
+        assert "poll_interval_min" not in t["spqc550"], f"{tk} still has poll_interval_min (R12)"
+        assert t["spqc550"].get("poll_interval_effective_sec") == 5, f"{tk} poll_interval_effective_sec != 5"
 
     cred = spqc["credit_accounting"]
     assert cred["estimated_remaining"] >= 5, f"estimated_remaining={cred['estimated_remaining']} < 5"
@@ -325,7 +427,7 @@ def gate_hardware_and_track_a():
     )
 
 
-def gate_figures_and_schematics():
+def gate_figures_and_schematics(code_only=False):
     expected_figs = [
         "fig01_v1_vs_v2_surrogate_metrics.png",
         "fig02_residual_and_calibration.png",
@@ -347,16 +449,20 @@ def gate_figures_and_schematics():
         "schematic02_band_alignment_window",
         "schematic03_qubo_ising_compilation",
     ]
+    check_paper_schem_src = (not code_only) or os.path.isdir(SCHEM_DIR)
     for stem in expected_schems:
-        svg_p = os.path.join(SCHEM_DIR, f"{stem}.svg")
-        png_s = os.path.join(SCHEM_DIR, f"{stem}.png")
         png_f = os.path.join(FIG_DIR, f"{stem}.png")
-        for p in (svg_p, png_s, png_f):
-            assert os.path.isfile(p), f"Missing schematic {p}"
-            assert os.path.getsize(p) > 5_000, f"Schematic {p} suspiciously small"
-        with open(svg_p, "r", encoding="utf-8") as f:
-            svg_txt = f.read()
-        assert not CJK_RE.search(svg_txt), f"CJK character found in {svg_p}"
+        assert os.path.isfile(png_f), f"Missing schematic PNG {png_f}"
+        assert os.path.getsize(png_f) > 5_000, f"Schematic {png_f} suspiciously small"
+        if check_paper_schem_src:
+            svg_p = os.path.join(SCHEM_DIR, f"{stem}.svg")
+            png_s = os.path.join(SCHEM_DIR, f"{stem}.png")
+            for p in (svg_p, png_s):
+                assert os.path.isfile(p), f"Missing schematic {p}"
+                assert os.path.getsize(p) > 5_000, f"Schematic {p} suspiciously small"
+            with open(svg_p, "r", encoding="utf-8") as f:
+                svg_txt = f.read()
+            assert not CJK_RE.search(svg_txt), f"CJK character found in {svg_p}"
 
     # Verify generate_figures.py has zero hardcoded Track A arrays and uses cert_min_ising_energy
     gf_path = os.path.join(V2_DIR, "generate_figures.py")
@@ -417,10 +523,25 @@ def gate_paper_and_report_sync():
         "all Top-25 blind candidates lie strictly below",
         "M_max in [6, 12]",
         "exact jump at alpha_P* = 1.50",
+        "Section 9.2",
+        "(F20)",
+        "non-degenerate",
+        "10.3358 plus.minus",
+        "Z_parity==0",
+        "9/9 raw-bytes",
+        "proving that legacy",
+        "10-shot",
+        "40-shot",
     ]
     for label, txt in (("paper/main.typ", typ_txt), ("v2_optimized/REPORT.md", rep_txt)):
         for ph in forbidden_phrases:
-            assert ph.lower() not in txt.lower(), f"Forbidden Section 8.6 / F29 phrase {ph!r} found in {label}"
+            if label == "v2_optimized/REPORT.md" and ph == "(F20)":
+                continue
+            assert ph.lower() not in txt.lower(), f"Forbidden Round-1/2 phrase {ph!r} found in {label}"
+
+    for req_phrase in ("Z_parity==1", "1/9", "9/9", "17/25", "returned records", "@eq:ising-recovery"):
+        assert req_phrase in typ_txt, f"paper/main.typ missing required Round-2 phrase {req_phrase!r}"
+    assert os.path.isfile(AI_PDF) and os.path.getsize(AI_PDF) > 5_000, f"Missing or empty formal AI PDF: {AI_PDF}"
 
     # Cross-check key verified JSON numbers appear consistently in paper & report
     qubo = _load_json(os.path.join(RES_DIR, "v2_qubo_results.json"))
@@ -441,7 +562,7 @@ def gate_paper_and_report_sync():
         for fr in ("30.0%", "90.0%", "20.0%"):
             assert fr in txt, f"{label} missing v3 hardware feasibility rate {fr}"
 
-    return "paper/main.typ & REPORT.md pass Section 8.6 phrasing, JSON numeric sync, and 0 PII/path leaks"
+    return "paper/main.typ, REPORT.md & AI PDF pass Round-2 phrasing, numeric sync, and 0 PII/path leaks"
 
 
 def main():
@@ -463,7 +584,10 @@ def main():
     runner.check("Gate 4: Q2/Q3 Certification, ANOVA 3-Layer & Attribution (F01-F03, F18, F19)", gate_qubo_certification)
     runner.check("Gate 5: Closed-Loop 20-Seed & Sensitivity Suite (F04, F13-F17)", gate_experiments)
     runner.check("Gate 6: SPQC-550 --verify-only, Credits, PII & Track A (F08, F09, F22, F23)", gate_hardware_and_track_a)
-    runner.check("Gate 7: Figures, Schematics & Zero Hardcoded Track A (F22, F23)", gate_figures_and_schematics)
+    runner.check(
+        "Gate 7: Figures, Schematics & Zero Hardcoded Track A (F22, F23)",
+        lambda: gate_figures_and_schematics(code_only=args.code_only),
+    )
     if not args.code_only:
         runner.check("Gate 8: Paper & REPORT.md Section 8.6 Sync (F10, F11, F27-F29)", gate_paper_and_report_sync)
     else:

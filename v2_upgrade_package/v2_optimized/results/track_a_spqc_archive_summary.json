@@ -1,5 +1,5 @@
 {
-  "source_csv_relative_path": "01_2026\u8d5b\u9898\u4e0e\u6570\u636e\u96c6/Problem_D_\u91cf\u5b50\u8ba1\u7b97\u9499\u949b\u77ff\u7a00\u6709\u76ee\u6807\u641c\u7d22/project/outputs/table4_spqc550_hardware_vs_classical.csv",
+  "source_csv_relative_path": "v2_upgrade_package/v2_optimized/reference_baselines/table4_spqc550_hardware_vs_classical.csv",
   "source_csv_sha256": "92a5231546e05706f883e54a5d6107165a89a6c78b813d32a200a1c6927883dd",
   "source_csv_lf_normalized_sha256": "92a5231546e05706f883e54a5d6107165a89a6c78b813d32a200a1c6927883dd",
   "row_count": 18,

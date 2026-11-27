@@ -14,7 +14,8 @@
     "max_feature_delta": 0.0,
     "max_pred_delta": 1.4210854715202004e-14,
     "threshold": 1e-12,
-    "runtime_sec": 168.29
+    "runtime_sec": 168.29,
+    "scope": "base_feature_and_4family_model_fold_isolation_test (fit_fold_isolated_pipeline; excludes pooled-OOF meta-layer)"
   },
   "band_center_val_r2": 1.0,
   "band_center_val_rmse_eV": 2.9008215235093315e-07,
@@ -104,7 +105,7 @@
     }
   ],
   "ensemble_meta": {
-    "outer_cv_protocol": "5-fold (A,B)-GroupKFold strictly isolated per fold",
+    "outer_cv_protocol": "5-fold (A,B)-GroupKFold isolated base features & 4-family predictors + pooled-OOF simplex/isotonic/sigma meta-layer",
     "stage0_oof_metrics": {
       "s0_a_lat": 0.9603,
       "s0_abs_mub": 0.6133,
@@ -200,10 +201,11 @@
       "EF@50(V<1.0)": 81.37,
       "MAE_V_lt_1": 5.699,
       "MAE_V_lt_0_5": 5.7275
-    }
+    },
+    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split (te_* encodings precede Stage-0's inner split); external evaluation uses 03_castelli_val.csv."
   },
   "phase2_ensemble_meta": {
-    "outer_cv_protocol": "5-fold (A,B)-GroupKFold strictly isolated per fold",
+    "outer_cv_protocol": "5-fold (A,B)-GroupKFold isolated base features & 4-family predictors + pooled-OOF simplex/isotonic/sigma meta-layer",
     "stage0_oof_metrics": {
       "s0_a_lat": 0.9658,
       "s0_abs_mub": 0.6414,
@@ -281,7 +283,8 @@
       "MAE_V_lt_1": 2.5713,
       "MAE_V_lt_0_5": 2.3654
     },
-    "outer_oof_metrics_direct": null
+    "outer_oof_metrics_direct": null,
+    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split (te_* encodings precede Stage-0's inner split); external evaluation uses 03_castelli_val.csv."
   },
   "metrics_table": [
     {
@@ -324,7 +327,7 @@
     }
   ],
   "baseline_comparison": {
-    "table1_path_rel": "01_2026\u8d5b\u9898\u4e0e\u6570\u636e\u96c6/Problem_D_\u91cf\u5b50\u8ba1\u7b97\u9499\u949b\u77ff\u7a00\u6709\u76ee\u6807\u641c\u7d22/project/outputs/table1_surrogate_ablation.csv",
+    "table1_path_rel": "v2_optimized/reference_baselines/table1_surrogate_ablation.csv",
     "orig_03_val_predictions_present": false,
     "models": [
       {
@@ -399,7 +402,7 @@
         "EF@50(V<1.0)": 61.74,
         "MAE_V_lt_1": null,
         "MAE_V_lt_0_5": null,
-        "source": "01_2026\u8d5b\u9898\u4e0e\u6570\u636e\u96c6/Problem_D_\u91cf\u5b50\u8ba1\u7b97\u9499\u949b\u77ff\u7a00\u6709\u76ee\u6807\u641c\u7d22/project/outputs/table1_surrogate_ablation.csv (02->03 protocol; per-row 03_val_predictions.csv not archived in project/outputs/)"
+        "source": "v2_optimized/reference_baselines/table1_surrogate_ablation.csv (archived 02->03 ablation; per-row 03_val_predictions.csv not archived)"
       },
       {
         "model": "M5_PIMT_Hybrid_Ensemble",
@@ -413,7 +416,7 @@
         "EF@50(V<1.0)": 61.74,
         "MAE_V_lt_1": null,
         "MAE_V_lt_0_5": null,
-        "source": "01_2026\u8d5b\u9898\u4e0e\u6570\u636e\u96c6/Problem_D_\u91cf\u5b50\u8ba1\u7b97\u9499\u949b\u77ff\u7a00\u6709\u76ee\u6807\u641c\u7d22/project/outputs/table1_surrogate_ablation.csv (02->03 protocol; per-row 03_val_predictions.csv not archived in project/outputs/)"
+        "source": "v2_optimized/reference_baselines/table1_surrogate_ablation.csv (archived 02->03 ablation; per-row 03_val_predictions.csv not archived)"
       },
       {
         "model": "v2_Direct_4FamPhys",
@@ -433,7 +436,7 @@
         "EF@50(V<1.0)": 67.62,
         "MAE_V_lt_1": 5.4475,
         "MAE_V_lt_0_5": 5.0721,
-        "source": "Fold-isolated v2 surrogate on 02->03 protocol"
+        "source": "Fold-isolated base + pooled-OOF meta v2 surrogate on 02->03 protocol"
       },
       {
         "model": "v2_PhysHurdle_Bayes",
@@ -453,7 +456,7 @@
         "EF@50(V<1.0)": 64.68,
         "MAE_V_lt_1": 2.928,
         "MAE_V_lt_0_5": 2.4126,
-        "source": "Fold-isolated v2 surrogate on 02->03 protocol"
+        "source": "Fold-isolated base + pooled-OOF meta v2 surrogate on 02->03 protocol"
       }
     ],
     "v2_phys_hurdle_relative_delta": {
@@ -655,5 +658,6 @@
     "v2_q2_blind_11.csv": "3154b240448bde8f2cd12a3cd27b121ac813eb56c85672c8f7337ab7b6412d4c",
     "v2_q3_full_08.csv": "751f92ff1ab1efb8f6c0f3e94070c2ee72ebcf7fb73211ec7e8576bc96bf35f0",
     "v2_q3_blind_12.csv": "9de6d43dcf6b1e35032f6d09c9a5de2a5bf16c44ed9e7bb1ff3b7738105004b6"
-  }
+  },
+  "revision_tradeoff_note": "Relative to Round-1 v2 on 03_val (RMSE=4.0675, MAE(V<1)=2.6167, Rec@50(V<0.5)=15/18=83.3%), enforcing strict outer-fold base isolation yields RMSE=4.0634 (-0.10%), MAE=2.0696, and increases Rec@50(V<0.5) to 17/18 (94.4%, Rec@75=18/18=100%), while near-target MAE(V<1) increases by +11.90% to 2.9280 (still nearly half of direct regression 5.4475)."
 }

@@ -553,6 +553,7 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
     }
 
     fm_seq_conv_logs = []
+    fm_qubo_conv_logs = []
     fm_qubo_round_logs = []
     v2_qubo_round_logs = []
 
@@ -607,6 +608,7 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
                 df_obs, df_obs["V"].values, cols_A, cols_B, cols_X,
                 k=8, reg=0.05, maxiter=600, seed=seed + 1000 + r
             )
+            fm_qubo_conv_logs.append((fm["converged"], fm["nit"], fm["train_mse"], fm["grad_norm"]))
             fq_ab = {ab for ab, idxs in ab_to_indices.items() if all(i in obs_fmq_set for i in idxs)}
             Q_fm, pen_fm = build_fm_q3_qubo(fm, val_ab_set, fully_queried_ab_set=fq_ab)
             ising_fm, _ = kw.qubo_matrix_to_ising_matrix(Q_fm)
@@ -775,14 +777,14 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
         },
         "v2_Classical_SeqRank": {
             "oracle_labels_used": "multi_property(e_form, gap, vbm, cbm)",
-            "surrogate_model": "ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM_ExpectedHinge",
+            "surrogate_model": "Lightweight_Online_ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM (fixed sigma_ef=0.25, sigma_g=0.80; no Stage-0/4-family/isotonic)",
             "acquisition_mechanism": "classical_np_argsort_unqueried",
             "uses_qubo_solver": False,
         },
         "v2_Real_8Bit_QUBO": {
             "oracle_labels_used": "multi_property(e_form, gap, vbm, cbm)",
-            "surrogate_model": "ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM_ExpectedHinge",
-            "acquisition_mechanism": "per_round_8bit_Model3A_Comp_MaskedQUBO_KaiwuSA",
+            "surrogate_model": "Lightweight_Online_ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM (fixed sigma_ef=0.25, sigma_g=0.80; no Stage-0/4-family/isotonic)",
+            "acquisition_mechanism": "hybrid_classical_top20_prescreen + per_round_8bit_Model3A_Comp_MaskedQUBO_KaiwuSA (excludes A=B)",
             "uses_qubo_solver": True,
         },
     }
@@ -798,6 +800,19 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
         "batch_size": batch_size,
         "n_rounds": n_rounds,
         "runtime_sec": round(time.perf_counter() - t0, 2),
+        "protocol_scope_notes": {
+            "same_surrogate_comparison": (
+                "Under the same lightweight online physics-hurdle surrogate, v2_Real_8Bit_QUBO achieved "
+                "16.20/18 (SD 1.077) vs 16.55/18 (SD 1.962) for v2_Classical_SeqRank (-0.35 targets, -1.94 pp), "
+                "supporting hybrid classical-prescreen + QUBO feasibility without claiming acquisition-level or quantum advantage. "
+                "Marginal across-seed SDs are reported; per-seed paired trajectories were not archived."
+            ),
+            "a_eq_b_eligibility": (
+                "03_val has 3,969 rows including 77 homonuclear (A=B) rows (0 targets with V<1, min V=6.65373). "
+                "Initial 50-sample pools and Random/SeqRank draw from all 3,969 rows (E[H_0.5(200)]=0.9070295), "
+                "whereas v2_Real_8Bit_QUBO excludes A=B in its QUBO decoding (non-homonuclear pool N=3,892 gives E[H_0.5(200)]=0.9249743)."
+            ),
+        },
         "analytical_hypergeometric": {
             "formula": "E[H(K)] = K * M / N",
             "rare05_mean": [round(float(x), 6) for x in hg_exp05],
@@ -811,11 +826,19 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
         },
         "methods": {},
         "fm_lbfgs_convergence": {
+            "measured_branch": "v1_FM_LBFGS_SeqRank",
+            "qubo_branch_note": (
+                "v1_FM_LBFGS_QUBO uses the identical fit_onehot_fm_lbfgs(maxiter=600) optimizer; "
+                "per-round convergence flags in the archived 20-seed JSON were recorded on v1_FM_LBFGS_SeqRank."
+            ),
             "total_fits": len(fm_seq_conv_logs),
             "converged_pct": round(100.0 * float(np.mean([c[0] for c in fm_seq_conv_logs])), 2),
             "mean_nit": round(float(np.mean([c[1] for c in fm_seq_conv_logs])), 2),
             "mean_train_mse": round(float(np.mean([c[2] for c in fm_seq_conv_logs])), 4),
             "mean_grad_inf_norm": round(float(np.mean([c[3] for c in fm_seq_conv_logs])), 6),
+            "v1_FM_LBFGS_QUBO_converged_pct": (
+                round(100.0 * float(np.mean([c[0] for c in fm_qubo_conv_logs])), 2) if fm_qubo_conv_logs else None
+            ),
         },
         "per_round_qubo_audit": {
             "v1_FM_LBFGS_QUBO": {

@@ -24,6 +24,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 10,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.493444,
+        "mean_regret_among_integer_ground_states": 0.141275,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -182,7 +186,7 @@
         "best_ising_energy": -1558.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.182
+        "runtime_sec": 7.188
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -221,7 +225,7 @@
         "best_ising_energy": -1558.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.431
+        "runtime_sec": 13.88
       }
     },
     "Q2_blind_11": {
@@ -248,6 +252,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 4,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.013573,
+        "mean_regret_among_integer_ground_states": 0.006886,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -333,7 +341,7 @@
         "best_ising_energy": -1000.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.22
+        "runtime_sec": 6.679
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -366,7 +374,7 @@
         "best_ising_energy": -1000.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.378
+        "runtime_sec": 13.109
       }
     }
   },
@@ -396,6 +404,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 10,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.320906,
+        "mean_regret_among_integer_ground_states": 0.112866,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -568,7 +580,7 @@
         "best_ising_energy": -2110.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.392
+        "runtime_sec": 7.015
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -613,7 +625,7 @@
         "best_ising_energy": -2110.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.569
+        "runtime_sec": 13.881
       }
     },
     "Q3_full_08_Model3A_HOBO": {
@@ -642,6 +654,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 10,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.320906,
+        "mean_regret_among_integer_ground_states": 0.112866,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -829,7 +845,7 @@
         "best_ising_energy": -2134.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.484
+        "runtime_sec": 7.106
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -877,7 +893,7 @@
         "best_ising_energy": -2134.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 4.908
+        "runtime_sec": 12.03
       }
     },
     "Q3_full_08_Model3B_CompactANOVA": {
@@ -887,6 +903,14 @@
       "M_max": 2,
       "P_block": 28.0,
       "distinct_legal_energy_levels": 6,
+      "level_occupancies": [
+        3,
+        1,
+        24,
+        59,
+        459,
+        42
+      ],
       "bit_width": 8,
       "dynamic_range": 6.88,
       "max_abs_coeff": 116,
@@ -905,6 +929,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 3,
+        "contains_continuous_surrogate_minimizer": false,
+        "best_regret_among_integer_ground_states": 0.005211,
+        "worst_regret_among_integer_ground_states": 0.013573,
+        "mean_regret_among_integer_ground_states": 0.009181,
         "ground_state_candidates": [
           {
             "formula": "SrTaO2N",
@@ -1000,7 +1028,7 @@
         "best_ising_energy": -2616.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.336
+        "runtime_sec": 6.775
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -1037,7 +1065,7 @@
         "best_ising_energy": -2616.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.734
+        "runtime_sec": 14.293
       }
     },
     "Q3_blind_12_Model3A_Comp": {
@@ -1065,6 +1093,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 7,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.162025,
+        "mean_regret_among_integer_ground_states": 0.057418,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -1198,7 +1230,7 @@
         "best_ising_energy": -1468.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.341
+        "runtime_sec": 6.614
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -1233,7 +1265,7 @@
         "best_ising_energy": -1468.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.394
+        "runtime_sec": 13.325
       }
     },
     "Q3_blind_12_Model3A_HOBO": {
@@ -1262,6 +1294,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 7,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.162025,
+        "mean_regret_among_integer_ground_states": 0.057418,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -1403,7 +1439,7 @@
         "best_ising_energy": -1662.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.395
+        "runtime_sec": 6.9
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -1446,7 +1482,7 @@
         "best_ising_energy": -1662.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 4.859
+        "runtime_sec": 11.801
       }
     },
     "Q3_blind_12_Model3B_CompactANOVA": {
@@ -1456,6 +1492,14 @@
       "M_max": 2,
       "P_block": 32.0,
       "distinct_legal_energy_levels": 6,
+      "level_occupancies": [
+        7,
+        9,
+        28,
+        50,
+        12,
+        2
+      ],
       "bit_width": 8,
       "dynamic_range": 6.83,
       "max_abs_coeff": 112,
@@ -1474,6 +1518,10 @@
         "illegal_ground_count": 0,
         "illegal_aux_tie_count": 0,
         "ground_state_degeneracy": 7,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.451804,
+        "mean_regret_among_integer_ground_states": 0.136656,
         "ground_state_candidates": [
           {
             "formula": "LaTiO2N",
@@ -1607,7 +1655,7 @@
         "best_ising_energy": -1992.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 3.182
+        "runtime_sec": 6.746
       },
       "Tabu": {
         "n_returned_shots": 50,
@@ -1642,7 +1690,7 @@
         "best_ising_energy": -1992.0,
         "energy_gap_to_cert": 0.0,
         "n_runs": 50,
-        "runtime_sec": 5.632
+        "runtime_sec": 13.34
       }
     }
   },
@@ -1661,6 +1709,15 @@
       "layer_2_float_anova_vs_8bit_ising": {
         "M_max": 2,
         "distinct_legal_energy_levels": 6,
+        "level_occupancies": [
+          3,
+          1,
+          24,
+          59,
+          459,
+          42
+        ],
+        "quantization_note": "Uniform 8x integer scaling eliminates the main-vs-interaction factor mismatch, while round(effect * scale) still discretizes relative float ANOVA weights.",
         "spearman_float_anova_vs_int": 0.5871,
         "spearman_Vhat_vs_int": 0.207,
         "cert_min_ising_energy": -2616,
@@ -1700,6 +1757,15 @@
       "layer_2_float_anova_vs_8bit_ising": {
         "M_max": 2,
         "distinct_legal_energy_levels": 6,
+        "level_occupancies": [
+          7,
+          9,
+          28,
+          50,
+          12,
+          2
+        ],
+        "quantization_note": "Uniform 8x integer scaling eliminates the main-vs-interaction factor mismatch, while round(effect * scale) still discretizes relative float ANOVA weights.",
         "spearman_float_anova_vs_int": 0.8795,
         "spearman_Vhat_vs_int": 0.4512,
         "cert_min_ising_energy": -1992,
@@ -1829,9 +1895,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 17,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.74585,
       "top25_retained_lt_cap": 17,
+      "top25_in_element_product_subspace": 24,
+      "top25_in_composite_ax_subspace": 24,
       "top25_in_active_subspace": 24,
       "top25_max_V_hat": 2.365644,
       "dropped_top25_count_lt_cap": 8,
@@ -1893,6 +1963,22 @@
           "V_hat": 2.365644
         }
       ],
+      "dropped_top25_count_element_product": 1,
+      "dropped_top25_element_product": [
+        {
+          "rank": 25,
+          "formula": "YGeO2N",
+          "V_hat": 2.365644
+        }
+      ],
+      "dropped_top25_count_composite_ax": 1,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 25,
+          "formula": "YGeO2N",
+          "V_hat": 2.365644
+        }
+      ],
       "dropped_top25_count_subspace": 1,
       "dropped_top25_subspace": [
         {
@@ -1910,9 +1996,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 20,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.74585,
       "top25_retained_lt_cap": 20,
+      "top25_in_element_product_subspace": 24,
+      "top25_in_composite_ax_subspace": 24,
       "top25_in_active_subspace": 24,
       "top25_max_V_hat": 2.365644,
       "dropped_top25_count_lt_cap": 5,
@@ -1953,6 +2043,22 @@
           "V_hat": 2.365644
         }
       ],
+      "dropped_top25_count_element_product": 1,
+      "dropped_top25_element_product": [
+        {
+          "rank": 25,
+          "formula": "YGeO2N",
+          "V_hat": 2.365644
+        }
+      ],
+      "dropped_top25_count_composite_ax": 1,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 25,
+          "formula": "YGeO2N",
+          "V_hat": 2.365644
+        }
+      ],
       "dropped_top25_count_subspace": 1,
       "dropped_top25_subspace": [
         {
@@ -1970,13 +2076,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 26,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.74585,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 2.365644,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -1988,13 +2102,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 27,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.74585,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 2.365644,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -2006,13 +2128,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 36,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.74585,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 2.365644,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -2024,9 +2154,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 9,
       "top10_retained_lt_cap": 9,
+      "top10_in_element_product_subspace": 9,
+      "top10_in_composite_ax_subspace": 9,
       "top10_in_active_subspace": 9,
       "top10_max_V_hat": 3.622695,
       "top25_retained_lt_cap": 9,
+      "top25_in_element_product_subspace": 9,
+      "top25_in_composite_ax_subspace": 9,
       "top25_in_active_subspace": 9,
       "top25_max_V_hat": 11.092857,
       "dropped_top25_count_lt_cap": 16,
@@ -2141,6 +2275,172 @@
           "formula": "KTaO2N",
           "A": "K",
           "B": "Ta",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_element_product": 16,
+      "dropped_top25_element_product": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_composite_ax": 16,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
           "V_hat": 11.092857
         }
       ],
@@ -2236,9 +2536,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 9,
       "top10_retained_lt_cap": 9,
+      "top10_in_element_product_subspace": 9,
+      "top10_in_composite_ax_subspace": 9,
       "top10_in_active_subspace": 9,
       "top10_max_V_hat": 3.622695,
       "top25_retained_lt_cap": 9,
+      "top25_in_element_product_subspace": 9,
+      "top25_in_composite_ax_subspace": 9,
       "top25_in_active_subspace": 9,
       "top25_max_V_hat": 11.092857,
       "dropped_top25_count_lt_cap": 16,
@@ -2353,6 +2657,172 @@
           "formula": "KTaO2N",
           "A": "K",
           "B": "Ta",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_element_product": 16,
+      "dropped_top25_element_product": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_composite_ax": 16,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
           "V_hat": 11.092857
         }
       ],
@@ -2448,9 +2918,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 9,
       "top10_retained_lt_cap": 9,
+      "top10_in_element_product_subspace": 9,
+      "top10_in_composite_ax_subspace": 9,
       "top10_in_active_subspace": 9,
       "top10_max_V_hat": 3.622695,
       "top25_retained_lt_cap": 9,
+      "top25_in_element_product_subspace": 9,
+      "top25_in_composite_ax_subspace": 9,
       "top25_in_active_subspace": 9,
       "top25_max_V_hat": 11.092857,
       "dropped_top25_count_lt_cap": 16,
@@ -2568,6 +3042,172 @@
           "V_hat": 11.092857
         }
       ],
+      "dropped_top25_count_element_product": 16,
+      "dropped_top25_element_product": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_composite_ax": 16,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
       "dropped_top25_count_subspace": 16,
       "dropped_top25_subspace": [
         {
@@ -2660,9 +3300,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 9,
       "top10_retained_lt_cap": 9,
+      "top10_in_element_product_subspace": 9,
+      "top10_in_composite_ax_subspace": 9,
       "top10_in_active_subspace": 9,
       "top10_max_V_hat": 3.622695,
       "top25_retained_lt_cap": 9,
+      "top25_in_element_product_subspace": 9,
+      "top25_in_composite_ax_subspace": 9,
       "top25_in_active_subspace": 9,
       "top25_max_V_hat": 11.092857,
       "dropped_top25_count_lt_cap": 16,
@@ -2777,6 +3421,172 @@
           "formula": "KTaO2N",
           "A": "K",
           "B": "Ta",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_element_product": 16,
+      "dropped_top25_element_product": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_composite_ax": 16,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 10,
+          "formula": "CdTaO2N",
+          "V_hat": 3.622695
+        },
+        {
+          "rank": 11,
+          "formula": "ZnNbO2N",
+          "V_hat": 3.957257
+        },
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
           "V_hat": 11.092857
         }
       ],
@@ -2872,9 +3682,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 11,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 3.622695,
       "top25_retained_lt_cap": 11,
+      "top25_in_element_product_subspace": 11,
+      "top25_in_composite_ax_subspace": 11,
       "top25_in_active_subspace": 11,
       "top25_max_V_hat": 11.092857,
       "dropped_top25_count_lt_cap": 14,
@@ -2978,6 +3792,152 @@
           "V_hat": 11.092857
         }
       ],
+      "dropped_top25_count_element_product": 14,
+      "dropped_top25_element_product": [
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
+      "dropped_top25_count_composite_ax": 14,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 12,
+          "formula": "BiGeO2N",
+          "V_hat": 7.950625
+        },
+        {
+          "rank": 13,
+          "formula": "SbSiO2N",
+          "V_hat": 8.678926
+        },
+        {
+          "rank": 14,
+          "formula": "BeNbO2N",
+          "V_hat": 8.722048
+        },
+        {
+          "rank": 15,
+          "formula": "CaVO2N",
+          "V_hat": 9.374667
+        },
+        {
+          "rank": 16,
+          "formula": "HfScO2N",
+          "V_hat": 9.756493
+        },
+        {
+          "rank": 17,
+          "formula": "KWO2N",
+          "V_hat": 10.128
+        },
+        {
+          "rank": 18,
+          "formula": "RbMoO2N",
+          "V_hat": 10.59062
+        },
+        {
+          "rank": 19,
+          "formula": "NaCrO2N",
+          "V_hat": 10.628116
+        },
+        {
+          "rank": 20,
+          "formula": "CsNbO2N",
+          "V_hat": 10.977508
+        },
+        {
+          "rank": 21,
+          "formula": "RbNbO2N",
+          "V_hat": 10.980312
+        },
+        {
+          "rank": 22,
+          "formula": "KReO2N",
+          "V_hat": 11.039388
+        },
+        {
+          "rank": 23,
+          "formula": "KNbO2N",
+          "V_hat": 11.046504
+        },
+        {
+          "rank": 24,
+          "formula": "RbVO2N",
+          "V_hat": 11.082934
+        },
+        {
+          "rank": 25,
+          "formula": "KTaO2N",
+          "V_hat": 11.092857
+        }
+      ],
       "dropped_top25_count_subspace": 14,
       "dropped_top25_subspace": [
         {
@@ -3060,9 +4020,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 19,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.573312,
       "top25_retained_lt_cap": 19,
+      "top25_in_element_product_subspace": 21,
+      "top25_in_composite_ax_subspace": 21,
       "top25_in_active_subspace": 21,
       "top25_max_V_hat": 1.215181,
       "dropped_top25_count_lt_cap": 6,
@@ -3116,6 +4080,52 @@
           "V_hat": 1.215181
         }
       ],
+      "dropped_top25_count_element_product": 4,
+      "dropped_top25_element_product": [
+        {
+          "rank": 21,
+          "formula": "MgTaO2N",
+          "V_hat": 1.005943
+        },
+        {
+          "rank": 22,
+          "formula": "ZnTiO3",
+          "V_hat": 1.013963
+        },
+        {
+          "rank": 24,
+          "formula": "GeTiO3",
+          "V_hat": 1.213364
+        },
+        {
+          "rank": 25,
+          "formula": "MgGeO3",
+          "V_hat": 1.215181
+        }
+      ],
+      "dropped_top25_count_composite_ax": 4,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 21,
+          "formula": "MgTaO2N",
+          "V_hat": 1.005943
+        },
+        {
+          "rank": 22,
+          "formula": "ZnTiO3",
+          "V_hat": 1.013963
+        },
+        {
+          "rank": 24,
+          "formula": "GeTiO3",
+          "V_hat": 1.213364
+        },
+        {
+          "rank": 25,
+          "formula": "MgGeO3",
+          "V_hat": 1.215181
+        }
+      ],
       "dropped_top25_count_subspace": 4,
       "dropped_top25_subspace": [
         {
@@ -3148,13 +4158,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 26,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.573312,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 1.215181,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -3166,13 +4184,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 36,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.573312,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 1.215181,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -3184,13 +4210,21 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 53,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.573312,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 1.215181,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -3200,15 +4234,23 @@
       "c_cap": 2.5,
       "declared_pool_size": 8112,
       "declared_min_V_hat": 0.252406,
-      "active_rows_lt_cap": 78,
+      "active_rows_lt_cap": 76,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.573312,
       "top25_retained_lt_cap": 25,
+      "top25_in_element_product_subspace": 25,
+      "top25_in_composite_ax_subspace": 25,
       "top25_in_active_subspace": 25,
       "top25_max_V_hat": 1.215181,
       "dropped_top25_count_lt_cap": 0,
       "dropped_top25_lt_cap": [],
+      "dropped_top25_count_element_product": 0,
+      "dropped_top25_element_product": [],
+      "dropped_top25_count_composite_ax": 0,
+      "dropped_top25_composite_ax": [],
       "dropped_top25_count_subspace": 0,
       "dropped_top25_subspace": []
     },
@@ -3220,9 +4262,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 13,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.704546,
       "top25_retained_lt_cap": 13,
+      "top25_in_element_product_subspace": 16,
+      "top25_in_composite_ax_subspace": 14,
       "top25_in_active_subspace": 16,
       "top25_max_V_hat": 2.943858,
       "dropped_top25_count_lt_cap": 12,
@@ -3324,6 +4370,112 @@
           "V_hat": 2.943858
         }
       ],
+      "dropped_top25_count_element_product": 9,
+      "dropped_top25_element_product": [
+        {
+          "rank": 15,
+          "formula": "MgTaO2N",
+          "V_hat": 1.005943
+        },
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
+      "dropped_top25_count_composite_ax": 11,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 15,
+          "formula": "MgTaO2N",
+          "V_hat": 1.005943
+        },
+        {
+          "rank": 16,
+          "formula": "BaGeO3",
+          "V_hat": 1.662982
+        },
+        {
+          "rank": 17,
+          "formula": "BaSnO3",
+          "V_hat": 1.822493
+        },
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
       "dropped_top25_count_subspace": 9,
       "dropped_top25_subspace": [
         {
@@ -3381,9 +4533,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 15,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.704546,
       "top25_retained_lt_cap": 15,
+      "top25_in_element_product_subspace": 17,
+      "top25_in_composite_ax_subspace": 15,
       "top25_in_active_subspace": 17,
       "top25_max_V_hat": 2.943858,
       "dropped_top25_count_lt_cap": 10,
@@ -3466,6 +4622,102 @@
           "A": "Rb",
           "B": "Ti",
           "X": "FO2",
+          "V_hat": 2.943858
+        }
+      ],
+      "dropped_top25_count_element_product": 8,
+      "dropped_top25_element_product": [
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
+      "dropped_top25_count_composite_ax": 10,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 16,
+          "formula": "BaGeO3",
+          "V_hat": 1.662982
+        },
+        {
+          "rank": 17,
+          "formula": "BaSnO3",
+          "V_hat": 1.822493
+        },
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
           "V_hat": 2.943858
         }
       ],
@@ -3521,9 +4773,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 15,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.704546,
       "top25_retained_lt_cap": 15,
+      "top25_in_element_product_subspace": 17,
+      "top25_in_composite_ax_subspace": 15,
       "top25_in_active_subspace": 17,
       "top25_max_V_hat": 2.943858,
       "dropped_top25_count_lt_cap": 10,
@@ -3609,6 +4865,102 @@
           "V_hat": 2.943858
         }
       ],
+      "dropped_top25_count_element_product": 8,
+      "dropped_top25_element_product": [
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
+      "dropped_top25_count_composite_ax": 10,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 16,
+          "formula": "BaGeO3",
+          "V_hat": 1.662982
+        },
+        {
+          "rank": 17,
+          "formula": "BaSnO3",
+          "V_hat": 1.822493
+        },
+        {
+          "rank": 18,
+          "formula": "BaInO2F",
+          "V_hat": 1.99593
+        },
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
       "dropped_top25_count_subspace": 8,
       "dropped_top25_subspace": [
         {
@@ -3661,9 +5013,13 @@
       "declared_min_V_hat": 0.252406,
       "active_rows_lt_cap": 18,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.704546,
       "top25_retained_lt_cap": 18,
+      "top25_in_element_product_subspace": 19,
+      "top25_in_composite_ax_subspace": 18,
       "top25_in_active_subspace": 19,
       "top25_max_V_hat": 2.943858,
       "dropped_top25_count_lt_cap": 7,
@@ -3725,6 +5081,77 @@
           "V_hat": 2.943858
         }
       ],
+      "dropped_top25_count_element_product": 6,
+      "dropped_top25_element_product": [
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        }
+      ],
+      "dropped_top25_count_composite_ax": 7,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 19,
+          "formula": "AgNbO3",
+          "V_hat": 2.184183
+        },
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 21,
+          "formula": "GeSiO3",
+          "V_hat": 2.470144
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
       "dropped_top25_count_subspace": 6,
       "dropped_top25_subspace": [
         {
@@ -3765,12 +5192,16 @@
       "c_cap": 2.5,
       "declared_pool_size": 1587,
       "declared_min_V_hat": 0.252406,
-      "active_rows_lt_cap": 21,
+      "active_rows_lt_cap": 20,
       "top10_retained_lt_cap": 10,
+      "top10_in_element_product_subspace": 10,
+      "top10_in_composite_ax_subspace": 10,
       "top10_in_active_subspace": 10,
       "top10_max_V_hat": 0.704546,
       "top25_retained_lt_cap": 21,
-      "top25_in_active_subspace": 24,
+      "top25_in_element_product_subspace": 22,
+      "top25_in_composite_ax_subspace": 20,
+      "top25_in_active_subspace": 22,
       "top25_max_V_hat": 2.943858,
       "dropped_top25_count_lt_cap": 4,
       "dropped_top25_lt_cap": [
@@ -3807,8 +5238,64 @@
           "V_hat": 2.943858
         }
       ],
-      "dropped_top25_count_subspace": 1,
+      "dropped_top25_count_element_product": 3,
+      "dropped_top25_element_product": [
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        }
+      ],
+      "dropped_top25_count_composite_ax": 5,
+      "dropped_top25_composite_ax": [
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
+        {
+          "rank": 23,
+          "formula": "SnGaO2F",
+          "V_hat": 2.596781
+        },
+        {
+          "rank": 24,
+          "formula": "AgHfO2F",
+          "V_hat": 2.735655
+        },
+        {
+          "rank": 25,
+          "formula": "RbTiO2F",
+          "V_hat": 2.943858
+        }
+      ],
+      "dropped_top25_count_subspace": 3,
       "dropped_top25_subspace": [
+        {
+          "rank": 20,
+          "formula": "SnSnO3",
+          "V_hat": 2.435755
+        },
+        {
+          "rank": 22,
+          "formula": "SnGeO3",
+          "V_hat": 2.523563
+        },
         {
           "rank": 23,
           "formula": "SnGaO2F",
@@ -3833,6 +5320,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 10,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.493444,
+      "mean_regret_among_integer_ground_states": 0.141275,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -3966,6 +5457,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 4,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.013573,
+      "mean_regret_among_integer_ground_states": 0.006886,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -4033,6 +5528,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 10,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.320906,
+      "mean_regret_among_integer_ground_states": 0.112866,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -4176,6 +5675,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 10,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.320906,
+      "mean_regret_among_integer_ground_states": 0.112866,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -4319,6 +5822,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 3,
+      "contains_continuous_surrogate_minimizer": false,
+      "best_regret_among_integer_ground_states": 0.005211,
+      "worst_regret_among_integer_ground_states": 0.013573,
+      "mean_regret_among_integer_ground_states": 0.009181,
       "ground_state_candidates": [
         {
           "formula": "SrTaO2N",
@@ -4378,6 +5885,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 7,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.162025,
+      "mean_regret_among_integer_ground_states": 0.057418,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -4485,6 +5996,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 7,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.162025,
+      "mean_regret_among_integer_ground_states": 0.057418,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",
@@ -4592,6 +6107,10 @@
       "illegal_ground_count": 0,
       "illegal_aux_tie_count": 0,
       "ground_state_degeneracy": 7,
+      "contains_continuous_surrogate_minimizer": true,
+      "best_regret_among_integer_ground_states": 0.0,
+      "worst_regret_among_integer_ground_states": 0.451804,
+      "mean_regret_among_integer_ground_states": 0.136656,
       "ground_state_candidates": [
         {
           "formula": "LaTiO2N",

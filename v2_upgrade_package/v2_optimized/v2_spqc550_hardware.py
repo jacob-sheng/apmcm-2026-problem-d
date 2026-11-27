@@ -4,15 +4,15 @@ SPQC-550 Real Optical Quantum Computer (CIM) Execution & Independent Verificatio
 for Compact Lossless Active-Subspace Exact-8-Bit Ising Formulations.
 
 Supported task sets:
-  - v2 (archived M1 baseline tasks):
-      1. apmcm26_v2_q2_blind_12  : Q2 Blind Pool (11, X=NO2)             - 12 spins, 8-bit
-      2. apmcm26_v2_q3_anova_24  : Q3 Blind Pool (12, Model 3B ANOVA)    - 24 spins, 0 aux, 8-bit
-      3. apmcm26_v2_q3_submod_33 : Q3 Blind Pool (12, Model 3A Submod)   - 33 spins, 13 aux, 7-bit
   - v3 (M4B repaired Q2/Q3 tasks; archived v2 tasks preserved under historical_v2_archived_tasks):
       1. v3_q2_blind_12          : Q2 Blind Pool (11, Exact-8bit)        - 12 spins, 0 aux, 8-bit
       2. v3_q3_comp_18           : Q3 Blind Pool (12, Model 3A-Comp)     - 18 spins, 0 aux, 8-bit
       3. v3_q3_hobo_29           : Q3 Blind Pool (12, Model 3A-HOBO)     - 29 spins, 11 aux, 8-bit
       4. v3_q3_anova_25          : Q3 Blind Pool (12, Model 3B-ANOVA)    - 25 spins, 0 aux, 8-bit
+  - v2 (historical checkpoint integrity audit ONLY; does not rebuild pre-fix matrices):
+      1. apmcm26_v2_q2_blind_12  : Historical Q2 Blind archive           - 12 spins
+      2. apmcm26_v2_q3_anova_24  : Historical Q3 ANOVA archive           - 24 spins
+      3. apmcm26_v2_q3_submod_33 : Historical Q3 Submod archive          - 33 spins
 
 SDK inspection note (kaiwu==1.4.4):
   `kaiwu.cim._client` does not exist in `kaiwu==1.4.4`; the compiled module is
@@ -24,13 +24,12 @@ SDK inspection note (kaiwu==1.4.4):
   checked via the QBoson cloud console and tracked carefully to preserve >= 5
   unused credits.
   The SDK signature `CIMOptimizer(..., interval=...)` defaults to `interval=6`
-  minutes, whereas our CLI `--poll-interval` defaults to `1` minute (the
-  minimum SDK polling interval; the historical v2 archive used `interval=10`).
+  seconds (minimum SDK-enforced effective polling interval is `5` seconds).
 
 Credentials are read strictly from environment variables KAIWU_USER_ID and
 KAIWU_SDK_CODE (never hardcoded or logged). Supports --dry-run (writes ONLY to
 results/v2_spqc550_dryrun.json), --verify-only (strict bit-exact SHA-256 +
-Section 9.2 Ising recovery), and --run-spqc.
+algebraic QUBO-to-Ising recovery + full record-level comparison), and --run-spqc.
 """
 
 import argparse
@@ -61,7 +60,8 @@ CKPT_DIR = os.path.join(RES_DIR, "spqc_checkpoints")
 DEFAULT_RESULTS_JSON = os.path.join(RES_DIR, "v2_spqc550_results.json")
 DEFAULT_DRYRUN_JSON = os.path.join(RES_DIR, "v2_spqc550_dryrun.json")
 DEFAULT_TRACK_A_SUMMARY = os.path.join(RES_DIR, "track_a_spqc_archive_summary.json")
-DEFAULT_TRACK_A_CSV = os.path.join(
+_BUNDLED_TRACK_A_CSV = os.path.join(CUR_DIR, "reference_baselines", "table4_spqc550_hardware_vs_classical.csv")
+_REPO_TRACK_A_CSV = os.path.join(
     REPO_ROOT,
     "01_2026赛题与数据集",
     "Problem_D_量子计算钙钛矿稀有目标搜索",
@@ -69,6 +69,7 @@ DEFAULT_TRACK_A_CSV = os.path.join(
     "outputs",
     "table4_spqc550_hardware_vs_classical.csv",
 )
+DEFAULT_TRACK_A_CSV = _BUNDLED_TRACK_A_CSV if os.path.isfile(_BUNDLED_TRACK_A_CSV) else _REPO_TRACK_A_CSV
 os.makedirs(CKPT_DIR, exist_ok=True)
 
 
@@ -150,9 +151,21 @@ def matrix_sha256(mat: np.ndarray) -> str:
     return hashlib.sha256(arr.tobytes()).hexdigest()
 
 
+def file_sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def spins_int8_sha256(arr: np.ndarray) -> str:
+    return hashlib.sha256(np.ascontiguousarray(arr, dtype=np.int8).tobytes()).hexdigest()
+
+
 def verify_section92_ising_recovery(mat: np.ndarray, extra_spins: np.ndarray = None) -> dict:
     """
-    Independently verify Forensic Report Section 9.2 QUBO <-> Ising equivalence:
+    Independently verify exact algebraic QUBO <-> Ising equivalence:
       x_i = (1 + s_i * s_ref) / 2,  E(s) = -s^T H s,
       H_ij = -Q_ij / 4 (i != j),  H_{i,ref} = -1/4 * sum_j Q_ij,  H_ii = 0,
       C = 1/4 * (sum_{ij} Q_ij + tr(Q)),   x^T Q x = -s^T H s + C.
@@ -221,6 +234,9 @@ def verify_section92_ising_recovery(mat: np.ndarray, extra_spins: np.ndarray = N
         "exact_matrix_identity": exact_identity,
         "qubo_ising_identity_max_diff": int(max_diff),
     }
+
+
+verify_algebraic_ising_recovery = verify_section92_ising_recovery
 
 
 def verify_hardware_matrix(mat: np.ndarray, name: str) -> dict:
@@ -476,53 +492,16 @@ evaluate_hardware_samples = decode_raw_spins
 
 def build_tasks(task_set: str = "v3", task_filter=None):
     """
-    Build task specifications cleanly for either archived 'v2' verification or
-    repaired 'v3' M4B execution (preserving archived v2 tasks under historical_v2_archived_tasks).
+    Build active repaired 'v3' SPQC-550 task specifications.
+    Note: Legacy 'v2' archives use historical pre-fix formulations and are verified via
+    checkpoint-integrity audit ONLY rather than rebuilt from current v3 builders (R11).
     """
+    if task_set == "v2":
+        return []
     q2b = pd.read_csv(os.path.join(RES_DIR, "v2_q2_blind_11.csv"))
     q3b = pd.read_csv(os.path.join(RES_DIR, "v2_q3_blind_12.csv"))
 
     tasks = []
-    if task_set in ("v2", "all"):
-        J1, m1, l1 = q23.build_exact8_q2_qubo(q2b, c_cap=2.5, penalty_mult=2.25)
-        J2, m2, l2 = q23.build_q3_compact_anova_qubo(q3b, top_k_subspace=25, c_cap=1.50)
-        J3, m3, l3 = q23.build_q3_submodular_hobo_qubo(q3b, c_cap=1.50)
-        tasks.extend([
-            {
-                "task_name": "apmcm26_v2_q2_blind_12",
-                "label": "v2 Q2 Blind (11) Active-Subspace",
-                "scope": "Q2_blind_11",
-                "kind": "q2",
-                "aux_vars": 0,
-                "J": np.asarray(J1, dtype=np.int64),
-                "meta": m1,
-                "lookup": l1,
-                "df": q2b,
-            },
-            {
-                "task_name": "apmcm26_v2_q3_anova_24",
-                "label": "v2 Q3 Blind (12) Compact ANOVA (Model 3B)",
-                "scope": "Q3_blind_12",
-                "kind": "q3",
-                "aux_vars": 0,
-                "J": np.asarray(J2, dtype=np.int64),
-                "meta": m2,
-                "lookup": l2,
-                "df": q3b,
-            },
-            {
-                "task_name": "apmcm26_v2_q3_submod_33",
-                "label": "v2 Q3 Blind (12) Submodular HOBO (Model 3A)",
-                "scope": "Q3_blind_12",
-                "kind": "q3",
-                "aux_vars": int(m3["nY"]),
-                "J": np.asarray(J3, dtype=np.int64),
-                "meta": m3,
-                "lookup": l3,
-                "df": q3b,
-            },
-        ])
-
     if task_set in ("v3", "all"):
         if not hasattr(q23, "build_q3_comp_qubo"):
             raise AttributeError(
@@ -802,19 +781,159 @@ def _update_credit_accounting(payload: dict):
     }
 
 
+def verify_historical_v2_checkpoints_integrity(prior_archived: dict, ckpt_dir: str) -> list:
+    """
+    Historical checkpoint integrity audit ONLY (R11):
+    Verifies archived v2 matrix SHA length, raw .npy checkpoint existence, spin alphabet {-1,+1},
+    file/array SHA-256 digests (when present), array shape (n_samples, spins), and sample list count
+    without pretending to rebuild pre-fix v2 Hamiltonians from current v3 builders.
+    """
+    failures = []
+    for h_tn, h_entry in prior_archived.items():
+        h_spec = h_entry.get("hardware_spec", {})
+        h_sha = h_spec.get("sha256", "")
+        h_spins = int(h_spec.get("spins", 0))
+        h_spqc = h_entry.get("spqc550", {})
+        h_spqc_sha = h_spqc.get("matrix_sha256")
+        if not h_sha or len(h_sha) != 64:
+            failures.append(f"historical:{h_tn}: invalid hardware_spec.sha256")
+            continue
+        if h_spqc_sha is not None and h_spqc_sha != h_sha:
+            failures.append(f"historical:{h_tn}: spqc550.matrix_sha256 != hardware_spec.sha256")
+            continue
+        hp, lp = _checkpoint_paths(h_tn, h_sha, ckpt_dir)
+        rp = hp if os.path.exists(hp) else (lp if os.path.exists(lp) else None)
+        if rp is None:
+            failures.append(f"historical:{h_tn}: missing archived raw spin checkpoint")
+            continue
+        arr_h = np.load(rp)
+        exp_n = int(h_spqc.get("n_samples", arr_h.shape[0]))
+        if arr_h.ndim != 2 or arr_h.shape != (exp_n, h_spins):
+            failures.append(f"historical:{h_tn}: checkpoint shape {arr_h.shape} != ({exp_n}, {h_spins})")
+            continue
+        if not np.all(np.isin(arr_h, [-1, 1])):
+            failures.append(f"historical:{h_tn}: checkpoint contains non-{{-1,+1}} spin values")
+            continue
+        exp_fsha = h_spqc.get("raw_spins_file_sha256")
+        if exp_fsha and file_sha256(rp) != exp_fsha:
+            failures.append(f"historical:{h_tn}: raw_spins_file_sha256 mismatch")
+            continue
+        exp_asha = h_spqc.get("raw_spins_int8_sha256")
+        if exp_asha and spins_int8_sha256(arr_h) != exp_asha:
+            failures.append(f"historical:{h_tn}: raw_spins_int8_sha256 mismatch")
+            continue
+        samples_h = h_spqc.get("samples", [])
+        if samples_h and len(samples_h) != exp_n:
+            failures.append(f"historical:{h_tn}: len(samples)={len(samples_h)} != n_samples={exp_n}")
+            continue
+        print(
+            f"  [HISTORICAL-CKPT-INTEGRITY-ONLY] {h_tn:26s} sha={h_sha[:12]}.. spins={h_spins} "
+            f"ckpt={os.path.basename(rp)} shape={arr_h.shape}",
+            flush=True,
+        )
+    return failures
+
+
+def _compare_decoded_with_archived(tn: str, dec: dict, archived: dict) -> list:
+    """
+    Strictly compare freshly recomputed decode_raw_spins() output against archived spqc550 JSON (R10).
+    Returns a list of mismatch descriptions (empty list means exact agreement).
+    """
+    errs = []
+    exact_keys = (
+        "n_samples",
+        "feasible_shot_count",
+        "feasible_count",
+        "primary_feasible_shot_count",
+        "y_aux_consistent_count",
+        "unique_feasible_candidates",
+        "unique_feasible_count",
+        "duplicate_feasible_hits",
+        "unique_topK_hits",
+        "unique_topK_count",
+        "top_k_target",
+    )
+    for k in exact_keys:
+        if k not in archived:
+            errs.append(f"{tn}: archived spqc550 missing required key '{k}'")
+        elif dec[k] != archived[k]:
+            errs.append(f"{tn}: '{k}' mismatch (redecoded={dec[k]!r} != archived={archived[k]!r})")
+
+    float_keys = (
+        "feasible_rate_pct",
+        "primary_feasible_rate_pct",
+        "best_ising_energy",
+        "exact_min_V_hat",
+        "gap_to_opt",
+        "continuous_regret",
+    )
+    for k in float_keys:
+        if k not in archived:
+            errs.append(f"{tn}: archived spqc550 missing float key '{k}'")
+            continue
+        dv, av = dec.get(k), archived.get(k)
+        if (dv is None) != (av is None):
+            errs.append(f"{tn}: '{k}' null mismatch (redecoded={dv!r} != archived={av!r})")
+        elif dv is not None and abs(float(dv) - float(av)) > 1e-5:
+            errs.append(f"{tn}: '{k}' mismatch (redecoded={dv} != archived={av})")
+
+    db, ab = dec.get("best_feasible"), archived.get("best_feasible")
+    if (db is None) != (ab is None):
+        errs.append(f"{tn}: best_feasible null mismatch (redecoded={db!r} != archived={ab!r})")
+    elif db is not None:
+        for bk in ("formula", "pool_rank"):
+            if db.get(bk) != ab.get(bk):
+                errs.append(f"{tn}: best_feasible.{bk} mismatch ({db.get(bk)!r} != {ab.get(bk)!r})")
+        for bk in ("V_hat", "regret", "ising_energy"):
+            if abs(float(db[bk]) - float(ab[bk])) > 1e-5:
+                errs.append(f"{tn}: best_feasible.{bk} mismatch ({db[bk]} != {ab[bk]})")
+
+    dsamps = dec.get("samples", [])
+    asamps = archived.get("samples", [])
+    if len(dsamps) != len(asamps):
+        errs.append(f"{tn}: samples length mismatch (redecoded={len(dsamps)} != archived={len(asamps)})")
+        return errs
+
+    row_exact = (
+        "sample_idx",
+        "kA",
+        "kB",
+        "kX",
+        "one_hot_ok",
+        "pool_ok",
+        "y_aux_consistent",
+        "y_aux_mismatch_count",
+        "primary_feasible",
+        "feasible",
+        "formula",
+        "pool_rank",
+    )
+    for idx, (dr, ar) in enumerate(zip(dsamps, asamps)):
+        for rk in row_exact:
+            if dr.get(rk) != ar.get(rk):
+                errs.append(f"{tn}: samples[{idx}].{rk} mismatch ({dr.get(rk)!r} != {ar.get(rk)!r})")
+        for rk in ("ising_energy", "V_hat", "regret"):
+            dv, av = dr.get(rk), ar.get(rk)
+            if (dv is None) != (av is None):
+                errs.append(f"{tn}: samples[{idx}].{rk} null mismatch ({dv!r} != {av!r})")
+            elif dv is not None and abs(float(dv) - float(av)) > 1e-5:
+                errs.append(f"{tn}: samples[{idx}].{rk} mismatch ({dv} != {av})")
+    return errs
+
+
 def main():
     parser = argparse.ArgumentParser(description="SPQC-550 Hardware Execution & Bit-Exact Verification Harness")
     parser.add_argument("--dry-run", action="store_true", help="Pre-flight hardware gate only; writes ONLY to results/v2_spqc550_dryrun.json (0 cloud calls)")
     parser.add_argument("--run-spqc", action="store_true", help="Submit uncached tasks to real SPQC-550 quantum hardware")
-    parser.add_argument("--verify-only", action="store_true", help="Re-verify saved SPQC-550 outputs from disk with strict SHA-256 & Section 9.2 enforcement")
+    parser.add_argument("--verify-only", action="store_true", help="Re-verify saved SPQC-550 outputs from disk with strict SHA-256, Ising recovery & per-record equality checks")
     parser.add_argument("--export-track-a", action="store_true", help="Parse Track A table4 CSV into results/track_a_spqc_archive_summary.json (0 cloud calls)")
-    parser.add_argument("--task-set", choices=["v2", "v3", "all"], default="v3", help="Registered task set to process (default: v3)")
+    parser.add_argument("--task-set", choices=["v2", "v3", "all"], default="v3", help="Task set to process ('v3' active tasks, or 'v2' historical checkpoint integrity audit)")
     parser.add_argument("--tasks", nargs="*", default=None, help="Optional subset of task names to process")
     parser.add_argument("--results-json", default=DEFAULT_RESULTS_JSON, help="Path to archived/live SPQC-550 results JSON")
     parser.add_argument("--dryrun-json", default=DEFAULT_DRYRUN_JSON, help="Path to isolated dry-run diagnostic JSON")
     parser.add_argument("--track-a-json", default=DEFAULT_TRACK_A_SUMMARY, help="Output path for Track A archive summary JSON")
     parser.add_argument("--ckpt-dir", default=CKPT_DIR, help="Checkpoint directory for raw spin .npy arrays")
-    parser.add_argument("--poll-interval", type=int, default=1, help="CIMOptimizer polling interval in minutes (SDK default=6, min=1; archived v2 used 10)")
+    parser.add_argument("--poll-interval", type=int, default=5, help="CIMOptimizer polling interval in SECONDS (SDK default=6s, SDK min=5s)")
     args = parser.parse_args()
 
     if not any([args.dry_run, args.run_spqc, args.verify_only, args.export_track_a]):
@@ -833,20 +952,33 @@ def main():
             return 0
 
     os.makedirs(args.ckpt_dir, exist_ok=True)
-    tasks = build_tasks(task_set=args.task_set, task_filter=args.tasks)
-    if not tasks:
-        print("[ERROR] No tasks matched the requested task-set / task filter.", file=sys.stderr)
-        return 1
-
     payload = {}
     if os.path.exists(args.results_json):
         with open(args.results_json, "r", encoding="utf-8") as f:
             payload = json.load(f)
     payload.setdefault("tasks", {})
-
-    # Snapshot prior archived records BEFORE any in-memory updates (prevents F09 read-before-write bug)
     prior_tasks = copy.deepcopy(payload["tasks"])
     prior_archived = copy.deepcopy(payload.get("historical_v2_archived_tasks", {}))
+
+    if args.task_set == "v2":
+        if args.run_spqc:
+            raise RuntimeError(
+                "Refusing --run-spqc for task_set='v2': archived v2 matrices belong to pre-fix formulations "
+                "and must not be overwritten with current v3 builders (R11)."
+            )
+        print("\n=== [Historical v2 Checkpoint Integrity Audit] ===", flush=True)
+        hist_failures = verify_historical_v2_checkpoints_integrity(prior_archived, args.ckpt_dir)
+        if hist_failures:
+            for msg in hist_failures:
+                print(f"  [FAIL] {msg}", file=sys.stderr, flush=True)
+            return 1
+        print(f"\n[HISTORICAL-AUDIT PASSED] {len(prior_archived)} archived v2 checkpoint(s) intact.", flush=True)
+        return 0
+
+    tasks = build_tasks(task_set=args.task_set, task_filter=args.tasks)
+    if not tasks:
+        print("[ERROR] No tasks matched the requested task-set / task filter.", file=sys.stderr)
+        return 1
 
     print("=== [Phase A] Pre-Flight SPQC-550 Hardware Gate Check ===", flush=True)
     staged_entries = {}
@@ -915,7 +1047,7 @@ def main():
         return 0
 
     if args.verify_only:
-        print("\n=== [Verify-Only] Strict SHA-256, Section 9.2 Recovery & Raw Spin Verification ===", flush=True)
+        print("\n=== [Verify-Only] Strict SHA-256, Algebraic Recovery & Full Per-Record Verification ===", flush=True)
         failures = []
         for t in tasks:
             tn = t["task_name"]
@@ -954,7 +1086,6 @@ def main():
                 raw_path = hash_path
                 ckpt_mode = "hash-keyed"
             elif os.path.exists(legacy_path):
-                # Legacy fallback permitted ONLY because archived_sha == cur_sha was strictly verified above
                 raw_path = legacy_path
                 ckpt_mode = "legacy-sha-verified"
             else:
@@ -964,8 +1095,29 @@ def main():
                 continue
 
             raw_spins = np.load(raw_path)
+            if raw_spins.ndim != 2 or raw_spins.shape[1] != J.shape[0]:
+                failures.append(f"{tn}: raw_spins shape {raw_spins.shape} incompatible with J.shape={J.shape}")
+                continue
+            if not np.all(np.isin(raw_spins, [-1, 1])):
+                failures.append(f"{tn}: raw_spins contains non-{{-1,+1}} entries")
+                continue
+
+            exp_file_sha = spqc_block.get("raw_spins_file_sha256")
+            if exp_file_sha is not None and file_sha256(raw_path) != exp_file_sha:
+                failures.append(f"{tn}: raw_spins_file_sha256 mismatch on {os.path.basename(raw_path)}")
+                continue
+            exp_arr_sha = spqc_block.get("raw_spins_int8_sha256")
+            if exp_arr_sha is not None and spins_int8_sha256(raw_spins) != exp_arr_sha:
+                failures.append(f"{tn}: raw_spins_int8_sha256 mismatch on {os.path.basename(raw_path)}")
+                continue
+
             rec92 = verify_section92_ising_recovery(J, extra_spins=raw_spins)
             dec = decode_raw_spins(raw_spins, J, t["kind"], t["meta"], t["df"], t["lookup"])
+            cmp_errs = _compare_decoded_with_archived(tn, dec, spqc_block)
+            if cmp_errs:
+                failures.extend(cmp_errs)
+                continue
+
             print(
                 f"  [VERIFIED:{ckpt_mode}] {tn:26s} sha={cur_sha[:12]}.. C={rec92['ising_offset_C']} "
                 f"certE={staged_entries[tn]['cert_min_ising_energy']} bestE={dec['best_ising_energy']} "
@@ -980,39 +1132,14 @@ def main():
 
         if args.task_set in ("v3", "all") and prior_archived:
             print("\n=== [Verify-Only] Checking Preserved Historical v2 Archive Checkpoints ===", flush=True)
-            for h_tn, h_entry in prior_archived.items():
-                h_spec = h_entry.get("hardware_spec", {})
-                h_sha = h_spec.get("sha256", "")
-                h_spins = int(h_spec.get("spins", 0))
-                h_spqc = h_entry.get("spqc550", {})
-                h_spqc_sha = h_spqc.get("matrix_sha256")
-                if not h_sha or len(h_sha) != 64:
-                    failures.append(f"historical:{h_tn}: invalid hardware_spec.sha256")
-                    continue
-                if h_spqc_sha is not None and h_spqc_sha != h_sha:
-                    failures.append(f"historical:{h_tn}: spqc550.matrix_sha256 != hardware_spec.sha256")
-                    continue
-                hp, lp = _checkpoint_paths(h_tn, h_sha, args.ckpt_dir)
-                rp = hp if os.path.exists(hp) else (lp if os.path.exists(lp) else None)
-                if rp is None:
-                    failures.append(f"historical:{h_tn}: missing archived raw spin checkpoint")
-                    continue
-                arr_h = np.load(rp)
-                if arr_h.ndim != 2 or arr_h.shape[1] != h_spins or arr_h.shape[0] != int(h_spqc.get("n_samples", arr_h.shape[0])):
-                    failures.append(f"historical:{h_tn}: checkpoint shape {arr_h.shape} incompatible with spins={h_spins}")
-                    continue
-                print(
-                    f"  [ARCHIVED-OK] {h_tn:26s} sha={h_sha[:12]}.. spins={h_spins} "
-                    f"ckpt={os.path.basename(rp)} shape={arr_h.shape}",
-                    flush=True,
-                )
+            failures.extend(verify_historical_v2_checkpoints_integrity(prior_archived, args.ckpt_dir))
 
         if failures:
             print("\n[VERIFY-ONLY FAILED]", file=sys.stderr, flush=True)
             for msg in failures:
                 print(f"  [FAIL] {msg}", file=sys.stderr, flush=True)
             return 1
-        print(f"\n[VERIFY-ONLY PASSED] All {len(tasks)} task(s) passed bit-exact SHA-256 & Section 9.2 recovery.", flush=True)
+        print(f"\n[VERIFY-ONLY PASSED] All {len(tasks)} task(s) passed bit-exact SHA-256, algebraic Ising recovery & full per-record comparison.", flush=True)
         return 0
 
     if args.run_spqc:
@@ -1120,10 +1247,18 @@ def main():
             np.save(hash_path, raw_arr)
             dec = decode_raw_spins(raw_arr, J, t["kind"], t["meta"], t["df"], t["lookup"])
             dec["matrix_sha256"] = cur_sha
+            dec["raw_spins_file_sha256"] = file_sha256(hash_path)
+            dec["raw_spins_int8_sha256"] = spins_int8_sha256(raw_arr)
             dec["ising_offset_C"] = staged_entries[tn]["hardware_spec"]["ising_offset_C"]
             dec["cloud_roundtrip_wall_sec"] = round(dt, 2)
-            dec["poll_interval_min"] = max(1, int(args.poll_interval))
+            req_sec = max(1, int(args.poll_interval))
+            dec["poll_interval_requested_sec"] = req_sec
             safe_opt_meta = _extract_safe_optimizer_meta(opt)
+            eff_sec = safe_opt_meta.get("interval", max(5, req_sec)) if safe_opt_meta else max(5, req_sec)
+            dec["poll_interval_effective_sec"] = int(eff_sec)
+            dec["poll_interval_unit_note"] = (
+                "Kaiwu SDK 1.4.4 CIMOptimizer interval is in seconds (default 6s, min 5s)."
+            )
             if safe_opt_meta:
                 dec["sdk_optimizer_meta"] = safe_opt_meta
 

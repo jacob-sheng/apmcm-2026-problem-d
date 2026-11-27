@@ -8,10 +8,10 @@ v3 Remediated Problem 2 & Problem 3 Quantum/Ising QUBO & HOBO Engine:
   - Model 3B-ANOVA: Repaired Uniform 8x Diagonal/Off-Diagonal Scaling & Effect-Amplitude Normalization
                     with 3-Layer Error Decomposition (Surrogate -> Float ANOVA -> 8-bit Ising -> Solver)
   - Global Ground-State Certification (`certify_global_ground_states`):
-      Analytic Y-elimination + Section 9.2 Ising-to-QUBO recovery cross-check +
+      Analytic Y-elimination + exact algebraic Ising-to-QUBO recovery cross-check +
       Full 2^{n_primary} enumeration (n_primary <= 22) or Exact Cardinality-Partitioned enumeration (n_primary > 22)
   - 4-Row Compression Attribution Table (F18), C_cap Top-10/Top-25 Retention Audit (F19),
-    and Fair Equal-Budget Solver Benchmark (n_runs=50, 1 best shot/run -> 50 returned shots, F13)
+    and Fair Equal-Budget Solver Benchmark (n_runs=50, 1 best run -> 50 returned solutions)
 """
 
 import json
@@ -36,13 +36,12 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
-# Section 9.2 Exact QUBO <-> Ising Recovery & Global Ground-State Certifier
+# Exact Algebraic QUBO <-> Ising Recovery & Global Ground-State Certifier
 # ---------------------------------------------------------------------------
 
 def _recover_qubo_from_ising_sec92(ising_mat):
     """
-    Recover exact symmetric integer QUBO Q and offset C from int64 Ising matrix J
-    per Forensic Report Section 9.2:
+    Recover exact symmetric integer QUBO Q and offset C from int64 Ising matrix J:
       x_i = (1 + s_i * s_ref) / 2,   E(s) = -s^T J s,
       Q_ij = -4 J_ij (i != j),   Q_ii = -4 J_{i,ref} - sum_{j != i} Q_ij,
       x^T Q x = -s^T J s + C,    C = (sum_{ij} Q_ij + tr(Q)) / 4.
@@ -61,24 +60,24 @@ def _recover_qubo_from_ising_sec92(ising_mat):
     row_off_sum = Q.sum(axis=1)
     np.fill_diagonal(Q, -4 * J[:n, n] - row_off_sum)
 
-    # Round-trip Section 9.2 verification
+    # Round-trip algebraic QUBO <-> Ising verification
     H = np.zeros((n + 1, n + 1), dtype=np.int64)
     H[:n, :n] = -Q // 4
     np.fill_diagonal(H[:n, :n], 0)
     assert np.all((-Q + 4 * np.diag(np.diag(Q // 4))) % 4 == 0) or np.array_equal(-4 * H[:n, :n], Q - np.diag(np.diag(Q))), (
-        "Non-integer off-diagonal recovery in Section 9.2 check"
+        "Non-integer off-diagonal recovery in algebraic Ising check"
     )
     row_sums_q = -Q.sum(axis=1)
-    assert np.all(row_sums_q % 4 == 0), "Non-integer reference-spin coupling in Section 9.2 check"
+    assert np.all(row_sums_q % 4 == 0), "Non-integer reference-spin coupling in algebraic Ising check"
     h_ref = row_sums_q // 4
     H[:n, n] = h_ref
     H[n, :n] = h_ref
 
     c_num = int(Q.sum()) + int(np.trace(Q))
-    assert c_num % 4 == 0, "Non-integer Ising constant C in Section 9.2 check"
+    assert c_num % 4 == 0, "Non-integer Ising constant C in algebraic Ising check"
     C = c_num // 4
 
-    assert np.array_equal(H, J), "Section 9.2 round-trip matrix H != J"
+    assert np.array_equal(H, J), "Algebraic Ising round-trip matrix H != J"
 
     rng = np.random.default_rng(2026)
     test_s = rng.choice(np.array([-1, 1], dtype=np.int64), size=(32, n + 1))
@@ -88,7 +87,7 @@ def _recover_qubo_from_ising_sec92(ising_mat):
         x = ((s[:-1] * s[-1]) + 1) // 2
         lhs = int(x @ Q @ x)
         rhs = int(-s @ J @ s + C)
-        assert lhs == rhs, f"Section 9.2 energy identity failed: {lhs} != {rhs}"
+        assert lhs == rhs, f"Algebraic QUBO-Ising energy identity failed: {lhs} != {rhs}"
 
     return Q, int(C)
 
@@ -409,7 +408,7 @@ def _certify_full_vectorized(Q, C, meta, lookup, task_kind):
 def certify_global_ground_states(ising_mat, meta, df_pool, lookup, task_kind="q2", verify_zero_illegal=True):
     """
     Independently certify the exact global ground state(s) of an integer Ising matrix:
-      1. Recover exact QUBO Q and offset C via Section 9.2 formulas & verify H == J.
+      1. Recover exact QUBO Q and offset C via exact algebraic Ising formulas & verify H == J.
       2. Analytically eliminate any auxiliary variables y_r via exact min_y.
       3. Enumerate ALL 2^{n_primary} states (if n_primary <= 22) or run exact
          zero-gap cardinality-partitioned enumeration (if n_primary > 22).
@@ -458,6 +457,9 @@ def certify_global_ground_states(ising_mat, meta, df_pool, lookup, task_kind="q2
     gs_list.sort(key=lambda d: (d["V_hat"], d["formula"]))
 
     regrets = [d["regret"] for d in gs_list] if gs_list else [None]
+    best_gs_reg = round(min(regrets), 6) if gs_list else None
+    worst_gs_reg = round(max(regrets), 6) if gs_list else None
+    mean_gs_reg = round(float(np.mean(regrets)), 6) if gs_list else None
     return {
         "n_primary_vars": int(n_primary),
         "n_aux_vars": int(nY),
@@ -472,12 +474,16 @@ def certify_global_ground_states(ising_mat, meta, df_pool, lookup, task_kind="q2
         "illegal_ground_count": int(raw_cert["illegal_ground_count"]),
         "illegal_aux_tie_count": int(raw_cert["illegal_aux_tie_count"]),
         "ground_state_degeneracy": int(raw_cert["legal_ground_count"]),
+        "contains_continuous_surrogate_minimizer": bool(gs_list and best_gs_reg == 0.0),
+        "best_regret_among_integer_ground_states": best_gs_reg,
+        "worst_regret_among_integer_ground_states": worst_gs_reg,
+        "mean_regret_among_integer_ground_states": mean_gs_reg,
         "ground_state_candidates": gs_list,
         "declared_pool_min_V_hat": round(declared_min_v, 6),
         "declared_pool_best_formula": declared_best_formula,
-        "continuous_regret_top1": round(min(regrets), 6) if gs_list else None,
-        "continuous_regret_worst_gs": round(max(regrets), 6) if gs_list else None,
-        "continuous_regret_mean_gs": round(float(np.mean(regrets)), 6) if gs_list else None,
+        "continuous_regret_top1": best_gs_reg,
+        "continuous_regret_worst_gs": worst_gs_reg,
+        "continuous_regret_mean_gs": mean_gs_reg,
     }
 
 
@@ -1106,7 +1112,9 @@ def build_q3_compact_anova_qubo(df_pool, top_k_subspace=35, c_cap=1.5):
                 int(qA[i] + qB[j] + qX[k] + qAB[i, j] + qAX[i, k] + qBX[j, k])
                 for i, j, k, *_ in legal_triples
             ], dtype=float)
-            distinct_levels = int(len(set(int_vals.tolist())))
+            uniq_lvls, lvl_counts = np.unique(int_vals.astype(int), return_counts=True)
+            distinct_levels = int(len(uniq_lvls))
+            level_occupancies = [int(c) for c in lvl_counts.tolist()]
             sp_int_float = float(spearmanr(fa_arr, int_vals).statistic)
             sp_int_vhat = float(spearmanr(v_arr, int_vals).statistic)
             best_meta = {
@@ -1124,6 +1132,11 @@ def build_q3_compact_anova_qubo(df_pool, top_k_subspace=35, c_cap=1.5):
                 "P_forbid": float(P_fbd_b),
                 "max_abs_ising": int(max_abs_b),
                 "distinct_legal_energy_levels": distinct_levels,
+                "level_occupancies": level_occupancies,
+                "quantization_note": (
+                    "Uniform 8x integer scaling eliminates the main-vs-interaction factor mismatch, "
+                    "while round(effect * scale) still discretizes relative float ANOVA weights."
+                ),
                 "spearman_float_anova_vs_int": round(sp_int_float, 4),
                 "spearman_Vhat_vs_int": round(sp_int_vhat, 4),
                 "layer_a_surrogate_vs_float_anova": layer_a,
@@ -1429,7 +1442,10 @@ def compute_compression_attribution_table(q3_entries):
 def compute_ccap_retention_table(pools_cfg):
     """
     Compute exact Top-10 and Top-25 retention counts + exact dropped Top-25 candidate lists
-    for declared pools and C_cap thresholds (F19).
+    for declared pools and C_cap thresholds across all distinct subspace definitions:
+      1. V_hat < c_cap (exact truncated threshold)
+      2. A x B [x X] element-product subspace (used by Q2, Model 3A-HOBO, Model 3B-ANOVA)
+      3. (A,X) x B composite subspace (used by Model 3A-Comp on Q3)
     """
     records = []
     for label, df_pool, default_cap, cap_grid in pools_cfg:
@@ -1440,24 +1456,37 @@ def compute_ccap_retention_table(pools_cfg):
 
         for c_cap in cap_grid:
             act = df_s[df_s["V_hat"] < c_cap]
+            if "a_eq_b" in act.columns:
+                act = act[act["a_eq_b"] == 0]
             actA = set(act["A"])
             actB = set(act["B"])
             actX = set(act["X"]) if is_q3 else None
+            actAX = set(zip(act["A"], act["X"])) if is_q3 else None
 
             t10_lt = int((top10["V_hat"] < c_cap).sum())
             t25_lt = int((top25["V_hat"] < c_cap).sum())
             if is_q3:
-                t10_sub = sum(
+                t10_elem = sum(
                     1 for a, b, x in zip(top10["A"], top10["B"], top10["X"])
-                    if a in actA and b in actB and x in actX
+                    if a != b and a in actA and b in actB and x in actX
                 )
-                t25_sub = sum(
+                t25_elem = sum(
                     1 for a, b, x in zip(top25["A"], top25["B"], top25["X"])
-                    if a in actA and b in actB and x in actX
+                    if a != b and a in actA and b in actB and x in actX
+                )
+                t10_comp = sum(
+                    1 for a, b, x in zip(top10["A"], top10["B"], top10["X"])
+                    if a != b and (a, x) in actAX and b in actB
+                )
+                t25_comp = sum(
+                    1 for a, b, x in zip(top25["A"], top25["B"], top25["X"])
+                    if a != b and (a, x) in actAX and b in actB
                 )
             else:
-                t10_sub = sum(1 for a, b in zip(top10["A"], top10["B"]) if a in actA and b in actB)
-                t25_sub = sum(1 for a, b in zip(top25["A"], top25["B"]) if a in actA and b in actB)
+                t10_elem = sum(1 for a, b in zip(top10["A"], top10["B"]) if a != b and a in actA and b in actB)
+                t25_elem = sum(1 for a, b in zip(top25["A"], top25["B"]) if a != b and a in actA and b in actB)
+                t10_comp = t10_elem
+                t25_comp = t25_elem
 
             dropped_lt_cap = [
                 {
@@ -1472,25 +1501,35 @@ def compute_ccap_retention_table(pools_cfg):
                 if float(row["V_hat"]) >= c_cap
             ]
             if is_q3:
-                dropped_subspace = [
+                dropped_elem = [
                     {
                         "rank": int(idx + 1),
                         "formula": str(row["formula"]),
                         "V_hat": round(float(row["V_hat"]), 6),
                     }
                     for idx, row in top25.iterrows()
-                    if not (row["A"] in actA and row["B"] in actB and row["X"] in actX)
+                    if not (row["A"] != row["B"] and row["A"] in actA and row["B"] in actB and row["X"] in actX)
+                ]
+                dropped_comp = [
+                    {
+                        "rank": int(idx + 1),
+                        "formula": str(row["formula"]),
+                        "V_hat": round(float(row["V_hat"]), 6),
+                    }
+                    for idx, row in top25.iterrows()
+                    if not (row["A"] != row["B"] and (row["A"], row["X"]) in actAX and row["B"] in actB)
                 ]
             else:
-                dropped_subspace = [
+                dropped_elem = [
                     {
                         "rank": int(idx + 1),
                         "formula": str(row["formula"]),
                         "V_hat": round(float(row["V_hat"]), 6),
                     }
                     for idx, row in top25.iterrows()
-                    if not (row["A"] in actA and row["B"] in actB)
+                    if not (row["A"] != row["B"] and row["A"] in actA and row["B"] in actB)
                 ]
+                dropped_comp = dropped_elem
 
             records.append({
                 "pool": label,
@@ -1500,15 +1539,23 @@ def compute_ccap_retention_table(pools_cfg):
                 "declared_min_V_hat": round(float(df_s.iloc[0]["V_hat"]), 6),
                 "active_rows_lt_cap": int(len(act)),
                 "top10_retained_lt_cap": t10_lt,
-                "top10_in_active_subspace": int(t10_sub),
+                "top10_in_element_product_subspace": int(t10_elem),
+                "top10_in_composite_ax_subspace": int(t10_comp),
+                "top10_in_active_subspace": int(t10_elem),
                 "top10_max_V_hat": round(float(top10["V_hat"].max()), 6),
                 "top25_retained_lt_cap": t25_lt,
-                "top25_in_active_subspace": int(t25_sub),
+                "top25_in_element_product_subspace": int(t25_elem),
+                "top25_in_composite_ax_subspace": int(t25_comp),
+                "top25_in_active_subspace": int(t25_elem),
                 "top25_max_V_hat": round(float(top25["V_hat"].max()), 6),
                 "dropped_top25_count_lt_cap": len(dropped_lt_cap),
                 "dropped_top25_lt_cap": dropped_lt_cap,
-                "dropped_top25_count_subspace": len(dropped_subspace),
-                "dropped_top25_subspace": dropped_subspace,
+                "dropped_top25_count_element_product": len(dropped_elem),
+                "dropped_top25_element_product": dropped_elem,
+                "dropped_top25_count_composite_ax": len(dropped_comp),
+                "dropped_top25_composite_ax": dropped_comp,
+                "dropped_top25_count_subspace": len(dropped_elem),
+                "dropped_top25_subspace": dropped_elem,
             })
     return records
 
@@ -1640,6 +1687,7 @@ def main():
             "M_max": meta_anov.get("M_max"),
             "P_block": meta_anov.get("P_block"),
             "distinct_legal_energy_levels": meta_anov.get("distinct_legal_energy_levels"),
+            "level_occupancies": meta_anov.get("level_occupancies"),
             "bit_width": pack_anov["bit_width"],
             "dynamic_range": pack_anov["dynamic_range"],
             "max_abs_coeff": pack_anov["max_abs_coeff"],
@@ -1655,6 +1703,8 @@ def main():
             "layer_2_float_anova_vs_8bit_ising": {
                 "M_max": meta_anov.get("M_max"),
                 "distinct_legal_energy_levels": meta_anov.get("distinct_legal_energy_levels"),
+                "level_occupancies": meta_anov.get("level_occupancies"),
+                "quantization_note": meta_anov.get("quantization_note"),
                 "spearman_float_anova_vs_int": meta_anov.get("spearman_float_anova_vs_int"),
                 "spearman_Vhat_vs_int": meta_anov.get("spearman_Vhat_vs_int"),
                 "cert_min_ising_energy": cert_anov["cert_min_ising_energy"],

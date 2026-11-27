@@ -16,7 +16,7 @@ import sys
 import warnings
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import norm, pearsonr, spearmanr
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -84,6 +84,7 @@ def run_deep_analysis():
 
     # 2. (A,B)-Group-Disjoint Mondrian Split-Conformal Calibration on 03_val (Frozen 02-only model)
     #    Split the 567 distinct (A,B) groups 50/50 (283 cal / 284 test) across 200 permutations.
+    #    Strata are defined by predicted p_semi >= 0.20 (NOT ground-truth metal/semiconductor labels).
     rng = np.random.default_rng(2026)
     groups = (val_df["A"].astype(str) + "_" + val_df["B"].astype(str)).values
     uniq_groups = np.unique(groups)
@@ -94,8 +95,13 @@ def run_deep_analysis():
     y_true = val_df["V"].values
     y_pred = val_df["V_hat"].values
     p_semi = val_df["p_semi"].values
+    y_true_semi = (val_df["gap"].values > 0).astype(int)
     abs_err = np.abs(y_true - y_pred)
-    stratum = (p_semi >= 0.20).astype(int)  # 0: confident metallic; 1: semiconducting/borderline
+    stratum = (p_semi >= 0.20).astype(int)  # 0: predicted low-prob (p_semi < 0.20); 1: predicted semi/borderline (>= 0.20)
+    n_s0_total = int((stratum == 0).sum())
+    n_s0_true_semi = int(((stratum == 0) & (y_true_semi == 1)).sum())
+    n_s1_total = int((stratum == 1).sum())
+    n_s1_true_semi = int(((stratum == 1) & (y_true_semi == 1)).sum())
 
     cov90_all, cov95_all = [], []
     cov90_s0_l, cov90_s1_l, cov95_s0_l, cov95_s1_l = [], [], [], []
@@ -158,6 +164,12 @@ def run_deep_analysis():
     total_exp_hits = float(p_by_v.sum())
     total_exp_sd = float(np.sqrt(np.sum(p_by_v * (1.0 - p_by_v))))
 
+    # Untruncated Gaussian negative-gap tail check on 04_holdout (E_g | E_g > 0 approximation)
+    p_neg_gap_04 = norm.cdf((0.0 - hold_df["mu_gap"].values) / hold_df["sigma_gap"].values)
+    p_neg_gap_median_all = float(np.median(p_neg_gap_04))
+    p_neg_gap_max_all = float(np.max(p_neg_gap_04))
+    p_neg_gap_max_top50 = float(np.max(p_neg_gap_04[:50]))
+
     val_sorted = val_df.sort_values("V_hat").reset_index(drop=True)
     sum_phit_03_all = float(val_sorted["P_hit"].sum())
     sum_phit_03_top75 = float(val_sorted.head(75)["P_hit"].sum())
@@ -183,6 +195,7 @@ def run_deep_analysis():
         },
         "mondrian_conformal_03val": {
             "split_protocol": f"200 (A,B)-group-disjoint 50/50 splits ({n_cal_groups} cal groups / {n_tst_groups} test groups)",
+            "stratum_definition": "Predicted probability threshold p_semi >= 0.20 (NOT ground-truth metal/semiconductor labels)",
             "predictor_scope": (
                 "Scoped strictly to frozen 02-only model predictions on unseen (A,B) pairs in 03_castelli_val.csv. "
                 "Does NOT transfer as a finite-sample guarantee to 02+03 refitted 04_holdout or adaptive Top-K subsets."
@@ -196,6 +209,32 @@ def run_deep_analysis():
             "empirical_coverage_90_std_pct": round(100.0 * float(np.std(cov90_all)), 2),
             "empirical_coverage_95_pct": round(100.0 * float(np.mean(cov95_all)), 2),
             "empirical_coverage_95_std_pct": round(100.0 * float(np.std(cov95_all)), 2),
+            "low_psemi_lt_020_stratum": {
+                "n_rows": n_s0_total,
+                "n_true_metals": n_s0_total - n_s0_true_semi,
+                "n_true_semiconductors": n_s0_true_semi,
+                "coverage_90_pct": round(100.0 * float(np.mean(cov90_s0_l)), 2),
+                "coverage_95_pct": round(100.0 * float(np.mean(cov95_s0_l)), 2),
+                "q90_radius_mean": round(float(np.mean(q90_s0_l)), 3),
+                "q90_radius_median": round(float(np.median(q90_s0_l)), 3),
+                "q90_radius_std": round(float(np.std(q90_s0_l)), 3),
+                "q95_radius_mean": round(float(np.mean(q95_s0_l)), 3),
+                "q95_radius_median": round(float(np.median(q95_s0_l)), 3),
+                "q95_radius_std": round(float(np.std(q95_s0_l)), 3),
+            },
+            "high_psemi_ge_020_stratum": {
+                "n_rows": n_s1_total,
+                "n_true_metals": n_s1_total - n_s1_true_semi,
+                "n_true_semiconductors": n_s1_true_semi,
+                "coverage_90_pct": round(100.0 * float(np.mean(cov90_s1_l)), 2),
+                "coverage_95_pct": round(100.0 * float(np.mean(cov95_s1_l)), 2),
+                "q90_radius_mean": round(float(np.mean(q90_s1_l)), 3),
+                "q90_radius_median": round(float(np.median(q90_s1_l)), 3),
+                "q90_radius_std": round(float(np.std(q90_s1_l)), 3),
+                "q95_radius_mean": round(float(np.mean(q95_s1_l)), 3),
+                "q95_radius_median": round(float(np.median(q95_s1_l)), 3),
+                "q95_radius_std": round(float(np.std(q95_s1_l)), 3),
+            },
             "metal_coverage_90_pct": round(100.0 * float(np.mean(cov90_s0_l)), 2),
             "metal_coverage_95_pct": round(100.0 * float(np.mean(cov95_s0_l)), 2),
             "semi_coverage_90_pct": round(100.0 * float(np.mean(cov90_s1_l)), 2),
@@ -226,15 +265,27 @@ def run_deep_analysis():
         },
         "holdout_04_expected_yield": {
             "definition_scope": (
-                "Model expectation sums of approximate hit score P_hit = P_form * P_semi * P_gap under assumed "
-                "predictive Gaussian marginals and conditional independence. Percentages are fractions of the "
-                "model expectation sum sum_P_hit_all, NOT unseen true-positive recall against the 19 hidden V=0 targets."
+                "Deterministic score sums of approximate hit score P_hit = P_form * P_semi * P_gap under "
+                "untruncated Gaussian marginals and conditional independence. Percentages are fractions of the "
+                "deterministic score sum sum_P_hit_all, NOT unseen true-positive recall against the 19 hidden V=0 targets."
+            ),
+            "indep_bernoulli_count_sd_note": (
+                "indep_bernoulli_count_sd = sqrt(sum p_i(1-p_i)) is the model-internal SD of a hypothetical "
+                "random hit count H under independent Bernoulli(p_i) trials ignoring cross-candidate covariance "
+                "and unconditioned on the known total of 19 hidden V=0 targets; it is NOT an error bar on deterministic sum(P_hit)."
             ),
             "total_compounds": int(len(hold_df)),
             "known_true_targets": 19,
             "sum_P_hit_all": round(total_exp_hits, 4),
             "sum_P_hit_all_3703": round(total_exp_hits, 2),
+            "indep_bernoulli_count_sd": round(total_exp_sd, 4),
             "sum_P_hit_sd": round(total_exp_sd, 2),
+            "untruncated_gaussian_neg_gap_tail": {
+                "note": "E_g | E_g > 0 is approximated by an untruncated Normal(mu_gap, sigma_gap^2); positive mean does not truncate negative support.",
+                "median_all_04": round(p_neg_gap_median_all, 6),
+                "max_all_04": round(p_neg_gap_max_all, 6),
+                "max_top50_by_Vhat_04": round(p_neg_gap_max_top50, 6),
+            },
             "sum_P_hit_top10": round(float(cum_yield_v[9]), 4),
             "sum_P_hit_top20": round(float(cum_yield_v[19]), 4),
             "sum_P_hit_top30": round(float(cum_yield_v[29]), 4),
@@ -319,13 +370,13 @@ def run_deep_analysis():
     ax_b.plot(ks, cum_yield_v[:150], "-", color=NAVY, lw=2.4,
               label=f"Ranked by V_hat (Sum@30={cum_yield_v[29]:.2f}, @50={cum_yield_v[49]:.2f})")
     ax_b.fill_between(ks, np.maximum(0, cum_yield_v[:150] - cum_sd_v[:150]), cum_yield_v[:150] + cum_sd_v[:150],
-                      color=NAVY, alpha=0.14, label="±1 Poisson-Binomial SD (indep. approx.)")
+                      color=NAVY, alpha=0.14, label="±1 Indep.-Bernoulli Count SD (ignores cross-cand. cov.)")
     ax_b.plot(ks, cum_yield_phit[:150], "--", color=TEAL, lw=2.1,
               label=f"Ranked by P_hit (Sum@30={cum_yield_phit[29]:.2f}, @50={cum_yield_phit[49]:.2f})")
     ax_b.plot(ks, 19.0 * ks / len(hold_df), ":", color=SLATE, lw=1.8, label="Uniform Random Expectation (0.15 @ K=30)")
     ax_b.axhline(19.0, color=CRIMSON, linestyle="-.", lw=1.4, label="Hidden V=0 Count in 04 (19 total; labels unseen)")
     ax_b.axhline(total_exp_hits, color=ORANGE, linestyle=":", lw=1.4,
-                 label=f"Total Model Sum(P_hit) = {total_exp_hits:.2f} ± {total_exp_sd:.2f}")
+                 label=f"Total Score Sum(P_hit) = {total_exp_hits:.2f} (indep. Bern. SD = {total_exp_sd:.2f})")
     ax_b.axvline(30, color=GOLD, linestyle="--", lw=1.2)
     pct30 = 100.0 * cum_yield_v[29] / max(total_exp_hits, 1e-6)
     ax_b.text(32, 3.0,

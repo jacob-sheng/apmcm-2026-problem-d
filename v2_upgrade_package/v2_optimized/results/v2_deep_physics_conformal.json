@@ -8,6 +8,7 @@
   },
   "mondrian_conformal_03val": {
     "split_protocol": "200 (A,B)-group-disjoint 50/50 splits (283 cal groups / 284 test groups)",
+    "stratum_definition": "Predicted probability threshold p_semi >= 0.20 (NOT ground-truth metal/semiconductor labels)",
     "predictor_scope": "Scoped strictly to frozen 02-only model predictions on unseen (A,B) pairs in 03_castelli_val.csv. Does NOT transfer as a finite-sample guarantee to 02+03 refitted 04_holdout or adaptive Top-K subsets.",
     "n_splits": 200,
     "n_unique_ab_groups": 567,
@@ -18,6 +19,32 @@
     "empirical_coverage_90_std_pct": 1.65,
     "empirical_coverage_95_pct": 95.12,
     "empirical_coverage_95_std_pct": 1.13,
+    "low_psemi_lt_020_stratum": {
+      "n_rows": 3808,
+      "n_true_metals": 3779,
+      "n_true_semiconductors": 29,
+      "coverage_90_pct": 90.17,
+      "coverage_95_pct": 95.09,
+      "q90_radius_mean": 4.411,
+      "q90_radius_median": 4.42,
+      "q90_radius_std": 0.252,
+      "q95_radius_mean": 7.004,
+      "q95_radius_median": 6.958,
+      "q95_radius_std": 0.538
+    },
+    "high_psemi_ge_020_stratum": {
+      "n_rows": 161,
+      "n_true_metals": 49,
+      "n_true_semiconductors": 112,
+      "coverage_90_pct": 90.66,
+      "coverage_95_pct": 95.62,
+      "q90_radius_mean": 12.375,
+      "q90_radius_median": 12.044,
+      "q90_radius_std": 0.848,
+      "q95_radius_mean": 18.014,
+      "q95_radius_median": 15.582,
+      "q95_radius_std": 5.025
+    },
     "metal_coverage_90_pct": 90.17,
     "metal_coverage_95_pct": 95.09,
     "semi_coverage_90_pct": 90.66,
@@ -47,12 +74,20 @@
     "res_gap_std": 0.7917
   },
   "holdout_04_expected_yield": {
-    "definition_scope": "Model expectation sums of approximate hit score P_hit = P_form * P_semi * P_gap under assumed predictive Gaussian marginals and conditional independence. Percentages are fractions of the model expectation sum sum_P_hit_all, NOT unseen true-positive recall against the 19 hidden V=0 targets.",
+    "definition_scope": "Deterministic score sums of approximate hit score P_hit = P_form * P_semi * P_gap under untruncated Gaussian marginals and conditional independence. Percentages are fractions of the deterministic score sum sum_P_hit_all, NOT unseen true-positive recall against the 19 hidden V=0 targets.",
+    "indep_bernoulli_count_sd_note": "indep_bernoulli_count_sd = sqrt(sum p_i(1-p_i)) is the model-internal SD of a hypothetical random hit count H under independent Bernoulli(p_i) trials ignoring cross-candidate covariance and unconditioned on the known total of 19 hidden V=0 targets; it is NOT an error bar on deterministic sum(P_hit).",
     "total_compounds": 3703,
     "known_true_targets": 19,
     "sum_P_hit_all": 10.3358,
     "sum_P_hit_all_3703": 10.34,
+    "indep_bernoulli_count_sd": 2.2973,
     "sum_P_hit_sd": 2.3,
+    "untruncated_gaussian_neg_gap_tail": {
+      "note": "E_g | E_g > 0 is approximated by an untruncated Normal(mu_gap, sigma_gap^2); positive mean does not truncate negative support.",
+      "median_all_04": 0.174308,
+      "max_all_04": 0.465995,
+      "max_top50_by_Vhat_04": 0.011031
+    },
     "sum_P_hit_top10": 5.2747,
     "sum_P_hit_top20": 7.6436,
     "sum_P_hit_top30": 8.6001,

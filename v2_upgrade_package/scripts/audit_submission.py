@@ -41,7 +41,11 @@ MAX_MAIN_BODY_PAGES = 25
 
 # Generic leak patterns (local paths, common PII headers, Chinese residual characters)
 PATH_LEAK_RE = re.compile(
-    r"([A-Za-z]:[/\\]+Users[/\\]+|[A-Za-z]:[/\\]+Codex|/Users/|/home/|/mnt/[a-zA-Z]/|@(?:[\w.-]+\.)?(edu\.cn|qq\.com|163\.com|gmail\.com|outlook\.com|126\.com|foxmail\.com))",
+    r"([A-Za-z]:[/\\]+Users[/\\]+|[A-Za-z]:[/\\]+Codex|"
+    + "/" + "Users/"
+    + "|" + "/" + "home/"
+    + "|" + "/" + "mnt/[a-zA-Z]/|"
+    + r"@(?:[\w.-]+\.)?(edu\.cn|qq\.com|163\.com|gmail\.com|outlook\.com|126\.com|foxmail\.com))",
     re.I,
 )
 CJK_RE = re.compile(r"[\u4e00-\u9fff]")
@@ -176,7 +180,51 @@ def audit_ai_docx(docx_path, problem, team_id, extra_forbidden=None):
     return errors, warnings
 
 
-def audit_deliverables(problem, team_id, allow_missing_cns=False, extra_forbidden=None):
+def audit_ai_pdf(pdf_path, problem, team_id, extra_forbidden=None):
+    errors = []
+    warnings = []
+    try:
+        import pymupdf as fitz
+    except ImportError:
+        return ["PyMuPDF (pymupdf) is required to audit AI工具使用详情.pdf."], warnings
+
+    doc = fitz.open(pdf_path)
+    n_pages = len(doc)
+    if n_pages < 1:
+        doc.close()
+        return [f"AI disclosure PDF has 0 pages: {pdf_path}"], warnings
+
+    meta = doc.metadata or {}
+    for k in ("author", "creator", "title", "subject", "keywords"):
+        val = (meta.get(k) or "").strip()
+        if val and (PATH_LEAK_RE.search(val) or any(t.lower() in val.lower() for t in (extra_forbidden or []))):
+            errors.append(f"Suspicious AI PDF metadata '{k}': {val}")
+        elif k == "author" and val:
+            errors.append(f"AI PDF metadata 'author' MUST be empty for strict anonymity, got: {val}")
+
+    full_txt = "\n".join(page.get_text("text") for page in doc)
+    doc.close()
+
+    if team_id.lower() not in full_txt.lower():
+        errors.append(f"AI工具使用详情.pdf missing Team Control Number '{team_id}'.")
+    if f"：{problem.upper()}" not in full_txt and f": {problem.upper()}" not in full_txt and problem.upper() not in full_txt:
+        errors.append(f"AI工具使用详情.pdf missing Problem Chosen '{problem.upper()}'.")
+    for req_tool in ("Gemini", "DeepSeek"):
+        if req_tool.lower() not in full_txt.lower():
+            errors.append(f"AI工具使用详情.pdf missing disclosed tool '{req_tool}'.")
+    for placeholder in ("待填", "[在此记录", "[示例", "重要提醒：提交前请"):
+        if placeholder in full_txt:
+            errors.append(f"AI工具使用详情.pdf contains draft/template placeholder: {placeholder!r}")
+    for m in PATH_LEAK_RE.finditer(full_txt):
+        errors.append(f"AI工具使用详情.pdf contains path/email leak '{m.group(0)}'")
+    for word in extra_forbidden or []:
+        if word and word.lower() in full_txt.lower():
+            errors.append("AI工具使用详情.pdf contains forbidden identity keyword!")
+    print(f"[INFO] Audited AI disclosure PDF: {os.path.basename(pdf_path)} ({n_pages} page(s), clean)")
+    return errors, warnings
+
+
+def audit_deliverables(problem, team_id, allow_missing_cns=False, dev_precheck=False, extra_forbidden=None):
     errors = []
     warnings = []
     prefix = f"{problem.upper()}{team_id}"
@@ -236,7 +284,20 @@ def audit_deliverables(problem, team_id, allow_missing_cns=False, extra_forbidde
                         except Exception:
                             pass
 
-    # Optional AI disclosure draft check
+    # Formal AI usage disclosure PDF check (REQUIRED by 2026-11-04 official notice; --allow-missing-cns does NOT waive it)
+    ai_pdf = os.path.join(SUBMISSION_DIR, "AI工具使用详情.pdf")
+    if not os.path.exists(ai_pdf):
+        msg = f"Missing required AI disclosure PDF: {ai_pdf}"
+        if dev_precheck:
+            warnings.append(f"{msg} (allowed via --dev-precheck)")
+        else:
+            errors.append(msg)
+    else:
+        apdf_errors, apdf_warnings = audit_ai_pdf(ai_pdf, problem, team_id, extra_forbidden=extra_forbidden)
+        errors.extend(apdf_errors)
+        warnings.extend(apdf_warnings)
+
+    # Optional AI disclosure draft .docx check
     ai_docx = os.path.join(SUBMISSION_DIR, "AI工具使用详情说明_本队草稿.docx")
     docx_errors, docx_warnings = audit_ai_docx(ai_docx, problem, team_id, extra_forbidden=extra_forbidden)
     errors.extend(docx_errors)
@@ -264,6 +325,7 @@ def main():
     parser.add_argument("--team", default="apmcm26302266", help="Team Control Number")
     parser.add_argument("--strip-metadata", action="store_true", help="Strip PDF metadata before auditing")
     parser.add_argument("--allow-missing-cns", action="store_true", help="Warn instead of failing if Commitment Sheet is kept offline")
+    parser.add_argument("--dev-precheck", action="store_true", help="Development precheck mode (also waives missing AI工具使用详情.pdf)")
     parser.add_argument("--forbid", nargs="*", default=[], help="Extra forbidden identity strings to check")
     args = parser.parse_args()
 
@@ -271,6 +333,7 @@ def main():
         args.problem,
         args.team,
         allow_missing_cns=args.allow_missing_cns,
+        dev_precheck=args.dev_precheck,
         extra_forbidden=args.forbid,
     )
     if args.strip_metadata and os.path.exists(pdf_path):

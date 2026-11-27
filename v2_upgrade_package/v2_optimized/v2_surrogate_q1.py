@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 """
-v2 Upgraded Problem 1 Surrogate (Strict Zero-Leakage Nested Outer-(A,B)-GroupKFold):
+v2 Upgraded Problem 1 Surrogate (Outer-(A,B)-GroupKFold Base Isolation + Pooled-OOF Meta-Layer):
   Physics-Coupled Stage-0 Auxiliary DFT + Multi-Family Ensemble +
   Calibrated Bayes-Optimal Mixture-Expectation Model.
 
-Strictly obeys Problem D evaluation rules and F05/F12/F25/F26 remediation:
-  - Zero-leakage outer (A,B)-GroupKFold: inside EVERY outer fold (ti, vi),
+Strictly obeys Problem D evaluation rules and R01/R03 scoping:
+  - Outer (A,B)-GroupKFold base-pipeline isolation: inside EVERY outer fold (ti, vi),
     Butler-Ginley Ridge weights, marginal target-encoding priors & inner-OOF stats,
-    Stage-0 DFT predictors, 4-family main models, and conditional semiconductor
+    Stage-0 DFT predictors, 4-family base models, and conditional semiconductor
     gap models (using the exact same outer fold partition) are fitted strictly
-    on df_tr_fold ONLY. Ensemble weights, residual scales, and IsotonicRegression
-    calibrators are fitted strictly on leakage-free outer OOF predictions.
-  - Automated +100 label-perturbation isolation test verifies max_feature_delta < 1e-12
-    and max_pred_delta < 1e-12.
+    on df_tr_fold ONLY.
+  - Pooled-OOF meta-layer: ensemble simplex weights, residual scales (sigma_ef, sigma_g),
+    and the 50/50 IsotonicRegression blend are subsequently fitted on the pooled
+    outer-OOF base predictions. Consequently, outer_oof_metrics_* are in-sample
+    pooled-OOF meta-fit development diagnostics, stage0_oof_metrics are inner-fold
+    development diagnostics (te_* encodings precede Stage-0's inner split), and
+    complete end-to-end generalization is evaluated on external 03_castelli_val.csv.
+  - Automated +100 label-perturbation isolation test verifies fit_fold_isolated_pipeline
+    (base feature/model path: max_feature_delta < 1e-12 and max_pred_delta < 1e-12).
   - Fair baseline alignment loads M4_PIMT_Physics_Only and M5_PIMT_Hybrid_Ensemble
-    from the original repo table1_surrogate_ablation.csv alongside v1 baselines and
-    near-target MAE(V<1) / MAE(V<0.5) metrics on the 02 -> 03 protocol.
+    from reference_baselines/table1_surrogate_ablation.csv (bundled for standalone ZIP
+    reproducibility) alongside v1 baselines on the 02 -> 03 protocol.
   - Dual holdout exports: v2_holdout_04_train02only.csv (frozen 02-only) and
     v2_holdout_04.csv (02+03 refit), plus A=B sensitivity diagnostics.
 """
@@ -491,10 +496,13 @@ def integrate_bayes_mixture(mu_ef, std_ef, sig_ef, p_semi, mu_g, std_g, sig_g, e
 
 def test_outer_fold_isolation(df_train, n_splits=5):
     """
-    Automated +100 Label-Perturbation Isolation Self-Test (F05):
+    Automated +100 Label-Perturbation Base-Pipeline Isolation Self-Test:
     Perturb fold-0 validation targets (V, e_form, gap) by +100.0, re-run fold-0
-    feature engineering & 4-family model fitting, and assert max_feature_delta < 1e-12
-    AND max_pred_delta < 1e-12 on unperturbed validation inputs.
+    target-dependent feature engineering & 4-family base model fitting
+    (`fit_fold_isolated_pipeline`), and assert max_feature_delta < 1e-12 AND
+    max_pred_delta < 1e-12 on unperturbed validation inputs.
+    Note: Tests base feature/model fold isolation; pooled-OOF meta-fitting occurs
+    downstream in fit_and_predict_v2.
     """
     t0 = time.perf_counter()
     groups = (df_train["A"].astype(str) + "_" + df_train["B"].astype(str)).values
@@ -556,14 +564,15 @@ def test_outer_fold_isolation(df_train, n_splits=5):
         "max_feature_delta": max_feat_delta,
         "max_pred_delta": max_pred_delta,
         "threshold": 1e-12,
+        "scope": "base_feature_and_4family_model_fold_isolation_test (fit_fold_isolated_pipeline; excludes pooled-OOF meta-layer)",
         "runtime_sec": round(dt, 2),
     }
 
 
 def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_splits=5):
     """
-    Strictly fold-isolated outer (A,B)-GroupKFold training on df_train
-    and out-of-sample ensemble inference on df_eval_list.
+    Outer (A,B)-GroupKFold isolated base features & 4-family predictors on df_train,
+    followed by pooled-OOF simplex/isotonic/sigma meta-fitting and external inference.
     """
     groups = (df_train["A"].astype(str) + "_" + df_train["B"].astype(str)).values
     gkf = GroupKFold(n_splits=n_splits)
@@ -610,7 +619,9 @@ def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_split
             ev_dir_4[j] += fold_res["preds_dir"][1 + j] / n_splits
             ev_ec[j] += fold_res["ec_evals"][1 + j] / n_splits
 
-    # Fit simplex ensemble weights, residual scales, and isotonic calibrator strictly on outer OOF
+    # Fit simplex ensemble weights, residual scales, and isotonic calibrator on pooled base-model outer-OOF predictions
+    # (Metrics evaluated in-place on these same pooled OOF labels are development diagnostics;
+    # end-to-end generalization is evaluated externally on 03_castelli_val.csv.)
     y_ef = df_train["e_form"].values
     w_ef = _fit_optimal_weights(oof_ef, y_ef, loss="mse")
     oof_ef_ens = oof_ef @ w_ef
@@ -663,7 +674,16 @@ def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_split
         eval_outputs.append(res)
 
     meta = {
-        "outer_cv_protocol": f"{n_splits}-fold (A,B)-GroupKFold strictly isolated per fold",
+        "outer_cv_protocol": (
+            f"{n_splits}-fold (A,B)-GroupKFold isolated base features & 4-family predictors "
+            "+ pooled-OOF simplex/isotonic/sigma meta-layer"
+        ),
+        "meta_layer_scope_note": (
+            "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit "
+            "(weights, residual scales, isotonic blend) and serve as development diagnostics; "
+            "stage0_oof_metrics are inner-fold development diagnostics within each outer "
+            "training split; external evaluation uses 03_castelli_val.csv."
+        ),
         "stage0_oof_metrics": s0_mean,
         "stage0_per_fold_metrics": fold_s0_metrics,
         "weights_e_form": dict(zip(["CatBoost", "LightGBM", "XGBoost", "ExtraTrees"], [round(float(x), 4) for x in w_ef])),
@@ -721,56 +741,68 @@ def evaluate_baselines_and_align(tr, va, m_v2_dir, m_v2_bayes):
     for r in v1_rows:
         r["source"] = "Recomputed on 02->03 via v1_baseline.py protocol (n_jobs=2)"
 
-    # Load original repository table1_surrogate_ablation.csv dynamically
-    orig_outputs_dir = os.path.join(
+    # Load archived table1_surrogate_ablation.csv (prefer bundled reference_baselines/ for standalone ZIP)
+    bundled_t1 = os.path.join(CUR_DIR, "reference_baselines", "table1_surrogate_ablation.csv")
+    repo_orig_outputs_dir = os.path.join(
         REPO_ROOT, "01_2026赛题与数据集", "Problem_D_量子计算钙钛矿稀有目标搜索", "project", "outputs"
     )
-    table1_path = os.path.join(orig_outputs_dir, "table1_surrogate_ablation.csv")
-    orig_val_pred_path = os.path.join(orig_outputs_dir, "03_val_predictions.csv")
+    repo_t1 = os.path.join(repo_orig_outputs_dir, "table1_surrogate_ablation.csv")
+    if os.path.isfile(bundled_t1):
+        table1_path = bundled_t1
+        table1_rel = "v2_optimized/reference_baselines/table1_surrogate_ablation.csv"
+    elif os.path.isfile(repo_t1):
+        table1_path = repo_t1
+        table1_rel = os.path.relpath(repo_t1, REPO_ROOT).replace("\\", "/")
+    else:
+        table1_path = None
+        table1_rel = None
 
-    if not os.path.isfile(table1_path):
-        raise FileNotFoundError(f"Missing original baseline ablation CSV: {table1_path}")
-
-    t1 = pd.read_csv(table1_path)
-    repo_rows = []
+    orig_val_pred_path = os.path.join(repo_orig_outputs_dir, "03_val_predictions.csv")
     has_per_row_val = os.path.isfile(orig_val_pred_path)
-    for model_name in ("M4_PIMT_Physics_Only", "M5_PIMT_Hybrid_Ensemble"):
-        sub = t1[t1["model"] == model_name]
-        if len(sub) == 0:
-            raise ValueError(f"Model {model_name} not found in {table1_path}")
-        row = sub.iloc[0]
-        rec = {
-            "model": model_name,
-            "RMSE": round(float(row["RMSE"]), 4),
-            "MAE": round(float(row["MAE"]), 4),
-            "R2": round(float(row["R2"]), 4),
-            "Spearman": round(float(row["Spearman_rho"]), 4),
-            "Rec@20(V<1.0)": round(float(row["Recall_Vlt1_Top20"]), 4),
-            "Rec@50(V<1.0)": round(float(row["Recall_Vlt1_Top50"]), 4),
-            "Rec@100(V<1.0)": round(float(row["Recall_Vlt1_Top100"]), 4),
-            "EF@50(V<1.0)": round(float(row["Enrichment_Vlt1_Top50"]), 2),
-            "MAE_V_lt_1": None,
-            "MAE_V_lt_0_5": None,
-            "source": (
-                "01_2026赛题与数据集/Problem_D_量子计算钙钛矿稀有目标搜索/project/outputs/table1_surrogate_ablation.csv "
-                "(02->03 protocol; per-row 03_val_predictions.csv not archived in project/outputs/)"
-            ),
-        }
-        repo_rows.append(rec)
+    repo_rows = []
+    if table1_path is None:
+        print("[WARN] Optional reference table1_surrogate_ablation.csv not found; skipping M4/M5 archival alignment.")
+    else:
+        t1 = pd.read_csv(table1_path)
+        for model_name in ("M4_PIMT_Physics_Only", "M5_PIMT_Hybrid_Ensemble"):
+            sub = t1[t1["model"] == model_name]
+            if len(sub) == 0:
+                raise ValueError(f"Model {model_name} not found in {table1_path}")
+            row = sub.iloc[0]
+            rec = {
+                "model": model_name,
+                "RMSE": round(float(row["RMSE"]), 4),
+                "MAE": round(float(row["MAE"]), 4),
+                "R2": round(float(row["R2"]), 4),
+                "Spearman": round(float(row["Spearman_rho"]), 4),
+                "Rec@20(V<1.0)": round(float(row["Recall_Vlt1_Top20"]), 4),
+                "Rec@50(V<1.0)": round(float(row["Recall_Vlt1_Top50"]), 4),
+                "Rec@100(V<1.0)": round(float(row["Recall_Vlt1_Top100"]), 4),
+                "EF@50(V<1.0)": round(float(row["Enrichment_Vlt1_Top50"]), 2),
+                "MAE_V_lt_1": None,
+                "MAE_V_lt_0_5": None,
+                "source": (
+                    f"{table1_rel} "
+                    "(archived 02->03 ablation; per-row 03_val_predictions.csv not archived)"
+                ),
+            }
+            repo_rows.append(rec)
 
     v2_rows = []
     for r in (m_v2_dir, m_v2_bayes):
         rc = dict(r)
-        rc["source"] = "Fold-isolated v2 surrogate on 02->03 protocol"
+        rc["source"] = "Fold-isolated base + pooled-OOF meta v2 surrogate on 02->03 protocol"
         v2_rows.append(rc)
 
     all_rows = v1_rows + repo_rows + v2_rows
     by_name = {r["model"]: r for r in all_rows}
 
-    # Relative RMSE & MAE improvements of v2_PhysHurdle_Bayes against key references
+    # Relative RMSE & MAE improvements of v2_PhysHurdle_Bayes against available references
     rel_cmp = {}
     v2b = by_name["v2_PhysHurdle_Bayes"]
     for ref_name in ("M4_PIMT_Physics_Only", "M5_PIMT_Hybrid_Ensemble", "v1_Direct_LGBM_log1pV", "v1_OneHot_FM_k8", "v2_Direct_4FamPhys"):
+        if ref_name not in by_name:
+            continue
         ref = by_name[ref_name]
         rel_cmp[ref_name] = {
             "ref_RMSE": ref["RMSE"],
@@ -780,7 +812,7 @@ def evaluate_baselines_and_align(tr, va, m_v2_dir, m_v2_bayes):
         }
 
     return {
-        "table1_path_rel": os.path.relpath(table1_path, REPO_ROOT).replace("\\", "/"),
+        "table1_path_rel": table1_rel,
         "orig_03_val_predictions_present": bool(has_per_row_val),
         "models": all_rows,
         "v2_phys_hurdle_relative_delta": rel_cmp,

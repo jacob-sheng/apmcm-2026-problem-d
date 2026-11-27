@@ -598,7 +598,7 @@
       },
       "v2_Classical_SeqRank": {
         "oracle_labels_used": "multi_property(e_form, gap, vbm, cbm)",
-        "surrogate_model": "ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM_ExpectedHinge",
+        "surrogate_model": "Lightweight_Online_ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM (fixed sigma_ef=0.25, sigma_g=0.80; no Stage-0/4-family/isotonic)",
         "acquisition_mechanism": "classical_np_argsort_unqueried",
         "uses_qubo_solver": false,
         "rare05_mean": [
@@ -720,8 +720,8 @@
       },
       "v2_Real_8Bit_QUBO": {
         "oracle_labels_used": "multi_property(e_form, gap, vbm, cbm)",
-        "surrogate_model": "ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM_ExpectedHinge",
-        "acquisition_mechanism": "per_round_8bit_Model3A_Comp_MaskedQUBO_KaiwuSA",
+        "surrogate_model": "Lightweight_Online_ButlerGinley_Ec_Ridge + PhysicsHurdle_LGBM (fixed sigma_ef=0.25, sigma_g=0.80; no Stage-0/4-family/isotonic)",
+        "acquisition_mechanism": "hybrid_classical_top20_prescreen + per_round_8bit_Model3A_Comp_MaskedQUBO_KaiwuSA (excludes A=B)",
         "uses_qubo_solver": true,
         "rare05_mean": [
           0.15,
@@ -846,7 +846,9 @@
       "converged_pct": 100.0,
       "mean_nit": 222.37,
       "mean_train_mse": 1.7628,
-      "mean_grad_inf_norm": 7.2e-05
+      "mean_grad_inf_norm": 7.2e-05,
+      "measured_branch": "v1_FM_LBFGS_SeqRank",
+      "qubo_branch_note": "v1_FM_LBFGS_QUBO uses the identical fit_onehot_fm_lbfgs(maxiter=600) optimizer; per-round convergence flags in this archived 20-seed JSON were recorded on v1_FM_LBFGS_SeqRank (300/300)."
     },
     "per_round_qubo_audit": {
       "v1_FM_LBFGS_QUBO": {
@@ -1293,6 +1295,10 @@
           }
         ]
       }
+    },
+    "protocol_scope_notes": {
+      "same_surrogate_comparison": "Under the same lightweight online physics-hurdle surrogate, v2_Real_8Bit_QUBO achieved 16.20/18 (SD 1.077) vs 16.55/18 (SD 1.962) for v2_Classical_SeqRank (-0.35 targets, -1.94 pp), supporting hybrid classical-prescreen + QUBO feasibility without claiming acquisition-level or quantum advantage. Marginal across-seed SDs are reported; per-seed paired trajectories were not archived.",
+      "a_eq_b_eligibility": "03_val has 3,969 rows including 77 homonuclear (A=B) rows (0 targets with V<1, min V=6.65373). Initial 50-sample pools and Random/SeqRank draw from all 3,969 rows (E[H_0.5(200)]=0.9070295), whereas v2_Real_8Bit_QUBO excludes A=B in its QUBO decoding (non-homonuclear pool N=3,892 gives E[H_0.5(200)]=0.9249743)."
     }
   },
   "equal_budget_solver_topk": {

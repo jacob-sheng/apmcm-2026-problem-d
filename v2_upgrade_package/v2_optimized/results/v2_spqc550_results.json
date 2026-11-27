@@ -20,7 +20,10 @@
         "continuous_regret_top1": 0.0,
         "continuous_regret_worst_gs": 0.013573,
         "enumeration_method": "full_2^n_vectorized",
-        "M_max": 4
+        "M_max": 4,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.013573
       },
       "hardware_spec": {
         "spins": 12,
@@ -312,7 +315,6 @@
         "matrix_sha256": "361cc4d8ef7d074479506820b0c3e3d90b3170e97ca7c721caea7aa013c02a6b",
         "ising_offset_C": 824,
         "cloud_roundtrip_wall_sec": 17.24,
-        "poll_interval_min": 1,
         "sdk_optimizer_meta": {
           "task_name": "v3_q2_blind_12",
           "wait": true,
@@ -321,7 +323,12 @@
           "task_mode": "optimization",
           "sample_number": 10,
           "interval": 5
-        }
+        },
+        "raw_spins_file_sha256": "40195aebc95d1b85e32b61c8edf91be59f3c4b1636aad708f1bfb6902c1566a3",
+        "raw_spins_int8_sha256": "7e82030cacffeac842ebc95102ed02a4a0e8b29d0fbfc380b33ae0e76b9622c5",
+        "poll_interval_requested_sec": 1,
+        "poll_interval_effective_sec": 5,
+        "poll_interval_unit_note": "Kaiwu SDK 1.4.4 CIMOptimizer interval is in seconds (default 6s, min 5s); requested=1s was clamped by SDK to effective=5s."
       }
     },
     "v3_q3_comp_18": {
@@ -344,7 +351,10 @@
         "continuous_regret_top1": 0.0,
         "continuous_regret_worst_gs": 0.162025,
         "enumeration_method": "full_2^n_vectorized",
-        "M_max": 4
+        "M_max": 4,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.162025
       },
       "hardware_spec": {
         "spins": 18,
@@ -661,7 +671,6 @@
         "matrix_sha256": "47b9b1f72e78fa9d4dc94ae9a83b6a0067c1f1914b8e9219df6f9b5e233939ae",
         "ising_offset_C": 1364,
         "cloud_roundtrip_wall_sec": 16.23,
-        "poll_interval_min": 1,
         "sdk_optimizer_meta": {
           "task_name": "v3_q3_comp_18",
           "wait": true,
@@ -670,7 +679,12 @@
           "task_mode": "optimization",
           "sample_number": 10,
           "interval": 5
-        }
+        },
+        "raw_spins_file_sha256": "cb6053f46a99780c035b7dc8a646790ff5090768bd837aa45b6e6f4a70198491",
+        "raw_spins_int8_sha256": "c524b5fea3890b1999fe9cb323727511f40bfe7a0fe4ab6b9d281b0dddcd27d4",
+        "poll_interval_requested_sec": 1,
+        "poll_interval_effective_sec": 5,
+        "poll_interval_unit_note": "Kaiwu SDK 1.4.4 CIMOptimizer interval is in seconds (default 6s, min 5s); requested=1s was clamped by SDK to effective=5s."
       }
     },
     "v3_q3_hobo_29": {
@@ -693,7 +707,10 @@
         "continuous_regret_top1": 0.0,
         "continuous_regret_worst_gs": 0.162025,
         "enumeration_method": "full_2^n_vectorized",
-        "M_max": 4
+        "M_max": 4,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.162025
       },
       "hardware_spec": {
         "spins": 29,
@@ -1006,7 +1023,6 @@
         "matrix_sha256": "302bf51ecc1b9281fea99a77ad038489818d626c5f288e81db1eab9211f55a2a",
         "ising_offset_C": 1482,
         "cloud_roundtrip_wall_sec": 19.06,
-        "poll_interval_min": 1,
         "sdk_optimizer_meta": {
           "task_name": "v3_q3_hobo_29",
           "wait": true,
@@ -1015,7 +1031,12 @@
           "task_mode": "optimization",
           "sample_number": 10,
           "interval": 5
-        }
+        },
+        "raw_spins_file_sha256": "d1e22ab8d9b7f8c91f80187d601c762683165550154158e22a7217bfffc32209",
+        "raw_spins_int8_sha256": "892a06dcb8f120077da77d3e368c6926764be337d4c3ee40cbf51e59e61c1fb1",
+        "poll_interval_requested_sec": 1,
+        "poll_interval_effective_sec": 5,
+        "poll_interval_unit_note": "Kaiwu SDK 1.4.4 CIMOptimizer interval is in seconds (default 6s, min 5s); requested=1s was clamped by SDK to effective=5s."
       }
     },
     "v3_q3_anova_25": {
@@ -1038,7 +1059,10 @@
         "continuous_regret_top1": 0.0,
         "continuous_regret_worst_gs": 0.451804,
         "enumeration_method": "exact_cardinality_partitioned",
-        "M_max": 2
+        "M_max": 2,
+        "contains_continuous_surrogate_minimizer": true,
+        "best_regret_among_integer_ground_states": 0.0,
+        "worst_regret_among_integer_ground_states": 0.451804
       },
       "hardware_spec": {
         "spins": 25,
@@ -1334,7 +1358,6 @@
         "matrix_sha256": "05ce8d9cfad20be928a3ec0cfd51742f094a311ed64612039681749d9e341f36",
         "ising_offset_C": 1872,
         "cloud_roundtrip_wall_sec": 16.43,
-        "poll_interval_min": 1,
         "sdk_optimizer_meta": {
           "task_name": "v3_q3_anova_25",
           "wait": true,
@@ -1343,7 +1366,12 @@
           "task_mode": "optimization",
           "sample_number": 10,
           "interval": 5
-        }
+        },
+        "raw_spins_file_sha256": "eb61ef5f1beffeee10cfc33bc76bedca07154c3252a4bb0d4ca5cbb4becd0b8d",
+        "raw_spins_int8_sha256": "ab33aed0a29e17a212637f1706ad1fb1e3846a83a4615e3221882f003c1f8f42",
+        "poll_interval_requested_sec": 1,
+        "poll_interval_effective_sec": 5,
+        "poll_interval_unit_note": "Kaiwu SDK 1.4.4 CIMOptimizer interval is in seconds (default 6s, min 5s); requested=1s was clamped by SDK to effective=5s."
       }
     }
   },
@@ -1539,7 +1567,9 @@
             "pool_rank": null
           }
         ],
-        "hardware_runtime_sec": 82.73
+        "hardware_runtime_sec": 82.73,
+        "raw_spins_file_sha256": "8cf75e3baaafba114a59da53f4897fe37a73af8327742c22fb0965f311939182",
+        "raw_spins_int8_sha256": "fc1ed60fd9d2f4be65b524af57706d7bdd453a57d5c46bb070c7606122bc37d0"
       }
     },
     "apmcm26_v2_q3_anova_24": {
@@ -1726,7 +1756,9 @@
             "pool_rank": null
           }
         ],
-        "hardware_runtime_sec": 42.91
+        "hardware_runtime_sec": 42.91,
+        "raw_spins_file_sha256": "b563fcad398331e1bb7e4be341b44ca879d4cdebd14efbc4dd3a85213464f589",
+        "raw_spins_int8_sha256": "c5aa7c59ac44779cd5e69c33c29741de03a2c9b156b4a85061dfe01fe086411b"
       }
     },
     "apmcm26_v2_q3_submod_33": {
@@ -1926,7 +1958,9 @@
             "pool_rank": null
           }
         ],
-        "hardware_runtime_sec": 12.1
+        "hardware_runtime_sec": 12.1,
+        "raw_spins_file_sha256": "79142abfabb30b34a3c2e96badf66dc82fa387cd4c111f418b8716a1335d32e0",
+        "raw_spins_int8_sha256": "685744c167ace118db0977ffda81547089f255f7485b7554325736c81746aaa2"
       }
     }
   },
