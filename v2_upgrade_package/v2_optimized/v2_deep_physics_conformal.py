@@ -312,7 +312,7 @@ def run_deep_analysis():
     }
 
     with open(os.path.join(RES_DIR, "v2_deep_physics_conformal.json"), "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary, f, indent=2, allow_nan=False)
 
     print("=== Deep Scientific Analysis Complete ===")
     print(json.dumps(summary, indent=2))

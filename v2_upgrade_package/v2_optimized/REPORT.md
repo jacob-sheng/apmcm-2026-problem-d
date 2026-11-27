@@ -19,13 +19,11 @@
    - 同协议纳入已随包打包至 `reference_baselines/` 的历史最佳基线 **`M4_PIMT_Physics_Only`** 与 **`M5_PIMT_Hybrid_Ensemble`**，同时导出 `02-only`（`v2_holdout_04_train02only.csv`）与 `02+03 refit`（`v2_holdout_04.csv`）双预测清单（`Spearman = 0.99704`, `Top-10 重合 = 9/10`）。
    - 将带中心 $E_c$ 定性为基于 GLLB-SC 数据的**经验 Butler–Ginley 对数加性关系**（`03_val` 上 $R^2=1.0000000000, \text{RMSE}=2.90\times 10^{-7}\,\text{eV}$），明确指出带隙误差仍以 $\sigma_{\text{VBM}}=\sigma_{\text{CBM}}=\sigma_{E_g}/2$ 传播至带边；电子窗口明确表述为 $[\exists E_g \ge 0:\, g_{\min}(E_c) \le E_g \le 3.1] \iff 4.18 \le E_c \le 6.05\,\text{eV}$。
    - 保形校准采用 **200 次 `(A,B)`-组不交 50/50 拆分**（`group_overlap = 0`），按**预测概率分层** $\hat{p}_{\text{semi}} \ge 0.20$ 划分：**低概率层**（$\hat{p}_{\text{semi}} < 0.20, n=3,808$，含 `29` 个真实半导体，90% 半径 `4.411`）vs **预测半导体/边界层**（$\hat{p}_{\text{semi}} \ge 0.20, n=161$，含 `112` 个真实半导体，90% 半径 `12.375`）；明确 `sum(P_hit) = 10.3358`（Top-30 `8.6001 = 83.2%`、Top-50 `9.4889 = 91.8%`）为**确定性模型概率质量总和，而非未见 `04` 真实正例召回**（`2.30` 仅为独立 Bernoulli 近似下的假设命中数模型内标准差，非 `10.3358` 的置信区间），并报告未截断高斯条件 $E_g$ 在 `04` 上的负尾概率（全池中位数 `0.1743`，Top-50 最大 `0.0110`）及 `03_val` 141 个半导体残差相关性（`r = -0.2930, rho = -0.3349`）。
-2. **Q2/Q3 整数 QUBO/HOBO 数学修复与全域基态证书（[`v2_qubo_q2_q3.py`](v2_qubo_q2_q3.py)）**：
-   - 修复原 `Model 3A-HOBO` 一侧 gadget 非法基态漏洞：采用累计行和辅助罚项 $P_{\text{aux}}(i,k) > \sum_j |Q_{\text{obj}}(y_{ik}, b_j)|$（`P_aux <= 48/56`）与精确基数分块块罚项 $P_{\text{block}}$，并新增 **零辅助复合配对二部图 QUBO `Model 3A-Comp`**（`26` / `18` 自旋）。Theorem 4 明确 $y_{ik}=a_i c_k$ 对所有主赋值取得极小（`a_i c_k=1` 且激活奖励为 `0` 的合法非基态如 `BaGeO2N` 允许 `y` 零能简并），而全部 8 个实例在**全局基态能级**处均为零辅助歧义。
-   - 修复 `Model 3B-ANOVA` 缩放不一致缺陷（对角/非对角统一 `8 * round(...)` 与效果幅值归一化，消除了不同系数尺度差但仍保留量化离散效应），得到 **`6` 个不同合法整数能级**（Full `08` 占有数 `[3, 1, 24, 59, 459, 42]`，Blind `12` `[7, 9, 28, 50, 12, 2]`）并执行三层误差分解。
-   - 实现 `certify_global_ground_states()`（解析消去辅助变量 + 代数 QUBO-Ising 恢复核验 + $2^{n_{\text{primary}}}$ 全枚举或零间隙分块基数枚举），对全部 **8 个矩阵** 认证 **`illegal_ground_count = 0`** 与 **`illegal_aux_tie_count = 0`**；7 个矩阵基态集合**包含**连续代理最优 `LaTiO2N`（需配合最差基态 regret 如 Q2 full `0.4934` / Q3 blind ANOVA `0.4518` 解读）。
+   - **四维模型域 `C_cap` 与 Top-K 保留审计**：从真实构建器 `metadata` 直接生成，严格区分 `< C_cap`、HOBO $A \times B \times X$、Comp `(A,X)-B` 与 ANOVA Top-$K$ 域（`Q3_full` Top-35 合法 Top-25 保留 `25/25`，`Q3_blind` Top-25 保留 `24/25`，仅 `SnSnO3` 排除；`Q3_blind` 在 `cap=1.5` 下为 `15/17/15`，在 `cap=2.5` 下活跃行数 `21` 含 `SnSnO3`，真实入域 `23/21` 含合法 `SnGeO3`）。
+   - **独立 HiGHS MILP 交叉核验**：新增 `scripts/verify_milp_qubo_crosscheck.py`（Fortet/McCormick 线性化，`mip_rel_gap = 0.0`），基于外部审阅建议由团队独立实现并归档 `results/v2_milp_crosscheck.json`，8 矩阵全部精确最优（`mip_gap = 0`）并与结构化穷举证书一致。
 3. **20 种子闭环混合采集、同预算实验与 `SPQC-550` 真机验证（[`v2_experiments.py`](v2_experiments.py), [`v2_spqc550_hardware.py`](v2_spqc550_hardware.py)）**：
-   - 闭环筛选升级至 **20 配对种子**（`N=3,969`，含 `77` 条均 $V \ge 6.6537$ 的 `A=B` 行）：解析超几何基准 `E[H(200)] = 0.9070`（非同核子集为 `0.9250`）；`v1_FM_LBFGS_SeqRank` 记录 `300/300` 次收敛（`v1_FM_LBFGS_QUBO` 调用同优化器，逐轮收敛标志未另行归档）；在相同**轻量在线物理 hurdle 代理**（多物性标签 `e_form, gap, vbm, cbm` + Ridge $E_c$ + LightGBM，固定 $\sigma_{\text{ef}}=0.25, \sigma_g=0.80$）下，古典 Top-20 预筛 + 逐轮 8-bit `Model 3A-Comp` 混合策略 `v2_Real_8Bit_QUBO` 命中 **`16.20/18`（SD `1.077`）**，对比同代理顺序排序 `v2_Classical_SeqRank` **`16.55/18`（SD `1.962`）**，支持混合采集可行性而不宣称采集层或量子优势。
-   - 完成全部 4 组修复后 `v3` 真机任务（`TaskMode.OPTIMIZATION`, `10` 条返回记录/任务；Kaiwu `interval` 单位为秒，请求 `1s` 由 SDK 钳制为有效最小 `5s`），`--verify-only` 强制校验矩阵 SHA-256、`.npy` 文件/数组 SHA-256 及逐条解码字段完全一致，并严格保留 **`18 >= 5`** 账号额度。
+   - 闭环筛选升级至 **20 配对种子**（`N=3,969`，含 `77` 条均 $V \ge 6.6537$ 的 `A=B` 行）：解析超几何基准 `E[H(200)] = 0.9070`（`SD = 0.9261`，非同核子集为 `0.9250`）；`v1_FM_LBFGS_SeqRank` 记录 `300/300` 次收敛（`v1_FM_LBFGS_QUBO` 调用同优化器，逐轮收敛标志未另行归档）；在相同**轻量在线物理 hurdle 代理**（多物性标签 `e_form, gap, vbm, cbm` + Ridge $E_c$ + LightGBM，固定 $\sigma_{\text{ef}}=0.25, \sigma_g=0.80$）下，古典 Top-20 预筛 + 逐轮 8-bit `Model 3A-Comp` 混合策略 `v2_Real_8Bit_QUBO` 命中 **`16.20/18`（SD `1.077`）**，对比同代理顺序排序 `v2_Classical_SeqRank` **`16.55/18`（SD `1.962`）**，支持混合采集可行性而不宣称采集层或量子优势（`protocol_scope_notes` 由实际运行参数与曲线动态生成，历史参考另单列）。
+   - 完成全部 4 组 `v3` 真机任务（`20.0%–90.0%` 严格可行返回记录，`TaskMode.OPTIMIZATION`, `10` 条返回记录/任务；Kaiwu `interval` 单位为秒，请求 `1s` 由 SDK 钳制为有效最小 `5s`），`--verify-only` 强制校验矩阵 SHA-256、`.npy` 文件/数组 SHA-256、有限浮点检查及包含 `kAX` 在内的全字段逐条解码一致性，并严格保留 **`18 >= 5`** 账号额度。
 
 ---
 
@@ -82,7 +80,7 @@
 - **20 种子闭环模拟 DFT 筛选**（`N=3,969`, 含 `77` 条 `A=B`, `M=18` for `V<0.5`）：解析超几何基准 `E[H_0.5(200)] = 0.9070`（去 `A=B` 为 `0.9250`）；`Random`: `0.60 ± 0.663 / 18`；`v1_FM_LBFGS_QUBO` (`0` 回退): `1.20 ± 0.980 / 18`；`v1_FM_LBFGS_SeqRank` (`300/300` 收敛): `4.30 ± 2.027 / 18`；`v2_PhysLGBM_ScalarV_SeqRank`: `12.25 ± 3.433 / 18`；同**轻量在线多物性 hurdle 代理**（`e_form, gap, vbm, cbm` + Ridge `E_c` + LightGBM）下，**`v2_Real_8Bit_QUBO`** (Top-20 预筛 + 逐轮 8-bit `Model 3A-Comp` QUBO, `300/300` 精确 8-bit, `0` 回退) 命中 **`16.20 ± 1.077 / 18`**，对比 **`v2_Classical_SeqRank`**: **`16.55 ± 1.962 / 18`**。
 - **独立 `4–12` bit 扫描 (`Q2_blind_11`)**：`bw=4..6` 触发 Kaiwu 重缩放回退（`bw=4` 产生 `5` 个非法基态，`42.0%` 可行）；`bw=7` (`M_max=2`)、`bw=8` (`M_max=4`)、`bw=10` (`M_max=17`)、`bw=12` (`M_max=71`) 均通过精确整型路径且 `0` 非法基态、`100.0%` SA 可行率。
 - **固定 `M_max=4` 罚系数相变扫描 (`Q2_blind_11`, 10 点)**：`alpha_P <= 1.00` 全域 `0` 合法基态；`alpha_P = 1.25` 处于边界（`4` 合法 / `1` 非法基态, `margin = 0.0`, SA `84.0%`）；`alpha_P in [1.40, 3.00]` 全部达到 `4` 合法 / `0` 非法基态与 `100.0%` SA 可行率（其中 `1.50, 1.75, 2.25` 为精确 8-bit 整数）。
-- **`C_cap` Top-10 / Top-25 保留与截断损失**：`Q2_blind_11` (`cap=2.5`) 保留 `9/10` / `9/25`（截去第 10 名 `CdTaO2N = 3.6227` 等）；`Q3_blind_12` (`cap=1.5`) 按 `< cap` 口径保留 `10/10` / `15/25`，按 $A \times B \times X$ 元素积子空间保留 **`17/25`**（**`8`** 个在子空间外：排名 `18–25`），按 `(A,X)-B` 复合子空间保留 **`15/25`**（`10` 个在外，另排除 `#16 BaGeO3 = 1.6630` 与 `#17 BaSnO3 = 1.8225`）。
+- **`C_cap` Top-10 / Top-25 保留与截断损失**：`Q2_blind_11` (`cap=2.5`) 保留 `9/10` / `9/25`（截去第 10 名 `CdTaO2N = 3.6227` 等）；`Q3_blind_12` (`cap=1.5`) 按 `< cap` 口径保留 `10/10` / `15/25`，按 HOBO $A \times B \times X$ 元素积子空间保留 **`17/25`**（**`8`** 个在子空间外：排名 `18–25`），按 `(A,X)-B` 复合子空间保留 **`15/25`**（`10` 个在外，另排除 `#16 BaGeO3 = 1.6630` 与 `#17 BaSnO3 = 1.8225`），按 ANOVA Top-25 保留 `24/25`（仅排除 `A=B` 的 `#22 SnSnO3`）；在 `cap=2.5` 下构建器活跃行 `21` 含 `SnSnO3`，合法入域数为 **`23/25` (HOBO)** 与 **`21/25` (Comp)**（均含 `SnGeO3`）。
 - **多尺度 (`0.5–2.0 sigma`) 蒙特卡洛排名稳定性 (`500` trials)**：独立高斯模式下 `Q2_blind_11` Top-10 留存率由 `95.70%` 渐变至 `83.28%`，`Q3_blind_12` Top-15 由 `96.24%` 渐变至 `61.01%`；`(A,B)`-组相关 + `p_semi` logit 扰动下分别为 `95.46% -> 83.10%` 与 `94.96% -> 58.84%`。
 
 ---
@@ -125,8 +123,9 @@ python v2_upgrade_package/scripts/audit_submission.py --problem D --team apmcm26
 ```
 
 ### 4.2 交件产物与 2026-11-04 AI 使用合规
-- **正式提交产物 (`v2_upgrade_package/submission/`)**：
+- **独立核验与交件产物 (`v2_upgrade_package/submission/`)**：
+  - `python v2_upgrade_package/scripts/verify_milp_qubo_crosscheck.py`（8 矩阵独立 HiGHS MILP `mip_gap = 0` 验证）；
   - `Dapmcm26302266.pdf`（正文含参考文献严格 $\le 25$ 页，第 1 页摘要，第 2 页目录，纯英文且零身份信息/本地路径）；
-  - `Dapmcm26302266fj.zip`（含自编代码、`scripts/` 审计门禁、`reference_baselines/` 历史对比表、结果、11 张 PNG 及说明，支持仅配官方 `APMCM_DATA_DIR` 独立完整运行；严格排除官方原始 CSV、`*dryrun*.json`、`*.npz` 与 `.env*`，体积 $< 25\,\text{MB}$）；
-  - `AI工具使用详情.pdf` 与 `AI工具使用详情说明_本队草稿.docx`（按 2026-11-04 规定匿名填报并与正文参考文献 `[13]–[14]` 一一对应；已纳入 `audit_submission.py` 默认必检清单，不打入 `fj.zip`）。
+  - `Dapmcm26302266fj.zip`（含自编代码、`scripts/` 审计与 MILP 门禁、`reference_baselines/` 历史对比表、结果、11 张 PNG 及说明，支持仅配官方 `APMCM_DATA_DIR` 独立完整运行；严格排除官方原始 CSV、`*dryrun*.json`、`*.npz` 与 `.env*`，体积 $< 25\,\text{MB}$）；
+  - `AI工具使用详情.pdf` 与 `AI工具使用详情说明_本队草稿.docx`（按 2026-11-04 规定匿名填报并与正文参考文献 `[13]–[15]` 含 ChatGPT 审阅记录一一对应；已纳入 `audit_submission.py` 默认必检清单，不打入 `fj.zip`）。
   - **交件前最后人工操作**：赛题官方承诺书（`Dapmcm26302266cns.<pdf|jpg|png>`）由全体队员线下签名扫描后上传至竞赛系统，切勿上传至公开 GitHub。

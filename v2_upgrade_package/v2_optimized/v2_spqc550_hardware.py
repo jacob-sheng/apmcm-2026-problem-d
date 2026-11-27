@@ -38,6 +38,7 @@ import csv
 import getpass
 import hashlib
 import json
+import math
 import os
 import re
 import sys
@@ -664,7 +665,7 @@ def export_track_a_archive_summary(
     _assert_no_sensitive_paths(summary)
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary, f, indent=2, allow_nan=False)
     return summary
 
 
@@ -834,10 +835,27 @@ def verify_historical_v2_checkpoints_integrity(prior_archived: dict, ckpt_dir: s
     return failures
 
 
+def _reject_non_finite_json(constant_str: str):
+    raise ValueError(f"Non-finite JSON constant rejected: {constant_str!r}")
+
+
+def _finite_float_eq(a, b, tol: float = 1e-5) -> bool:
+    if isinstance(a, bool) or isinstance(b, bool):
+        return False
+    try:
+        fa = float(a)
+        fb = float(b)
+    except (TypeError, ValueError):
+        return False
+    if not (math.isfinite(fa) and math.isfinite(fb)):
+        return False
+    return abs(fa - fb) <= tol
+
+
 def _compare_decoded_with_archived(tn: str, dec: dict, archived: dict) -> list:
     """
-    Strictly compare freshly recomputed decode_raw_spins() output against archived spqc550 JSON (R10).
-    Returns a list of mismatch descriptions (empty list means exact agreement).
+    Strictly compare freshly recomputed decode_raw_spins() output against archived spqc550 JSON (R10/T03).
+    Checks finite numeric values, full keyset equality, and all record fields including kAX.
     """
     errs = []
     exact_keys = (
@@ -874,19 +892,21 @@ def _compare_decoded_with_archived(tn: str, dec: dict, archived: dict) -> list:
         dv, av = dec.get(k), archived.get(k)
         if (dv is None) != (av is None):
             errs.append(f"{tn}: '{k}' null mismatch (redecoded={dv!r} != archived={av!r})")
-        elif dv is not None and abs(float(dv) - float(av)) > 1e-5:
-            errs.append(f"{tn}: '{k}' mismatch (redecoded={dv} != archived={av})")
+        elif dv is not None and not _finite_float_eq(dv, av, tol=1e-5):
+            errs.append(f"{tn}: '{k}' mismatch or non-finite (redecoded={dv!r} != archived={av!r})")
 
     db, ab = dec.get("best_feasible"), archived.get("best_feasible")
     if (db is None) != (ab is None):
         errs.append(f"{tn}: best_feasible null mismatch (redecoded={db!r} != archived={ab!r})")
     elif db is not None:
+        if set(db.keys()) != set(ab.keys()):
+            errs.append(f"{tn}: best_feasible key mismatch (redecoded={sorted(db.keys())} != archived={sorted(ab.keys())})")
         for bk in ("formula", "pool_rank"):
             if db.get(bk) != ab.get(bk):
                 errs.append(f"{tn}: best_feasible.{bk} mismatch ({db.get(bk)!r} != {ab.get(bk)!r})")
         for bk in ("V_hat", "regret", "ising_energy"):
-            if abs(float(db[bk]) - float(ab[bk])) > 1e-5:
-                errs.append(f"{tn}: best_feasible.{bk} mismatch ({db[bk]} != {ab[bk]})")
+            if not _finite_float_eq(db.get(bk), ab.get(bk), tol=1e-5):
+                errs.append(f"{tn}: best_feasible.{bk} mismatch or non-finite ({db.get(bk)!r} != {ab.get(bk)!r})")
 
     dsamps = dec.get("samples", [])
     asamps = archived.get("samples", [])
@@ -894,30 +914,24 @@ def _compare_decoded_with_archived(tn: str, dec: dict, archived: dict) -> list:
         errs.append(f"{tn}: samples length mismatch (redecoded={len(dsamps)} != archived={len(asamps)})")
         return errs
 
-    row_exact = (
-        "sample_idx",
-        "kA",
-        "kB",
-        "kX",
-        "one_hot_ok",
-        "pool_ok",
-        "y_aux_consistent",
-        "y_aux_mismatch_count",
-        "primary_feasible",
-        "feasible",
-        "formula",
-        "pool_rank",
-    )
+    row_float_keys = {"ising_energy", "V_hat", "regret"}
     for idx, (dr, ar) in enumerate(zip(dsamps, asamps)):
-        for rk in row_exact:
-            if dr.get(rk) != ar.get(rk):
-                errs.append(f"{tn}: samples[{idx}].{rk} mismatch ({dr.get(rk)!r} != {ar.get(rk)!r})")
-        for rk in ("ising_energy", "V_hat", "regret"):
+        if set(dr.keys()) != set(ar.keys()):
+            errs.append(
+                f"{tn}: samples[{idx}] keyset mismatch "
+                f"(redecoded={sorted(dr.keys())} != archived={sorted(ar.keys())})"
+            )
+            continue
+        for rk in sorted(dr.keys()):
             dv, av = dr.get(rk), ar.get(rk)
-            if (dv is None) != (av is None):
-                errs.append(f"{tn}: samples[{idx}].{rk} null mismatch ({dv!r} != {av!r})")
-            elif dv is not None and abs(float(dv) - float(av)) > 1e-5:
-                errs.append(f"{tn}: samples[{idx}].{rk} mismatch ({dv} != {av})")
+            if rk in row_float_keys:
+                if (dv is None) != (av is None):
+                    errs.append(f"{tn}: samples[{idx}].{rk} null mismatch ({dv!r} != {av!r})")
+                elif dv is not None and not _finite_float_eq(dv, av, tol=1e-5):
+                    errs.append(f"{tn}: samples[{idx}].{rk} mismatch or non-finite ({dv!r} != {av!r})")
+            else:
+                if (type(dv) is not type(av)) or (dv != av):
+                    errs.append(f"{tn}: samples[{idx}].{rk} mismatch ({dv!r} != {av!r})")
     return errs
 
 
@@ -955,7 +969,7 @@ def main():
     payload = {}
     if os.path.exists(args.results_json):
         with open(args.results_json, "r", encoding="utf-8") as f:
-            payload = json.load(f)
+            payload = json.load(f, parse_constant=_reject_non_finite_json)
     payload.setdefault("tasks", {})
     prior_tasks = copy.deepcopy(payload["tasks"])
     prior_archived = copy.deepcopy(payload.get("historical_v2_archived_tasks", {}))
@@ -1038,7 +1052,7 @@ def main():
         _assert_no_sensitive_paths(dryrun_payload)
         os.makedirs(os.path.dirname(os.path.abspath(args.dryrun_json)), exist_ok=True)
         with open(args.dryrun_json, "w", encoding="utf-8") as f:
-            json.dump(dryrun_payload, f, indent=2)
+            json.dump(dryrun_payload, f, indent=2, allow_nan=False)
         print(
             f"\n[Dry-Run Complete] Diagnostic output written ONLY to {_safe_relative_path(args.dryrun_json)} "
             f"(0 cloud calls; {os.path.basename(args.results_json)} untouched).",
@@ -1271,7 +1285,7 @@ def main():
             # Save incrementally after every single real hardware call!
             _assert_no_sensitive_paths(payload)
             with open(args.results_json, "w", encoding="utf-8") as f:
-                json.dump(payload, f, indent=2)
+                json.dump(payload, f, indent=2, allow_nan=False)
 
             bf = dec["best_feasible"]
             bf_str = f"{bf['formula']} (#{bf['pool_rank']}, V={bf['V_hat']})" if bf else "INFEASIBLE"

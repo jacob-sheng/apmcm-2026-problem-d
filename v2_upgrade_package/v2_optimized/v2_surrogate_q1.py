@@ -569,10 +569,17 @@ def test_outer_fold_isolation(df_train, n_splits=5):
     }
 
 
-def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_splits=5):
+def fit_and_predict_v2(
+    df_train,
+    df_eval_list,
+    fit_direct_ablation=True,
+    n_splits=5,
+    training_split_id=None,
+    external_eval_note=None,
+):
     """
     Outer (A,B)-GroupKFold isolated base features & 4-family predictors on df_train,
-    followed by pooled-OOF simplex/isotonic/sigma meta-fitting and external inference.
+    followed by pooled-OOF simplex/isotonic/sigma meta-fitting and downstream inference.
     """
     groups = (df_train["A"].astype(str) + "_" + df_train["B"].astype(str)).values
     gkf = GroupKFold(n_splits=n_splits)
@@ -673,7 +680,11 @@ def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_split
         res["V_direct"] = np.maximum(0.0, ev_dir_4[j] @ w_dir) if fit_direct_ablation else np.zeros(len(df_eval_list[j]))
         eval_outputs.append(res)
 
+    ext_note = external_eval_note or (
+        "End-to-end generalization must be evaluated on a labeled split disjoint from df_train."
+    )
     meta = {
+        "training_split_id": training_split_id or f"unspecified_n{n}",
         "outer_cv_protocol": (
             f"{n_splits}-fold (A,B)-GroupKFold isolated base features & 4-family predictors "
             "+ pooled-OOF simplex/isotonic/sigma meta-layer"
@@ -682,7 +693,7 @@ def fit_and_predict_v2(df_train, df_eval_list, fit_direct_ablation=True, n_split
             "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit "
             "(weights, residual scales, isotonic blend) and serve as development diagnostics; "
             "stage0_oof_metrics are inner-fold development diagnostics within each outer "
-            "training split; external evaluation uses 03_castelli_val.csv."
+            f"training split; {ext_note}"
         ),
         "stage0_oof_metrics": s0_mean,
         "stage0_per_fold_metrics": fold_s0_metrics,
@@ -921,7 +932,17 @@ def main():
 
     print("\n=== [Phase 1] Strict Fold-Isolated Training on 02_train -> 03_val & Frozen 04_holdout ===")
     t0 = time.perf_counter()
-    phase1_outs, meta_val = fit_and_predict_v2(tr, [va, holdout], fit_direct_ablation=True, n_splits=5)
+    phase1_outs, meta_val = fit_and_predict_v2(
+        tr,
+        [va, holdout],
+        fit_direct_ablation=True,
+        n_splits=5,
+        training_split_id="02_castelli_train_only",
+        external_eval_note=(
+            "Phase 1 (02_castelli_train.csv only): public external validation uses disjoint "
+            "03_castelli_val.csv; frozen 02-only blind inference exported to v2_holdout_04_train02only.csv."
+        ),
+    )
     vo = phase1_outs[0]
     hold02_res = phase1_outs[1]
     dt_val = time.perf_counter() - t0
@@ -989,7 +1010,17 @@ def main():
     t1 = time.perf_counter()
     tv = pd.concat([tr, va], ignore_index=True)
     pool_outs, meta_full = fit_and_predict_v2(
-        tv, [holdout, q2_full, q2_blind, q3_full, q3_blind], fit_direct_ablation=False, n_splits=5
+        tv,
+        [holdout, q2_full, q2_blind, q3_full, q3_blind],
+        fit_direct_ablation=False,
+        n_splits=5,
+        training_split_id="02_train_plus_03_val_refit",
+        external_eval_note=(
+            "Phase 2 refit (02_castelli_train.csv + 03_castelli_val.csv): 03_castelli_val.csv "
+            "is part of the refit training set and is NOT an external validation set for Phase 2; "
+            "no independent labeled external evaluation set exists for Phase 2 (used only for blind "
+            "pool inference on 04/07/08/11/12)."
+        ),
     )
     names = ["holdout_04", "q2_full_07", "q2_blind_11", "q3_full_08", "q3_blind_12"]
     dfs = [holdout, q2_full, q2_blind, q3_full, q3_blind]
@@ -1061,7 +1092,7 @@ def main():
     }
 
     with open(os.path.join(OUT_DIR, "v2_q1_diagnostics.json"), "w", encoding="utf-8") as f:
-        json.dump(diagnostics, f, indent=2)
+        json.dump(diagnostics, f, indent=2, allow_nan=False)
 
     print(f"\n[Phase 2] Refit & pool scoring finished in {dt_phase2:.2f}s.")
     print("Holdout 02-only vs 02+03 lineage:", json.dumps(holdout_diff, indent=2))

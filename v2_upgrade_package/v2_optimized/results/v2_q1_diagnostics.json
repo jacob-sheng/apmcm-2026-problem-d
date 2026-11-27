@@ -202,7 +202,8 @@
       "MAE_V_lt_1": 5.699,
       "MAE_V_lt_0_5": 5.7275
     },
-    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split (te_* encodings precede Stage-0's inner split); external evaluation uses 03_castelli_val.csv."
+    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split; Phase 1 (02_castelli_train.csv only): public external validation uses disjoint 03_castelli_val.csv; frozen 02-only blind inference exported to v2_holdout_04_train02only.csv.",
+    "training_split_id": "02_castelli_train_only"
   },
   "phase2_ensemble_meta": {
     "outer_cv_protocol": "5-fold (A,B)-GroupKFold isolated base features & 4-family predictors + pooled-OOF simplex/isotonic/sigma meta-layer",
@@ -284,7 +285,8 @@
       "MAE_V_lt_0_5": 2.3654
     },
     "outer_oof_metrics_direct": null,
-    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split (te_* encodings precede Stage-0's inner split); external evaluation uses 03_castelli_val.csv."
+    "meta_layer_scope_note": "outer_oof_metrics_* are in-sample with respect to the pooled-OOF meta-fit (weights, residual scales, isotonic blend) and serve as development diagnostics; stage0_oof_metrics are inner-fold development diagnostics within each outer training split; Phase 2 refit (02_castelli_train.csv + 03_castelli_val.csv): 03_castelli_val.csv is part of the refit training set and is NOT an external validation set for Phase 2; no independent labeled external evaluation set exists for Phase 2 (used only for blind pool inference on 04/07/08/11/12).",
+    "training_split_id": "02_train_plus_03_val_refit"
   },
   "metrics_table": [
     {

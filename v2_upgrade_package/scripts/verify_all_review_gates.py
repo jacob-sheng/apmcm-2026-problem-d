@@ -63,9 +63,32 @@ PATH_LEAK_RE = re.compile(
 CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 
 
+def _reject_non_finite_json(const_str):
+    raise ValueError(f"Non-finite JSON constant rejected: {const_str!r}")
+
+
+def _assert_all_numbers_finite(obj, ctx="json"):
+    if isinstance(obj, bool) or obj is None or isinstance(obj, (int, str)):
+        return
+    if isinstance(obj, float):
+        if not math.isfinite(obj):
+            raise AssertionError(f"Non-finite float {obj!r} in {ctx}")
+        return
+    if isinstance(obj, list):
+        for idx, item in enumerate(obj):
+            _assert_all_numbers_finite(item, f"{ctx}[{idx}]")
+        return
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            _assert_all_numbers_finite(v, f"{ctx}.{k}")
+        return
+
+
 def _load_json(path):
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f, parse_constant=_reject_non_finite_json)
+    _assert_all_numbers_finite(data, os.path.basename(path))
+    return data
 
 
 def _sha256_file(path):
@@ -118,6 +141,10 @@ def gate_q1_diagnostics():
     assert iso["max_feature_delta"] < 1e-12, f"max_feature_delta={iso['max_feature_delta']}"
     assert iso["max_pred_delta"] < 1e-12, f"max_pred_delta={iso['max_pred_delta']}"
     assert "meta_layer_scope_note" in diag["ensemble_meta"], "Missing ensemble_meta.meta_layer_scope_note (R01)"
+    assert "meta_layer_scope_note" in diag["phase2_ensemble_meta"], "Missing phase2_ensemble_meta.meta_layer_scope_note (T04B)"
+    p2_note = diag["phase2_ensemble_meta"]["meta_layer_scope_note"]
+    assert "NOT an external validation set" in p2_note, "phase2_ensemble_meta incorrectly implies 03_val external eval (T04B)"
+    assert diag["ensemble_meta"].get("training_split_id") != diag["phase2_ensemble_meta"].get("training_split_id")
 
     # Recompute 03_val metrics directly from exported v2_val_predictions.csv
     val_csv = pd.read_csv(os.path.join(RES_DIR, "v2_val_predictions.csv"))
@@ -240,25 +267,34 @@ def gate_qubo_certification():
     ]
 
     hobo_instances = {}
+    live_meta_by_id = {}
+    live_sha_by_id = {}
     for mid, kind, dfp, builder in specs:
         ising, meta, lookup = builder(dfp)
         assert int(np.max(np.abs(ising))) <= 127, f"{mid}: max|H| > 127"
+        live_meta_by_id[mid] = meta
+        live_sha_by_id[mid] = hashlib.sha256(np.ascontiguousarray(ising, dtype=np.int64).tobytes()).hexdigest()
         live_cert = q23.certify_global_ground_states(ising, meta, dfp, lookup, task_kind=kind, verify_zero_illegal=True)
         saved_cert = certs_by_id[mid]
-        for fk in (
-            "cert_min_ising_energy",
-            "ising_offset_C",
-            "legal_ground_count",
-            "illegal_ground_count",
-            "illegal_aux_tie_count",
-            "best_regret_among_integer_ground_states",
-            "continuous_regret_worst_gs",
-        ):
-            assert live_cert[fk] == saved_cert[fk], f"{mid}.{fk}: live={live_cert[fk]} != saved={saved_cert[fk]}"
+        nested_cert = (qubo["Q2"] if kind == "q2" else qubo["Q3"])[mid]["certification"]
+        for c_name, c_obj in (("certification_summary", saved_cert), ("nested.certification", nested_cert)):
+            for fk, live_v in live_cert.items():
+                assert fk in c_obj, f"{mid}.{c_name} missing key {fk} (T03)"
+                assert c_obj[fk] == live_v, f"{mid}.{c_name}.{fk}: saved={c_obj[fk]} != live={live_v} (T03)"
+            assert c_obj["continuous_regret_top1"] == c_obj["best_regret_among_integer_ground_states"]
+            assert c_obj["continuous_regret_worst_gs"] == c_obj["worst_regret_among_integer_ground_states"]
+            assert c_obj["continuous_regret_mean_gs"] == c_obj["mean_regret_among_integer_ground_states"]
+            assert c_obj["contains_continuous_surrogate_minimizer"] == (c_obj["best_regret_among_integer_ground_states"] == 0.0)
         if mid.endswith("_Model3A_HOBO"):
             hobo_instances[mid] = (ising, meta, dfp)
 
-    # 3. R02 Mathematical Edge-Case Assertions
+    # Verify eight_matrix_provenance SHA-256 digests match live built H (T03)
+    prov_by_id = {r["matrix_id"]: r for r in qubo.get("eight_matrix_provenance", [])}
+    assert len(prov_by_id) == 8, f"Missing/incomplete eight_matrix_provenance (got {len(prov_by_id)})"
+    for mid, live_sha in live_sha_by_id.items():
+        assert prov_by_id[mid]["matrix_int64_sha256"] == live_sha, f"{mid}: provenance SHA mismatch"
+
+    # 3. R02 & T01 Mathematical Edge-Case Assertions
     # R02A: E_c = 5.10 lies in [4.18, 6.05] with g_min=1.4, yet E_g=0 fails with v_gap_low = 7.84
     ec_ce = 5.10
     g_min_ce = max(1.4, 2.0 * (5.73 - ec_ce), 2.0 * (ec_ce - 4.50))
@@ -286,10 +322,37 @@ def gate_qubo_certification():
         assert (e_bg_qubo - C_h) == expected_e_ising, f"{mid} BaGeO2N E={e_bg_qubo - C_h} != {expected_e_ising}"
         assert q23._check_hobo_aux_uniqueness(z_bg, Q_zy, d_yy, m_h) >= 1, f"{mid} BaGeO2N should exhibit non-ground aux tie"
 
-    for k in ("Q3_full_08_Model3B_CompactANOVA", "Q3_blind_12_Model3B_CompactANOVA"):
+    # T01: Verify exact H_mask contribution on masked one-hot assignments
+    for mid, (ea, eb, ex), exp_q, exp_forbid in [
+        ("Q3_full_08_Model3A_HOBO", ("Ge", "Ge", "O3"), -68, 40),
+        ("Q3_blind_12_Model3A_HOBO", ("Ba", "Hf", "NO2"), -100, 56),
+    ]:
+        J_h, m_h, _ = hobo_instances[mid]
+        Q_h, _ = q23._recover_qubo_from_ising_sec92(J_h)
+        n_p = Q_h.shape[0] - int(m_h["nY"])
+        z_m = np.zeros(n_p, dtype=np.int64)
+        z_m[m_h["elems_A"].index(ea)] = 1
+        z_m[m_h["off_B"] + m_h["elems_B"].index(eb)] = 1
+        z_m[m_h["off_X"] + m_h["elems_X"].index(ex)] = 1
+        Q_zz, Q_zy = Q_h[:n_p, :n_p], Q_h[:n_p, n_p:]
+        d_yy = np.diag(Q_h[n_p:, n_p:]).astype(np.int64)
+        e_m_qubo = int(z_m @ Q_zz @ z_m + np.minimum(0, d_yy + 2 * (z_m @ Q_zy)).sum())
+        assert e_m_qubo == exp_q, f"{mid} T01 mask counterexample Q={e_m_qubo} != {exp_q}"
+        assert e_m_qubo + 3 * int(m_h["P_block"]) == exp_forbid == int(m_h["P_forbid"])
+
+    aed = qubo["anova_error_decomposition"]
+    for k, scope in [
+        ("Q3_full_08_Model3B_CompactANOVA", "Q3_full_08"),
+        ("Q3_blind_12_Model3B_CompactANOVA", "Q3_blind_12"),
+    ]:
+        live_m = live_meta_by_id[k]
         lvl = qubo["Q3"][k]["distinct_legal_energy_levels"]
-        assert lvl >= 6, f"{k}: distinct_legal_energy_levels={lvl} < 6"
-        assert len(qubo["Q3"][k].get("level_occupancies", [])) == lvl
+        assert lvl == live_m["distinct_legal_energy_levels"] >= 6, f"{k}: levels={lvl}"
+        saved_occ = qubo["Q3"][k].get("level_occupancies", [])
+        assert saved_occ == live_m["level_occupancies"], f"{k}: level_occupancies mismatch saved={saved_occ} != live={live_m['level_occupancies']} (T03)"
+        assert sum(saved_occ) == live_m["layer_a_surrogate_vs_float_anova"]["n_legal_subspace_candidates"]
+        l2_occ = aed[scope]["layer_2_float_anova_vs_8bit_ising"].get("level_occupancies", [])
+        assert l2_occ == live_m["level_occupancies"], f"{scope} ANOVA L2 level_occupancies mismatch (T03)"
 
     ca = qubo["compression_attribution"]
     assert len(ca) >= 4, f"compression_attribution rows={len(ca)}"
@@ -297,20 +360,42 @@ def gate_qubo_certification():
     for req in ("A-B Rosenberg", "A-X Rosenberg", "Model 3A-HOBO", "Model 3A-Comp"):
         assert req in enc_joined, f"Missing '{req}' in compression_attribution"
 
-    cap_ret = qubo["c_cap_retention"]
-    assert len(cap_ret) > 0, "c_cap_retention empty"
-    q3b_def = [r for r in cap_ret if r["pool"] == "Q3_blind_12" and r["is_default_cap"]][0]
+    # Recompute entire c_cap_retention live from builders and verify every row/field (T02 + T03)
+    live_cap_ret = q23.compute_ccap_retention_table([
+        ("Q2_full_07", pool_dfs["q2_full"], 2.0, [1.5, 2.0, 2.5, 3.0, 4.0], None),
+        ("Q2_blind_11", pool_dfs["q2_blind"], 2.5, [1.5, 2.0, 2.5, 3.0, 4.0], None),
+        ("Q3_full_08", pool_dfs["q3_full"], 1.25, [1.0, 1.25, 1.5, 2.0, 2.5], 35),
+        ("Q3_blind_12", pool_dfs["q3_blind"], 1.50, [1.0, 1.25, 1.5, 2.0, 2.5], 25),
+    ])
+    assert qubo["c_cap_retention"] == live_cap_ret, "c_cap_retention differs from live builder recomputation (T02/T03)"
+
+    q3b_def = [r for r in live_cap_ret if r["pool"] == "Q3_blind_12" and r["is_default_cap"]][0]
     assert q3b_def["top25_retained_lt_cap"] == 15
     assert q3b_def["top25_in_element_product_subspace"] == 17
     assert q3b_def["top25_in_composite_ax_subspace"] == 15
+    assert q3b_def["top25_in_anova_topk_subspace"] == 24
+    q3b_25 = [r for r in live_cap_ret if r["pool"] == "Q3_blind_12" and abs(r["c_cap"] - 2.5) < 1e-9][0]
+    assert q3b_25["active_rows_lt_cap"] == 21
+    assert q3b_25["top25_in_element_product_subspace"] == 23
+    assert q3b_25["top25_in_composite_ax_subspace"] == 21
 
-    aed = qubo["anova_error_decomposition"]
     for scope in ("Q3_full_08", "Q3_blind_12"):
         assert scope in aed
         for layer in ("layer_1_surrogate_vs_float_anova", "layer_2_float_anova_vs_8bit_ising", "layer_3_8bit_ising_vs_solvers"):
             assert layer in aed[scope], f"Missing {scope}.{layer}"
 
-    return "8/8 matrices live-rebuilt & certified (0 illegal GS, 0 GS aux ties), R02 assertions & 3-subspace cap retention (15/17/15) OK"
+    # 4. T06 Standalone HiGHS MILP Cross-Check (mip_gap=0)
+    if SCRIPTS_DIR not in sys.path:
+        sys.path.insert(0, SCRIPTS_DIR)
+    import verify_milp_qubo_crosscheck as milp_chk
+
+    milp_res = milp_chk.run_milp_crosscheck(verify_saved=True, write_json=False)
+    assert milp_res["all_optimal_zero_gap"] and milp_res["all_exact_match_structured_cert"]
+
+    return (
+        "8/8 matrices live-rebuilt + MILP (mip_gap=0) + full certs/occupancies + T01 mask + "
+        "live 20-row builder c_cap_retention (15/17/15, cap=2.5->23/21, ANOVA 24) OK"
+    )
 
 
 def gate_experiments():
@@ -351,7 +436,27 @@ def gate_experiments():
         for inst in ("Q2_blind_11", "Q3_blind_12"):
             assert len(mc[mode][inst]) == 4
 
-    return "20-seed closed-loop (hypergeom=0.9070295, 300/300 8-bit exact), 32 solver rows, 7 bitwidths, 10 M_max=4 penalty rows, 4 MC scales"
+    # T04A: Verify build_closed_loop_protocol_scope_notes updates dynamically with n_init/means
+    import v2_experiments as exp_mod
+    dyn_notes = exp_mod.build_closed_loop_protocol_scope_notes(
+        n_total=3969,
+        n_a_eq_b=77,
+        min_v_a_eq_b=6.65373,
+        n_rare05=18,
+        n_init=60,
+        final_budget=200,
+        hg_all=200 * 18 / 3969,
+        hg_neq=200 * 18 / 3892,
+        methods_dict={
+            "v2_Real_8Bit_QUBO": {"final_mean_rare05": 14.5, "rare05_std": [1.0]},
+            "v2_Classical_SeqRank": {"final_mean_rare05": 15.25, "rare05_std": [1.2]},
+        },
+    )
+    assert "Initial 60-sample" in dyn_notes["a_eq_b_eligibility"]
+    assert "14.50/18" in dyn_notes["same_surrogate_comparison"]
+    assert "15.25/18" in dyn_notes["same_surrogate_comparison"]
+
+    return "20-seed closed-loop (hypergeom=0.9070295, 300/300 8-bit exact, dynamic T04A), 32 solver rows, 7 bitwidths, 10 M_max=4 penalty rows, 4 MC scales"
 
 
 def gate_hardware_and_track_a():
@@ -532,16 +637,35 @@ def gate_paper_and_report_sync():
         "proving that legacy",
         "10-shot",
         "40-shot",
+        "0.9070 plus.minus 0.9261",
+        "full ANOVA minimum is `0.005211`",
+        "strictly fold-isolated Q1 surrogate",
     ]
     for label, txt in (("paper/main.typ", typ_txt), ("v2_optimized/REPORT.md", rep_txt)):
         for ph in forbidden_phrases:
             if label == "v2_optimized/REPORT.md" and ph == "(F20)":
                 continue
-            assert ph.lower() not in txt.lower(), f"Forbidden Round-1/2 phrase {ph!r} found in {label}"
+            assert ph.lower() not in txt.lower(), f"Forbidden Round-1/2/3 phrase {ph!r} found in {label}"
+    assert "30.0%$--$90.0%" not in typ_txt, "Conclusion point 3 still says 30.0%--90.0% instead of 20.0%--90.0% (T05)"
 
-    for req_phrase in ("Z_parity==1", "1/9", "9/9", "17/25", "returned records", "@eq:ising-recovery"):
-        assert req_phrase in typ_txt, f"paper/main.typ missing required Round-2 phrase {req_phrase!r}"
+    for req_phrase in (
+        "Z_parity==1",
+        "1/9",
+        "9/9",
+        "17/25",
+        "returned records",
+        "@eq:ising-recovery",
+        'H_("mask")(z)',
+        "$20.0%$--$90.0%$",
+        "[15]",
+        "verify_milp_qubo_crosscheck.py",
+    ):
+        assert req_phrase in typ_txt, f"paper/main.typ missing required Round-2/3 phrase {req_phrase!r}"
     assert os.path.isfile(AI_PDF) and os.path.getsize(AI_PDF) > 5_000, f"Missing or empty formal AI PDF: {AI_PDF}"
+    import pymupdf
+    ai_doc = pymupdf.open(AI_PDF)
+    ai_text = "\n".join(p.get_text() for p in ai_doc)
+    assert "ChatGPT" in ai_text, "AI工具使用详情.pdf missing ChatGPT disclosure entry (T07)"
 
     # Cross-check key verified JSON numbers appear consistently in paper & report
     qubo = _load_json(os.path.join(RES_DIR, "v2_qubo_results.json"))

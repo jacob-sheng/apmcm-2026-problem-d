@@ -506,6 +506,45 @@ def _score_v2_physics_hurdle_round(va, df_obs, obs_idx, X_phys_all, X_aug_all_oh
     return v_f + (1 - p_semi) * (vm_gl + vm_gh + vm_v + vm_c) + p_semi * (vs_gl + vs_gh + vs_v + vs_c)
 
 
+def build_closed_loop_protocol_scope_notes(
+    n_total,
+    n_a_eq_b,
+    min_v_a_eq_b,
+    n_rare05,
+    n_init,
+    final_budget,
+    hg_all,
+    hg_neq,
+    methods_dict,
+):
+    """Build dynamic closed-loop scope notes from actual run parameters and curves (T04A)."""
+    q_m = float(methods_dict["v2_Real_8Bit_QUBO"]["final_mean_rare05"])
+    q_sd = float(methods_dict["v2_Real_8Bit_QUBO"]["rare05_std"][-1])
+    s_m = float(methods_dict["v2_Classical_SeqRank"]["final_mean_rare05"])
+    s_sd = float(methods_dict["v2_Classical_SeqRank"]["rare05_std"][-1])
+    delta = q_m - s_m
+    delta_pp = 100.0 * delta / max(1, int(n_rare05))
+    n_neq = int(n_total) - int(n_a_eq_b)
+    return {
+        "same_surrogate_comparison": (
+            f"Under the same lightweight online physics-hurdle surrogate (K={final_budget}, V<0.5 M={n_rare05}), "
+            f"v2_Real_8Bit_QUBO achieved {q_m:.2f}/{n_rare05} (SD {q_sd:.3f}) vs "
+            f"{s_m:.2f}/{n_rare05} (SD {s_sd:.3f}) for v2_Classical_SeqRank "
+            f"({delta:+.2f} targets, {delta_pp:+.2f} pp), supporting hybrid classical-prescreen + QUBO "
+            "feasibility without claiming acquisition-level or quantum advantage. "
+            "Marginal across-seed SDs are reported; per-seed paired trajectories were not archived."
+        ),
+        "a_eq_b_eligibility": (
+            f"03_val has {n_total:,} rows including {n_a_eq_b} homonuclear (A=B) rows "
+            f"(0 targets with V<1, min V={min_v_a_eq_b:.5f}). "
+            f"Initial {n_init}-sample pools and Random/SeqRank draw from all {n_total:,} rows "
+            f"(E[H_0.5({final_budget})]={hg_all:.7f}), "
+            f"whereas v2_Real_8Bit_QUBO excludes A=B in its QUBO decoding "
+            f"(non-homonuclear pool N={n_neq:,} gives E[H_0.5({final_budget})]={hg_neq:.7f})."
+        ),
+    }
+
+
 def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_rounds=15):
     """
     20-seed closed-loop simulated DFT screening benchmark on 03_castelli_val.csv
@@ -516,6 +555,8 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
     t0 = time.perf_counter()
     va = pd.read_csv(os.path.join(DATA_DIR, "03_castelli_val.csv")).reset_index(drop=True)
     n_total = len(va)
+    n_a_eq_b = int((va["A"].astype(str) == va["B"].astype(str)).sum())
+    min_v_a_eq_b = float(va.loc[va["A"].astype(str) == va["B"].astype(str), "V"].min())
     y_true = va["V"].values
     is_rare05 = (y_true < 0.5).astype(int)
     is_rare10 = (y_true < 1.0).astype(int)
@@ -800,19 +841,6 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
         "batch_size": batch_size,
         "n_rounds": n_rounds,
         "runtime_sec": round(time.perf_counter() - t0, 2),
-        "protocol_scope_notes": {
-            "same_surrogate_comparison": (
-                "Under the same lightweight online physics-hurdle surrogate, v2_Real_8Bit_QUBO achieved "
-                "16.20/18 (SD 1.077) vs 16.55/18 (SD 1.962) for v2_Classical_SeqRank (-0.35 targets, -1.94 pp), "
-                "supporting hybrid classical-prescreen + QUBO feasibility without claiming acquisition-level or quantum advantage. "
-                "Marginal across-seed SDs are reported; per-seed paired trajectories were not archived."
-            ),
-            "a_eq_b_eligibility": (
-                "03_val has 3,969 rows including 77 homonuclear (A=B) rows (0 targets with V<1, min V=6.65373). "
-                "Initial 50-sample pools and Random/SeqRank draw from all 3,969 rows (E[H_0.5(200)]=0.9070295), "
-                "whereas v2_Real_8Bit_QUBO excludes A=B in its QUBO decoding (non-homonuclear pool N=3,892 gives E[H_0.5(200)]=0.9249743)."
-            ),
-        },
         "analytical_hypergeometric": {
             "formula": "E[H(K)] = K * M / N",
             "rare05_mean": [round(float(x), 6) for x in hg_exp05],
@@ -888,6 +916,28 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
             "enrichment_vs_hypergeom_rare10": round(m10_fin / hg_final10, 2),
             "enrichment_vs_empirical_random_rare10": round(m10_fin / max(emp_rand_final10, 1e-9), 2),
         }
+
+    final_budget = int(budgets[-1])
+    hg_neq_final05 = float(final_budget * n_rare05 / max(1, n_total - n_a_eq_b))
+    summary["protocol_scope_notes"] = build_closed_loop_protocol_scope_notes(
+        n_total=n_total,
+        n_a_eq_b=n_a_eq_b,
+        min_v_a_eq_b=min_v_a_eq_b,
+        n_rare05=n_rare05,
+        n_init=n_init,
+        final_budget=final_budget,
+        hg_all=hg_final05,
+        hg_neq=hg_neq_final05,
+        methods_dict=summary["methods"],
+    )
+    summary["archived_20seed_reference"] = {
+        "reference_commit": "8320231",
+        "n_seeds": 20,
+        "n_init": 50,
+        "final_budget": 200,
+        "v2_Real_8Bit_QUBO_rare05": "16.20/18 (SD 1.077)",
+        "v2_Classical_SeqRank_rare05": "16.55/18 (SD 1.962)",
+    }
 
     return summary
 
@@ -1860,7 +1910,7 @@ def main():
     }
     out_path = os.path.join(OUT_DIR, "v2_experiments.json")
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2)
+        json.dump(out, f, indent=2, allow_nan=False)
     print(f"\nSaved {out_path} successfully in {out['total_runtime_sec']}s.")
 
 

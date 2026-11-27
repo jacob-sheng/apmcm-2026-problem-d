@@ -67,7 +67,7 @@ README_CONTENT = """# Supporting Materials — 2026 APMCM Problem D (Team Dapmcm
 - `v2_optimized/reference_baselines/`: Bundled archival reference CSV summaries (`table1_surrogate_ablation.csv`, `table4_spqc550_hardware_vs_classical.csv`) enabling completely standalone offline reproduction.
 - `v2_optimized/results/`: All quantitative JSON/CSV summaries (`track_a_spqc_archive_summary.json`, `v2_holdout_04_train02only.csv`, `v2_holdout_04.csv`, `v2_q2_blind_11.csv`, `v2_q3_blind_12.csv`, etc.), and verified `SPQC-550` raw spin checkpoints (`spqc_checkpoints/`).
 - `v2_optimized/figures/`: All 11 publication-grade 300 DPI English PNGs (`fig01` through `fig08` plus conceptual schematics `schematic01` through `schematic03`).
-- `scripts/`: Standalone code-gate verifier (`verify_all_review_gates.py`) and submission packaging/audit scripts (`package_submission.py`, `audit_submission.py`).
+- `scripts/`: Standalone code-gate verifier (`verify_all_review_gates.py`), independent HiGHS MILP cross-check (`verify_milp_qubo_crosscheck.py`), and submission packaging/audit scripts (`package_submission.py`, `audit_submission.py`).
 - `requirements.txt`: Pinned Python environment dependencies and offline `kaiwu==1.4.4` installation notes.
 
 All official raw competition CSV datasets, dry-run artifacts, `.npz` files, and credentials are strictly excluded per APMCM submission rules.
@@ -75,8 +75,9 @@ All official raw competition CSV datasets, dry-run artifacts, `.npz` files, and 
 ## Standalone Reproduction (Supporting Archive + Official Dataset Only)
 Unpack this archive, install `requirements.txt` (with `kaiwu==1.4.4`), set `APMCM_DATA_DIR` to the official `date/` directory, and run:
 1. `python v2_optimized/run_all.py --verify-saved`            (checksums, saved CSVs/JSONs & SPQC-550 record audit; 0 cloud calls)
-2. `python scripts/verify_all_review_gates.py --code-only`   (all 7 live matrix, certification & data gates; 0 cloud calls)
-3. `python v2_optimized/run_all.py --all`                     (full offline retraining, Q2/Q3 certification, experiments & figures)
+2. `python scripts/verify_milp_qubo_crosscheck.py`             (independent Fortet/McCormick MILP cross-check via SciPy/HiGHS, `mip_gap=0`)
+3. `python scripts/verify_all_review_gates.py --code-only`   (all 7 live matrix, MILP, certification & data gates; 0 cloud calls)
+4. `python v2_optimized/run_all.py --all`                     (full offline retraining, Q2/Q3 certification, experiments & figures)
 
 *(In the full repository containing `paper/` and `submission/`, run `python scripts/verify_all_review_gates.py` and `python scripts/audit_submission.py --problem D --team apmcm26302266`.)*
 """

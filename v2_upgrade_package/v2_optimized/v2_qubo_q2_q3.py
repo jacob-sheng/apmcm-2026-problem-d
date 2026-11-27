@@ -1441,31 +1441,67 @@ def compute_compression_attribution_table(q3_entries):
 
 def compute_ccap_retention_table(pools_cfg):
     """
-    Compute exact Top-10 and Top-25 retention counts + exact dropped Top-25 candidate lists
-    for declared pools and C_cap thresholds across all distinct subspace definitions:
-      1. V_hat < c_cap (exact truncated threshold)
-      2. A x B [x X] element-product subspace (used by Q2, Model 3A-HOBO, Model 3B-ANOVA)
-      3. (A,X) x B composite subspace (used by Model 3A-Comp on Q3)
+    Compute exact Top-10 and Top-25 retention counts and dropped Top-25 candidate lists
+    directly from the real matrix builders' active-subspace metadata across four domains:
+      1. V_hat < c_cap (truncated pool threshold, both all-rows and legal A != B rows)
+      2. Q2 / Model 3A-HOBO element-product subspace (elems_A x elems_B [x elems_X] from builder)
+      3. Model 3A-Comp composite subspace ((A,X) x B from build_q3_comp_qubo metadata)
+      4. Model 3B-ANOVA Top-K element subspace (from build_q3_compact_anova_qubo, Q3 only)
     """
+    anova_tk_defaults = {"Q3_full_08": 35, "Q3_blind_12": 25}
     records = []
-    for label, df_pool, default_cap, cap_grid in pools_cfg:
+    for item in pools_cfg:
+        if len(item) == 5:
+            label, df_pool, default_cap, cap_grid, anova_tk = item
+        else:
+            label, df_pool, default_cap, cap_grid = item
+            anova_tk = anova_tk_defaults.get(label)
         df_s = df_pool.sort_values("V_hat").reset_index(drop=True)
         top10 = df_s.head(10)
         top25 = df_s.head(25)
         is_q3 = ("X" in df_s.columns) and (df_s["X"].nunique() > 1)
 
-        for c_cap in cap_grid:
-            act = df_s[df_s["V_hat"] < c_cap]
-            if "a_eq_b" in act.columns:
-                act = act[act["a_eq_b"] == 0]
-            actA = set(act["A"])
-            actB = set(act["B"])
-            actX = set(act["X"]) if is_q3 else None
-            actAX = set(zip(act["A"], act["X"])) if is_q3 else None
+        anova_meta = None
+        if is_q3 and anova_tk is not None:
+            _, anova_meta, _ = build_q3_compact_anova_qubo(df_s, top_k_subspace=int(anova_tk), c_cap=float(default_cap))
+            anovA = set(anova_meta["elems_A"])
+            anovB = set(anova_meta["elems_B"])
+            anovX = set(anova_meta["elems_X"])
+            t10_anov = sum(
+                1 for a, b, x in zip(top10["A"], top10["B"], top10["X"])
+                if a != b and a in anovA and b in anovB and x in anovX
+            )
+            t25_anov = sum(
+                1 for a, b, x in zip(top25["A"], top25["B"], top25["X"])
+                if a != b and a in anovA and b in anovB and x in anovX
+            )
+            dropped_anov = [
+                {
+                    "rank": int(idx + 1),
+                    "formula": str(row["formula"]),
+                    "V_hat": round(float(row["V_hat"]), 6),
+                }
+                for idx, row in top25.iterrows()
+                if not (row["A"] != row["B"] and row["A"] in anovA and row["B"] in anovB and row["X"] in anovX)
+            ]
+        else:
+            t10_anov = None
+            t25_anov = None
+            dropped_anov = None
 
-            t10_lt = int((top10["V_hat"] < c_cap).sum())
-            t25_lt = int((top25["V_hat"] < c_cap).sum())
+        for c_cap in cap_grid:
+            act_all = df_s[df_s["V_hat"] < c_cap]
+            act_legal = act_all[act_all["A"] != act_all["B"]]
+
             if is_q3:
+                _, meta_hobo, _ = build_q3_submodular_hobo_qubo(df_s, c_cap=float(c_cap))
+                _, meta_comp, _ = build_q3_comp_qubo(df_s, c_cap=float(c_cap), penalty_mult=1.60)
+                actA = set(meta_hobo["elems_A"])
+                actB = set(meta_hobo["elems_B"])
+                actX = set(meta_hobo["elems_X"])
+                actAX = {tuple(p) for p in meta_comp["ax_pairs"]}
+                compB = set(meta_comp["elems_B"])
+
                 t10_elem = sum(
                     1 for a, b, x in zip(top10["A"], top10["B"], top10["X"])
                     if a != b and a in actA and b in actB and x in actX
@@ -1476,31 +1512,12 @@ def compute_ccap_retention_table(pools_cfg):
                 )
                 t10_comp = sum(
                     1 for a, b, x in zip(top10["A"], top10["B"], top10["X"])
-                    if a != b and (a, x) in actAX and b in actB
+                    if a != b and (a, x) in actAX and b in compB
                 )
                 t25_comp = sum(
                     1 for a, b, x in zip(top25["A"], top25["B"], top25["X"])
-                    if a != b and (a, x) in actAX and b in actB
+                    if a != b and (a, x) in actAX and b in compB
                 )
-            else:
-                t10_elem = sum(1 for a, b in zip(top10["A"], top10["B"]) if a != b and a in actA and b in actB)
-                t25_elem = sum(1 for a, b in zip(top25["A"], top25["B"]) if a != b and a in actA and b in actB)
-                t10_comp = t10_elem
-                t25_comp = t25_elem
-
-            dropped_lt_cap = [
-                {
-                    "rank": int(idx + 1),
-                    "formula": str(row["formula"]),
-                    "A": str(row["A"]),
-                    "B": str(row["B"]),
-                    **({"X": str(row["X"])} if is_q3 else {}),
-                    "V_hat": round(float(row["V_hat"]), 6),
-                }
-                for idx, row in top25.iterrows()
-                if float(row["V_hat"]) >= c_cap
-            ]
-            if is_q3:
                 dropped_elem = [
                     {
                         "rank": int(idx + 1),
@@ -1517,9 +1534,16 @@ def compute_ccap_retention_table(pools_cfg):
                         "V_hat": round(float(row["V_hat"]), 6),
                     }
                     for idx, row in top25.iterrows()
-                    if not (row["A"] != row["B"] and (row["A"], row["X"]) in actAX and row["B"] in actB)
+                    if not (row["A"] != row["B"] and (row["A"], row["X"]) in actAX and row["B"] in compB)
                 ]
             else:
+                _, meta_q2, _ = build_exact8_q2_qubo(df_s, c_cap=float(c_cap), penalty_mult=2.25)
+                actA = set(meta_q2["elems_A"])
+                actB = set(meta_q2["elems_B"])
+                t10_elem = sum(1 for a, b in zip(top10["A"], top10["B"]) if a != b and a in actA and b in actB)
+                t25_elem = sum(1 for a, b in zip(top25["A"], top25["B"]) if a != b and a in actA and b in actB)
+                t10_comp = t10_elem
+                t25_comp = t25_elem
                 dropped_elem = [
                     {
                         "rank": int(idx + 1),
@@ -1531,21 +1555,42 @@ def compute_ccap_retention_table(pools_cfg):
                 ]
                 dropped_comp = dropped_elem
 
+            t10_lt = int((top10["V_hat"] < c_cap).sum())
+            t25_lt = int((top25["V_hat"] < c_cap).sum())
+            t25_legal_lt = int(((top25["V_hat"] < c_cap) & (top25["A"] != top25["B"])).sum())
+            dropped_lt_cap = [
+                {
+                    "rank": int(idx + 1),
+                    "formula": str(row["formula"]),
+                    "A": str(row["A"]),
+                    "B": str(row["B"]),
+                    **({"X": str(row["X"])} if is_q3 else {}),
+                    "V_hat": round(float(row["V_hat"]), 6),
+                }
+                for idx, row in top25.iterrows()
+                if float(row["V_hat"]) >= c_cap
+            ]
+
             records.append({
                 "pool": label,
                 "is_default_cap": bool(abs(c_cap - default_cap) < 1e-9),
                 "c_cap": float(c_cap),
                 "declared_pool_size": int(len(df_s)),
                 "declared_min_V_hat": round(float(df_s.iloc[0]["V_hat"]), 6),
-                "active_rows_lt_cap": int(len(act)),
+                "active_rows_lt_cap": int(len(act_all)),
+                "legal_active_rows_lt_cap": int(len(act_legal)),
                 "top10_retained_lt_cap": t10_lt,
                 "top10_in_element_product_subspace": int(t10_elem),
                 "top10_in_composite_ax_subspace": int(t10_comp),
+                "top10_in_anova_topk_subspace": int(t10_anov) if t10_anov is not None else None,
                 "top10_in_active_subspace": int(t10_elem),
                 "top10_max_V_hat": round(float(top10["V_hat"].max()), 6),
                 "top25_retained_lt_cap": t25_lt,
+                "top25_legal_lt_cap": t25_legal_lt,
                 "top25_in_element_product_subspace": int(t25_elem),
                 "top25_in_composite_ax_subspace": int(t25_comp),
+                "anova_top_k_subspace": int(anova_tk) if anova_tk is not None else None,
+                "top25_in_anova_topk_subspace": int(t25_anov) if t25_anov is not None else None,
                 "top25_in_active_subspace": int(t25_elem),
                 "top25_max_V_hat": round(float(top25["V_hat"].max()), 6),
                 "dropped_top25_count_lt_cap": len(dropped_lt_cap),
@@ -1554,6 +1599,8 @@ def compute_ccap_retention_table(pools_cfg):
                 "dropped_top25_element_product": dropped_elem,
                 "dropped_top25_count_composite_ax": len(dropped_comp),
                 "dropped_top25_composite_ax": dropped_comp,
+                "dropped_top25_count_anova_topk": len(dropped_anov) if dropped_anov is not None else None,
+                "dropped_top25_anova_topk": dropped_anov,
                 "dropped_top25_count_subspace": len(dropped_elem),
                 "dropped_top25_subspace": dropped_elem,
             })
@@ -1757,7 +1804,7 @@ def main():
 
     out_path = os.path.join(OUT_DIR, "v2_qubo_results.json")
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+        json.dump(results, f, indent=2, allow_nan=False)
     print(f"\nSaved {out_path} successfully.")
 
 

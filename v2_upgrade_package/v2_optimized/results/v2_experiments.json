@@ -1297,8 +1297,16 @@
       }
     },
     "protocol_scope_notes": {
-      "same_surrogate_comparison": "Under the same lightweight online physics-hurdle surrogate, v2_Real_8Bit_QUBO achieved 16.20/18 (SD 1.077) vs 16.55/18 (SD 1.962) for v2_Classical_SeqRank (-0.35 targets, -1.94 pp), supporting hybrid classical-prescreen + QUBO feasibility without claiming acquisition-level or quantum advantage. Marginal across-seed SDs are reported; per-seed paired trajectories were not archived.",
+      "same_surrogate_comparison": "Under the same lightweight online physics-hurdle surrogate (K=200, V<0.5 M=18), v2_Real_8Bit_QUBO achieved 16.20/18 (SD 1.077) vs 16.55/18 (SD 1.962) for v2_Classical_SeqRank (-0.35 targets, -1.94 pp), supporting hybrid classical-prescreen + QUBO feasibility without claiming acquisition-level or quantum advantage. Marginal across-seed SDs are reported; per-seed paired trajectories were not archived.",
       "a_eq_b_eligibility": "03_val has 3,969 rows including 77 homonuclear (A=B) rows (0 targets with V<1, min V=6.65373). Initial 50-sample pools and Random/SeqRank draw from all 3,969 rows (E[H_0.5(200)]=0.9070295), whereas v2_Real_8Bit_QUBO excludes A=B in its QUBO decoding (non-homonuclear pool N=3,892 gives E[H_0.5(200)]=0.9249743)."
+    },
+    "archived_20seed_reference": {
+      "reference_commit": "8320231",
+      "n_seeds": 20,
+      "n_init": 50,
+      "final_budget": 200,
+      "v2_Real_8Bit_QUBO_rare05": "16.20/18 (SD 1.077)",
+      "v2_Classical_SeqRank_rare05": "16.55/18 (SD 1.962)"
     }
   },
   "equal_budget_solver_topk": {
