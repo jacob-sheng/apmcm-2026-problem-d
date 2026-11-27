@@ -10,6 +10,8 @@ stability probability alongside Goldschmidt t, electron parity, closed-shell
 charge neutrality, and the exact Butler-Ginley log-additive band-center model.
 """
 
+import hashlib
+import json
 import os
 import numpy as np
 import pandas as pd
@@ -17,7 +19,145 @@ from scipy.stats import norm
 from sklearn.linear_model import Ridge
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, "2026 APMCM Problems", "2026 APMCM Problem D", "date")
+
+
+def resolve_data_dir(repo_root=None):
+    """
+    Dynamically resolve the official Castelli dataset directory ('date/').
+    Search priority:
+      1. Environment variable APMCM_DATA_DIR (if set and non-empty)
+      2. <repo_root>/01_2026赛题与数据集/Problem_D_量子计算钙钛矿稀有目标搜索/date
+      3. <repo_root>/2026 APMCM Problems/2026 APMCM Problem D/date
+    Raises FileNotFoundError with searched paths and APMCM_DATA_DIR instructions if missing.
+    """
+    default_repo_root = os.path.dirname(BASE_DIR)
+    root = os.path.abspath(repo_root) if repo_root is not None else default_repo_root
+
+    searched = []
+    env_dir = os.environ.get("APMCM_DATA_DIR", "").strip()
+    if env_dir:
+        cand_env = os.path.abspath(env_dir)
+        searched.append(("APMCM_DATA_DIR", cand_env))
+        if os.path.isdir(cand_env):
+            return cand_env
+        raise FileNotFoundError(
+            f"APMCM_DATA_DIR is set to '{cand_env}', which does not exist or is not a directory. "
+            "Set APMCM_DATA_DIR to the directory containing 02_castelli_train.csv and sha256_public.json, "
+            "or unset APMCM_DATA_DIR to use repository auto-discovery."
+        )
+
+    candidates = [
+        ("workspace_cn_dataset", os.path.join(root, "01_2026赛题与数据集", "Problem_D_量子计算钙钛矿稀有目标搜索", "date")),
+        ("workspace_en_dataset", os.path.join(root, "2026 APMCM Problems", "2026 APMCM Problem D", "date")),
+    ]
+    if repo_root is None:
+        candidates.append(
+            ("package_legacy_dataset", os.path.join(BASE_DIR, "2026 APMCM Problems", "2026 APMCM Problem D", "date"))
+        )
+
+    for label, path in candidates:
+        searched.append((label, path))
+        if os.path.isdir(path):
+            return os.path.abspath(path)
+
+    searched_msg = "\n".join(f"  - [{lbl}] {p}" for lbl, p in searched)
+    raise FileNotFoundError(
+        "Could not locate the official Problem D dataset directory ('date/').\n"
+        f"Searched paths:\n{searched_msg}\n"
+        "Fix: set the environment variable APMCM_DATA_DIR to the folder containing "
+        "'02_castelli_train.csv' and 'sha256_public.json' (e.g., export APMCM_DATA_DIR=/path/to/date)."
+    )
+
+
+def verify_dataset_checksums(data_dir=None):
+    """
+    Verify all official dataset files against sha256_public.json using BOTH:
+      - raw-byte SHA-256 (exact file bytes on disk)
+      - CRLF-normalized SHA-256 (accounting for LF <-> CRLF checkout conversion)
+    Returns a summary dict with raw_bytes_matches, crlf_normalized_matches, total_files, and per-file details.
+    """
+    target_dir = os.path.abspath(data_dir) if data_dir is not None else DATA_DIR
+    manifest_path = os.path.join(target_dir, "sha256_public.json")
+    if not os.path.isfile(manifest_path):
+        raise FileNotFoundError(f"Missing official checksum manifest: {manifest_path}")
+
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+
+    files = {}
+    raw_matches = 0
+    crlf_norm_matches = 0
+    for fname, expected_sha in manifest.items():
+        fpath = os.path.join(target_dir, fname)
+        if not os.path.isfile(fpath):
+            files[fname] = {
+                "exists": False,
+                "size_bytes": 0,
+                "expected_sha256": expected_sha,
+                "raw_sha256": None,
+                "crlf_sha256": None,
+                "lf_sha256": None,
+                "raw_match": False,
+                "crlf_exact_match": False,
+                "crlf_normalized_match": False,
+                "detected_eol": "MISSING",
+            }
+            continue
+
+        with open(fpath, "rb") as fp:
+            raw = fp.read()
+        raw_sha = hashlib.sha256(raw).hexdigest()
+        lf_bytes = raw.replace(b"\r\n", b"\n")
+        crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+        lf_sha = hashlib.sha256(lf_bytes).hexdigest()
+        crlf_sha = hashlib.sha256(crlf_bytes).hexdigest()
+
+        has_crlf = b"\r\n" in raw
+        has_bare_lf = b"\n" in raw.replace(b"\r\n", b"")
+        if has_crlf and has_bare_lf:
+            eol = "MIXED"
+        elif has_crlf:
+            eol = "CRLF"
+        elif has_bare_lf:
+            eol = "LF"
+        else:
+            eol = "NONE"
+
+        raw_ok = (raw_sha == expected_sha)
+        crlf_exact_ok = (crlf_sha == expected_sha)
+        crlf_norm_ok = raw_ok or crlf_exact_ok or (lf_sha == expected_sha)
+        if raw_ok:
+            raw_matches += 1
+        if crlf_norm_ok:
+            crlf_norm_matches += 1
+
+        files[fname] = {
+            "exists": True,
+            "size_bytes": len(raw),
+            "expected_sha256": expected_sha,
+            "raw_sha256": raw_sha,
+            "crlf_sha256": crlf_sha,
+            "lf_sha256": lf_sha,
+            "raw_match": raw_ok,
+            "crlf_exact_match": crlf_exact_ok,
+            "crlf_normalized_match": crlf_norm_ok,
+            "detected_eol": eol,
+        }
+
+    total = len(manifest)
+    return {
+        "data_dir": target_dir,
+        "manifest_path": manifest_path,
+        "total_files": total,
+        "raw_bytes_matches": raw_matches,
+        "crlf_normalized_matches": crlf_norm_matches,
+        "all_raw_match": (raw_matches == total),
+        "all_crlf_normalized_match": (crlf_norm_matches == total),
+        "files": files,
+    }
+
+
+DATA_DIR = resolve_data_dir()
 
 # (Z, mass, group, period, chi_pauling, ie1_eV, ea_eV, r_cov_A, r_ion6_A,
 #  n_val, n_d, mendeleev, common_ox, closed_shell_ox)

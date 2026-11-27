@@ -34,3 +34,8 @@ Thumbs.db
 *.7z
 *.mp4
 *.npz
+
+# === Dry-run diagnostics & sensitive local submission sheets ===
+*dryrun*.json
+Dapmcm26302266cns.*
+*[本队预填版]*Control Sheet*
