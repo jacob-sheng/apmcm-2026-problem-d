@@ -379,10 +379,15 @@ def run_deep_analysis():
                  label=f"Total Score Sum(P_hit) = {total_exp_hits:.2f} (indep. Bern. SD = {total_exp_sd:.2f})")
     ax_b.axvline(30, color=GOLD, linestyle="--", lw=1.2)
     pct30 = 100.0 * cum_yield_v[29] / max(total_exp_hits, 1e-6)
-    ax_b.text(32, 3.0,
-              f"K=30 (0.81% pool):\nSum(P_hit)={cum_yield_v[29]:.2f}/{total_exp_hits:.2f}\n({pct30:.1f}% of model sum;\nnot unseen true recall)",
-              fontsize=8.0, fontweight="bold", color="#8B5A00",
-              bbox=dict(boxstyle="round,pad=0.3", facecolor="#FFFDF2", edgecolor=GOLD))
+    ax_b.annotate(
+        f"K=30 (0.81% pool):\nSum(P_hit)={cum_yield_v[29]:.2f}/{total_exp_hits:.2f}\n({pct30:.1f}% of model sum;\nnot unseen true recall)",
+        xy=(30, float(cum_yield_v[29])),
+        xytext=(38, 12.6),
+        arrowprops=dict(arrowstyle="->", color="#8B5A00", lw=1.15),
+        fontsize=7.8, fontweight="bold", color="#8B5A00",
+        bbox=dict(boxstyle="round,pad=0.3", facecolor="#FFFDF2", edgecolor=GOLD),
+        zorder=6,
+    )
     ax_b.set_xlabel("Top-K Budget in 04_holdout (out of 3,703)")
     ax_b.set_ylabel("Cumulative Model Expectation Sum(P_hit)")
     ax_b.set_title("(b) Model Expectation Sum(P_hit) vs Budget (Scoped, Not True Recall)")

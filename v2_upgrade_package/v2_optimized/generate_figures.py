@@ -1088,9 +1088,11 @@ def schematic02_band_alignment_window():
     ax.axvline(4.18, color=TEAL, linestyle=":", linewidth=1.3)
     ax.axvline(6.05, color=TEAL, linestyle=":", linewidth=1.3)
     ax.scatter([4.18, 5.03, 5.20, 6.05], [3.1, 1.4, 1.4, 3.1], s=48, color=NAVY, zorder=6)
-    ax.text(4.18, 3.18, "(4.18, 3.10)", ha="center", va="bottom", fontsize=7.6, fontweight="bold", color=NAVY)
-    ax.text(6.05, 3.18, "(6.05, 3.10)", ha="center", va="bottom", fontsize=7.6, fontweight="bold", color=NAVY)
-    ax.text(5.115, 1.26, "Base [5.03, 5.20] at E_g = 1.40", ha="center", va="top", fontsize=7.6, fontweight="bold", color=NAVY)
+    ax.text(4.24, 3.22, "(4.18, 3.10)", ha="left", va="bottom", fontsize=7.6, fontweight="bold", color=NAVY,
+            bbox=dict(boxstyle="round,pad=0.12", facecolor="white", edgecolor="none", alpha=0.88), zorder=7)
+    ax.text(5.99, 3.22, "(6.05, 3.10)", ha="right", va="bottom", fontsize=7.6, fontweight="bold", color=NAVY,
+            bbox=dict(boxstyle="round,pad=0.12", facecolor="white", edgecolor="none", alpha=0.88), zorder=7)
+    ax.text(5.115, 1.24, "Base [5.03, 5.20] at E_g = 1.40", ha="center", va="top", fontsize=7.6, fontweight="bold", color=NAVY)
 
     # Metallic E_g = 0 line at bottom
     ax.plot([3.6, 6.6], [0.0, 0.0], color=ORANGE, linewidth=3.5, label="Metallic Manifold E_g = 0 (96.12% of grid)")
