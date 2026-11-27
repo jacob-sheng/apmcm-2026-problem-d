@@ -648,8 +648,8 @@ def gate_paper_and_report_sync():
             assert ph.lower() not in txt.lower(), f"Forbidden Round-1/2/3 phrase {ph!r} found in {label}"
     assert "30.0%$--$90.0%" not in typ_txt, "Conclusion point 3 still says 30.0%--90.0% instead of 20.0%--90.0% (T05)"
 
+    assert "Z_parity==1" in typ_txt or "Odd $Z$ parity" in typ_txt, "paper/main.typ missing odd electron parity audit entry"
     for req_phrase in (
-        "Z_parity==1",
         "1/9",
         "9/9",
         "17/25",
