@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-"""
-Independent HiGHS MILP (McCormick Linearization) Cross-Check for All 8 Q2/Q3 Integer Ising Matrices.
-
-For each of the 8 active-subspace matrices:
-  1. Verifies SHA-256 integrity of the 4 declared pool CSVs against v2_q1_diagnostics.json.
-  2. Builds the exact 8-bit integer Ising matrix H in [-127, 127] and computes its int64 SHA-256.
-  3. Recovers the exact integer QUBO (Q, C) via x^T Q x = -s^T H s + C.
-  4. Linearizes min_{x in {0,1}^n} x^T Q x via Fortet/McCormick constraints:
-       w_{ij} - x_i <= 0,  w_{ij} - x_j <= 0,  x_i + x_j - w_{ij} <= 1   (x_i in {0,1}, w_{ij} in [0,1])
-     and solves to provable global optimality (mip_rel_gap = 0.0) using SciPy/HiGHS.
-  5. Cross-checks exact global equality against structured primary-variable enumeration.
-"""
+"""Independent Fortet-McCormick MILP verification of the 8 integer Ising matrices via SciPy/HiGHS."""
 
 import argparse
 import hashlib

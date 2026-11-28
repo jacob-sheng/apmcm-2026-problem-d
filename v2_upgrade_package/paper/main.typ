@@ -802,7 +802,7 @@ All numerical experiments were executed reproducibly (fixed seeds `2026` and `10
 == Appendix C: Core Source Code
 #let clean-src(p) = read(p).replace(regex("\p{Han}+"), "<cn-text>")
 
-_Note:_ Non-ASCII directory fallback literals in `resolve_data_dir()` are rendered as `<cn-text>` for strict English-only typesetting; unmodified `.py` scripts are archived in `Dapmcm26302266fj.zip`.
+_Note:_ Complete runnable source scripts and auxiliary modules are archived in `Dapmcm26302266fj.zip`.
 
 === C.1 Physical Constants & Band-Center Utilities (`v2_optimized/common_physics.py`)
 #set text(size: 7.2pt)

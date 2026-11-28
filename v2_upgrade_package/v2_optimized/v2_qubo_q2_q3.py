@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
-"""
-v3 Remediated Problem 2 & Problem 3 Quantum/Ising QUBO & HOBO Engine:
-  - Q2 Exact-8bit Active-Subspace Bipartite QUBO ([-127, 127] exact integer Ising)
-  - Model 3A-Comp: Zero-Auxiliary Composite (A,X)-B Bipartite QUBO (Theorem 2 P_block > 1.5 max|Q_obj|)
-  - Model 3A-HOBO: Repaired Asymmetric Submodular HOBO->QUBO with Cumulative Row-Sum P_aux(i,k)
-                   & Exact Cardinality-Bound P_block (0 illegal global ground states certified)
-  - Model 3B-ANOVA: Repaired Uniform 8x Diagonal/Off-Diagonal Scaling & Effect-Amplitude Normalization
-                    with 3-Layer Error Decomposition (Surrogate -> Float ANOVA -> 8-bit Ising -> Solver)
-  - Global Ground-State Certification (`certify_global_ground_states`):
-      Analytic Y-elimination + exact algebraic Ising-to-QUBO recovery cross-check +
-      Full 2^{n_primary} enumeration (n_primary <= 22) or Exact Cardinality-Partitioned enumeration (n_primary > 22)
-  - 4-Row Compression Attribution Table (F18), C_cap Top-10/Top-25 Retention Audit (F19),
-    and Fair Equal-Budget Solver Benchmark (n_runs=50, 1 best run -> 50 returned solutions)
-"""
+"""Problem 2 and Problem 3 8-bit QUBO/HOBO formulations, exact ground-state certification, and solver benchmarks."""
 
 import json
 import math
@@ -675,7 +662,7 @@ def build_q3_comp_qubo(df_pool, c_cap=1.50, penalty_mult=1.60):
         amax = int(np.max(np.abs(m_int)))
         if amax == 0:
             continue
-        # Theorem 2 bound: P_block = 4*j_pen > (3/2)*(8*amax) = 12*amax  <=>  j_pen >= 3*amax + 1
+        # Theorem 2 bound: P_block = 4*j_pen > (3/2)*(8*amax) = 12*amax <=> j_pen >= 3*amax + 1
         j_pen = max(3 * amax + 1, int(np.ceil(2.0 * penalty_mult * amax)))
         P_block = 4.0 * j_pen
         P_forbid = 8.0 * int(np.ceil(j_pen / 2.0))  # >= P_block and multiple of 8
@@ -791,15 +778,7 @@ def _compute_hobo_block_penalty_bound(T8, nA, nB, nX):
 
 
 def build_q3_submodular_hobo_qubo(df_pool, c_cap=1.5):
-    """
-    Model 3A-HOBO: Repaired Asymmetric One-Sided Submodular HOBO->QUBO.
-    Fixes F01 via:
-      1. Cumulative row-sum auxiliary penalty per active (i,k):
-           P_aux(i,k) = sum_j |Q_obj(y_{ik}, b_j)| + 8 > sum_j |Q_obj(y_{ik}, b_j)|,
-         guaranteeing y_{ik}=1 when a_i c_k = 0 strictly increases energy even if ALL b_j = 1.
-      2. Exact cardinality-partitioned one-hot penalty:
-           P_block > max_{(kA,kB,kX) != (1,1,1)} (-min H_obj(kA,kB,kX)) / ((kA-1)^2+(kB-1)^2+(kX-1)^2).
-    """
+    """Model 3A-HOBO: asymmetric submodular HOBO-to-QUBO reduction with cumulative row-sum P_aux(i,k)."""
     active = df_pool[df_pool["V_hat"] < c_cap].copy()
     if len(active) == 0:
         raise ValueError(f"No Q3 candidates satisfy V_hat < {c_cap}")
@@ -967,15 +946,7 @@ def _anova_exact_illegal_min_check(Q_sym, elems_A, elems_B, elems_X, lookup):
 
 
 def build_q3_compact_anova_qubo(df_pool, top_k_subspace=35, c_cap=1.5):
-    """
-    Model 3B-ANOVA: Zero-Auxiliary-Variable Compact ANOVA-QUBO on the Top-K Subspace.
-    Fixes F02 via:
-      1. Uniform 8.0 * round(...) scaling on BOTH main-effect diagonals (tA, tB, tX)
-         AND pairwise off-diagonals (tAB, tAX, tBX) after Q_sym = 0.5*(Q + Q.T).
-      2. Effect-amplitude scaling max_eff = max(|tA|, |tB|, |tX|, |tAB|, |tAX|, |tBX|).
-      3. Maximal M_max and largest j_pen within [-127, 127] verified with
-         illegal_min > legal_min (zero illegal global ground states).
-    """
+    """Model 3B-ANOVA: zero-auxiliary second-order ANOVA QUBO with uniform 8x integer scaling."""
     sub = df_pool.nsmallest(top_k_subspace, "V_hat")
     elems_A = sorted(sub["A"].unique())
     elems_B = sorted(sub["B"].unique())
@@ -1364,17 +1335,11 @@ def evaluate_q3_solutions(sols, meta, df_pool, lookup, ground_sols=None, energie
 
 
 # ---------------------------------------------------------------------------
-# Compression Attribution (F18) & C_cap Top-10/Top-25 Retention Audit (F19)
+# Compression Attribution & C_cap Top-10/Top-25 Retention Audit
 # ---------------------------------------------------------------------------
 
 def compute_compression_attribution_table(q3_entries):
-    """
-    Build the 4-row compression attribution table requested in F18:
-      1) Full-space A-B Rosenberg (52x51 = 2,652 aux)
-      2) Full-space A-X Rosenberg (52x3 = 156 aux, 264 spins)
-      3) Active-subspace A-X HOBO (Model 3A-HOBO for Blind & Full)
-      4) Active-subspace Composite (A,X) Bipartite (Model 3A-Comp for Blind & Full)
-    """
+    """Compute four-stage spin compression attribution from full A-B Rosenberg to composite (A,X)-B."""
     rows = [
         {
             "row_id": 1,
@@ -1678,14 +1643,14 @@ def main():
         sa_comp = evaluate_q3_solutions(pack_comp["sa_sols"], meta_comp, dfp, lkp_comp, ground_sols=pack_comp["sa_ground"], energies=pack_comp["sa_energies"], cert=cert_comp)
         tb_comp = evaluate_q3_solutions(pack_comp["tabu_sols"], meta_comp, dfp, lkp_comp, ground_sols=pack_comp["tabu_ground"], energies=pack_comp["tabu_energies"], cert=cert_comp)
 
-        # Model 3A-HOBO: Repaired Cumulative-P_aux Submodular HOBO->QUBO
+        # Model 3A-HOBO: Cumulative-P_aux Submodular HOBO->QUBO
         ising_hobo, meta_hobo, lkp_hobo = build_q3_submodular_hobo_qubo(dfp, c_cap=c_cap)
         cert_hobo = certify_global_ground_states(ising_hobo, meta_hobo, dfp, lkp_hobo, task_kind="q3", verify_zero_illegal=True)
         pack_hobo = _solve_ising_multi_solver(ising_hobo, n_sa=50, n_tabu=50, seed_base=2000)
         sa_hobo = evaluate_q3_solutions(pack_hobo["sa_sols"], meta_hobo, dfp, lkp_hobo, ground_sols=pack_hobo["sa_ground"], energies=pack_hobo["sa_energies"], cert=cert_hobo)
         tb_hobo = evaluate_q3_solutions(pack_hobo["tabu_sols"], meta_hobo, dfp, lkp_hobo, ground_sols=pack_hobo["tabu_ground"], energies=pack_hobo["tabu_energies"], cert=cert_hobo)
 
-        # Model 3B-ANOVA: Repaired Uniform 8x Compact ANOVA-QUBO
+        # Model 3B-ANOVA: Uniform 8x Compact ANOVA-QUBO
         ising_anov, meta_anov, lkp_anov = build_q3_compact_anova_qubo(dfp, top_k_subspace=tk, c_cap=c_cap)
         cert_anov = certify_global_ground_states(ising_anov, meta_anov, dfp, lkp_anov, task_kind="q3", verify_zero_illegal=True)
         pack_anov = _solve_ising_multi_solver(ising_anov, n_sa=50, n_tabu=50, seed_base=3000)
@@ -1744,7 +1709,7 @@ def main():
             "Tabu": {**tb_anov, "n_runs": 50, "runtime_sec": pack_anov["tabu_runtime_sec"]},
         }
 
-        # 3-Layer Error Decomposition for Model 3B-ANOVA (F02)
+        # 3-Layer Error Decomposition for Model 3B-ANOVA
         results["anova_error_decomposition"][label] = {
             "layer_1_surrogate_vs_float_anova": meta_anov.get("layer_a_surrogate_vs_float_anova"),
             "layer_2_float_anova_vs_8bit_ising": {
@@ -1791,10 +1756,10 @@ def main():
         print("  SA  :", {k: sa_anov[k] for k in ["n_returned_shots", "feasibility_pct", "unique_feasible_count", "best_V_hat", "continuous_regret", "top15_hits"]}, f"({pack_anov['sa_runtime_sec']}s)")
         print("  Tabu:", {k: tb_anov[k] for k in ["n_returned_shots", "feasibility_pct", "unique_feasible_count", "best_V_hat", "continuous_regret", "top15_hits"]}, f"({pack_anov['tabu_runtime_sec']}s)")
 
-    # 3. 4-Row Compression Attribution Table (F18)
+    # 3. 4-Row Compression Attribution Table
     results["compression_attribution"] = compute_compression_attribution_table(results["Q3"])
 
-    # 4. C_cap Top-10 / Top-25 Retention Table (F19)
+    # 4. C_cap Top-10 / Top-25 Retention Table
     results["c_cap_retention"] = compute_ccap_retention_table([
         ("Q2_full_07", q2_dfs["Q2_full_07"][0], 2.0, [1.5, 2.0, 2.5, 3.0, 4.0]),
         ("Q2_blind_11", q2_dfs["Q2_blind_11"][0], 2.5, [1.5, 2.0, 2.5, 3.0, 4.0]),

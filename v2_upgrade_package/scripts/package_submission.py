@@ -31,6 +31,9 @@ RAW_EXCLUDED_NAMES = {
     "sha256_public.json",
     "report.md",
     "v2_spqc550_dryrun.json",
+    "verify_all_review_gates.py",
+    "audit_submission.py",
+    "package_submission.py",
     ".ds_store",
     "thumbs.db",
 }
@@ -54,32 +57,22 @@ INCLUDE_DIRS = [
 
 README_CONTENT = """# Supporting Materials — 2026 APMCM Problem D (Team Dapmcm26302266)
 
-## Contents
-- `v2_optimized/*.py`: Complete, anonymized, reproducible Python source code for:
-  - `common_physics.py`: Dynamic `resolve_data_dir()` (`APMCM_DATA_DIR` -> workspace official dataset folder), dual raw-bytes & CRLF-normalized SHA-256 audit (`verify_dataset_checksums()`), Periodic Table descriptors, Bartel tau tolerance factor, Butler-Ginley log-additive band-center Ridge, Gaussian hinge expectation, and Ising energy sorting.
-  - `v1_baseline.py`: Baseline benchmarks (Direct LightGBM, log1p LightGBM, One-Hot FM, and naive 8-bit QUBO).
-  - `v2_surrogate_q1.py`: Problem 1 outer `(A,B)`-GroupKFold base-isolated Stage-0 + 4-family calibrated Bayes-optimal hurdle surrogate (with pooled-OOF meta-layer), automated `+100` base-path isolation test, `M4/M5` baseline alignment, and dual `02-only` (`v2_holdout_04_train02only.csv`) & `02+03` refit (`v2_holdout_04.csv`) exports.
-  - `v2_deep_physics_conformal.py`: Site-exchange Butler-Ginley audit, 200 `(A,B)`-group-disjoint Mondrian split-conformal calibration (`p_semi >= 0.20` strata), semiconductor residual correlation, deterministic `sum(P_hit)` analysis, and Figure 8 generation.
-  - `v2_qubo_q2_q3.py`: Problems 2 & 3 hardware-exact 8-bit QUBO/HOBO (`Q2 Exact-8bit`, `Model 3A-Comp`, `Model 3A-HOBO`, `Model 3B-ANOVA`), `certify_global_ground_states()` full primary-variable enumeration (`0` illegal ground states), 3-layer ANOVA error decomposition, 4-row compression attribution, 3-subspace `C_cap` retention, and equal-budget 50-run SA vs. Tabu benchmarking.
-  - `v2_experiments.py`: 20-seed closed-loop benchmark (analytical hypergeometric expectation, converged `L-BFGS-B` FM, classical sequential vs. hybrid Top-20 + 8-bit masked-QUBO acquisition), equal-budget Top-K, independent 4-12 bit `M_max(B)` sweep, fixed-`M_max=4` penalty sweep, and multi-scale (0.5-2.0 sigma) independent & group-correlated MC perturbation stability.
-  - `v2_spqc550_hardware.py`: Bose Quantum `SPQC-550` submission & independent algebraic Ising recovery + per-record verification (`--dry-run` isolated, `--verify-only` bit-exact SHA-256 + record equality check, explicit `--run-spqc`).
-  - `generate_figures.py` & `run_all.py`: Publication-grade 300 DPI figure generator and staged offline CLI runner.
-- `v2_optimized/reference_baselines/`: Bundled archival reference CSV summaries (`table1_surrogate_ablation.csv`, `table4_spqc550_hardware_vs_classical.csv`) enabling completely standalone offline reproduction.
-- `v2_optimized/results/`: All quantitative JSON/CSV summaries (`track_a_spqc_archive_summary.json`, `v2_holdout_04_train02only.csv`, `v2_holdout_04.csv`, `v2_q2_blind_11.csv`, `v2_q3_blind_12.csv`, etc.), and verified `SPQC-550` raw spin checkpoints (`spqc_checkpoints/`).
-- `v2_optimized/figures/`: All 11 publication-grade 300 DPI English PNGs (`fig01` through `fig08` plus conceptual schematics `schematic01` through `schematic03`).
-- `scripts/`: Standalone code-gate verifier (`verify_all_review_gates.py`), independent HiGHS MILP cross-check (`verify_milp_qubo_crosscheck.py`), and submission packaging/audit scripts (`package_submission.py`, `audit_submission.py`).
-- `requirements.txt`: Pinned Python environment dependencies and offline `kaiwu==1.4.4` installation notes.
+## Directory Layout
+- `v2_optimized/`: Python source code for crystal-chemistry descriptors (`common_physics.py`), baseline benchmarks (`v1_baseline.py`), Problem 1 hurdle-Bayes surrogate (`v2_surrogate_q1.py`), conformal calibration (`v2_deep_physics_conformal.py`), Problem 2/3 8-bit QUBO/HOBO formulations and exact certification (`v2_qubo_q2_q3.py`), closed-loop and sensitivity benchmarks (`v2_experiments.py`), SPQC-550 hardware decoding (`v2_spqc550_hardware.py`), figure generation (`generate_figures.py`), and the offline runner (`run_all.py`).
+- `v2_optimized/results/`: Exported prediction tables, JSON summaries, and saved SPQC-550 raw spin checkpoints (`spqc_checkpoints/`).
+- `v2_optimized/figures/`: Figures and diagrams used in the paper.
+- `v2_optimized/reference_baselines/`: Reference baseline summary CSVs.
+- `scripts/verify_milp_qubo_crosscheck.py`: Independent Fortet-McCormick MILP verification using SciPy/HiGHS.
+- `requirements.txt`: Python package versions.
 
-All official raw competition CSV datasets, dry-run artifacts, `.npz` files, and credentials are strictly excluded per APMCM submission rules.
+Official competition CSV files and API credentials are excluded.
 
-## Standalone Reproduction (Supporting Archive + Official Dataset Only)
-Unpack this archive, install `requirements.txt` (with `kaiwu==1.4.4`), set `APMCM_DATA_DIR` to the official `date/` directory, and run:
-1. `python v2_optimized/run_all.py --verify-saved`            (checksums, saved CSVs/JSONs & SPQC-550 record audit; 0 cloud calls)
-2. `python scripts/verify_milp_qubo_crosscheck.py`             (independent Fortet/McCormick MILP cross-check via SciPy/HiGHS, `mip_gap=0`)
-3. `python scripts/verify_all_review_gates.py --code-only`   (all 7 live matrix, MILP, certification & data gates; 0 cloud calls)
-4. `python v2_optimized/run_all.py --all`                     (full offline retraining, Q2/Q3 certification, experiments & figures)
+## Offline Reproduction
+Install dependencies from `requirements.txt` (plus `kaiwu==1.4.4`), set `APMCM_DATA_DIR` to the official dataset folder (`date/`), and run:
 
-*(In the full repository containing `paper/` and `submission/`, run `python scripts/verify_all_review_gates.py` and `python scripts/audit_submission.py --problem D --team apmcm26302266`.)*
+1. `python v2_optimized/run_all.py --verify-saved` — verify dataset checksums, saved predictions, and SPQC-550 raw spin checkpoints (no cloud API calls).
+2. `python scripts/verify_milp_qubo_crosscheck.py` — cross-check all 8 integer Ising ground-state energies via HiGHS MILP (`mip_gap = 0`).
+3. `python v2_optimized/run_all.py --all` — run full offline surrogate training, QUBO/HOBO certification, benchmarks, and figure generation.
 """
 
 

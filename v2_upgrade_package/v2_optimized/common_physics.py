@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""
-Common First-Principles Crystal-Chemistry Descriptors & Exact Band-Edge Physics
-for 2026 APMCM Problem D (Castelli ABX3 Cubic Perovskites).
-
-All elemental constants are textbook periodic-table quantities (CRC Handbook /
-Pauling / Cordero / Shannon / NIST). Strictly NO external DFT labels are used.
-Includes Bartel et al. (Science Advances 2019) tolerance factor tau and logistic
-stability probability alongside Goldschmidt t, electron parity, closed-shell
-charge neutrality, and the exact Butler-Ginley log-additive band-center model.
-"""
+"""Crystal-chemistry descriptors, Butler-Ginley band-center regression, and Gaussian hinge utilities."""
 
 import hashlib
 import json
@@ -22,14 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def resolve_data_dir(repo_root=None):
-    """
-    Dynamically resolve the official Castelli dataset directory ('date/').
-    Search priority:
-      1. Environment variable APMCM_DATA_DIR (if set and non-empty)
-      2. <repo_root>/01_2026赛题与数据集/Problem_D_量子计算钙钛矿稀有目标搜索/date
-      3. <repo_root>/2026 APMCM Problems/2026 APMCM Problem D/date
-    Raises FileNotFoundError with searched paths and APMCM_DATA_DIR instructions if missing.
-    """
+    """Locate the official dataset directory via APMCM_DATA_DIR or standard relative paths."""
     default_repo_root = os.path.dirname(BASE_DIR)
     root = os.path.abspath(repo_root) if repo_root is not None else default_repo_root
 
@@ -160,7 +144,7 @@ def verify_dataset_checksums(data_dir=None):
 DATA_DIR = resolve_data_dir()
 
 # (Z, mass, group, period, chi_pauling, ie1_eV, ea_eV, r_cov_A, r_ion6_A,
-#  n_val, n_d, mendeleev, common_ox, closed_shell_ox)
+# n_val, n_d, mendeleev, common_ox, closed_shell_ox)
 ELEMENT_DATA = {
     "Li": (3,   6.941,   1, 2, 0.98,  5.392, 0.618, 1.28, 0.76,  1,  0,  1, (1,),          (1,)),
     "Be": (4,   9.012,   2, 2, 1.57,  9.323, 0.000, 0.96, 0.45,  2,  0, 67, (2,),          (2,)),
@@ -270,7 +254,7 @@ def _min_charge_defect(ox_a, ox_b, q_x):
 
 
 def build_basic_v1_features(df):
-    """Minimal elemental descriptor set matching teammate's v1 baseline roadmap."""
+    """Basic elemental descriptor set for baseline surrogate benchmarks."""
     rows = []
     for a, b, x, a_eq_b in zip(df["A"], df["B"], df["X"], df["a_eq_b"]):
         za, ma, ga, pa, chia, iea, eaa, rcova, riona, nva, nda, menda, _, _ = ELEMENT_DATA[a]

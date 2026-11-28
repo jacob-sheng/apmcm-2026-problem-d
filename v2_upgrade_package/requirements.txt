@@ -1,26 +1,21 @@
-# 2026 APMCM Problem D — Pinned Runtime Dependencies (Python 3.12.16 / WSL2 .venv)
-#
-# Core Numerical & Data Science
+# Core scientific packages
 numpy==2.5.5
 scipy==1.18.1
 pandas==2.2.3
 
-# Machine Learning, Gradient Boosting & Hyperparameter Optimization
+# Machine learning
 scikit-learn==1.9.1
 catboost==1.2.10
 lightgbm==4.7.0
 xgboost-cpu==3.4.1
-# Note: xgboost==3.4.1 may be substituted on GPU-enabled hosts if desired.
 optuna==5.1.0
 
-# Publication-Grade Visualization
+# Plotting and document utilities
 matplotlib==3.10.3
 seaborn==0.13.2
 pillow==13.0.0
 plotly==7.2.0
 graphviz==0.21
-
-# PDF / Document / Typesetting / Environment Utilities
 typst==0.15.2
 pypdf==7.2.0
 pymupdf==2.2
@@ -30,16 +25,5 @@ requests==2.32.3
 networkx==3.7
 tabulate==0.10.0
 
-# -----------------------------------------------------------------------------
-# QBoson Kaiwu SDK (Enterprise 1.4.4) — Offline Wheel & License Setup
-# -----------------------------------------------------------------------------
-# `kaiwu==1.4.4` (with `kaiwu-community==1.0.8`) is distributed as an enterprise
-# wheel from QBoson and is NOT hosted on public PyPI. Install it manually from
-# the downloaded wheel before running QUBO/Ising or SPQC-550 modules:
-#   uv pip install --python /path/to/.venv/bin/python /path/to/kaiwu-1.4.4-*.whl
-#
-# For SPQC-550 hardware execution (`v2_spqc550_hardware.py --run-spqc`), supply
-# credentials strictly via environment variables or a local `.env` (never commit
-# credentials to git):
-#   export KAIWU_USER_ID="<your_user_id>"
-#   export KAIWU_SDK_CODE="<your_sdk_code>"
+# Kaiwu SDK 1.4.4 (install from official QBoson wheel; supply KAIWU_USER_ID and
+# KAIWU_SDK_CODE via environment variables when running SPQC-550 tasks)

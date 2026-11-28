@@ -1,36 +1,5 @@
 #!/usr/bin/env python3
-"""
-SPQC-550 Real Optical Quantum Computer (CIM) Execution & Independent Verification
-for Compact Lossless Active-Subspace Exact-8-Bit Ising Formulations.
-
-Supported task sets:
-  - v3 (M4B repaired Q2/Q3 tasks; archived v2 tasks preserved under historical_v2_archived_tasks):
-      1. v3_q2_blind_12          : Q2 Blind Pool (11, Exact-8bit)        - 12 spins, 0 aux, 8-bit
-      2. v3_q3_comp_18           : Q3 Blind Pool (12, Model 3A-Comp)     - 18 spins, 0 aux, 8-bit
-      3. v3_q3_hobo_29           : Q3 Blind Pool (12, Model 3A-HOBO)     - 29 spins, 11 aux, 8-bit
-      4. v3_q3_anova_25          : Q3 Blind Pool (12, Model 3B-ANOVA)    - 25 spins, 0 aux, 8-bit
-  - v2 (historical checkpoint integrity audit ONLY; does not rebuild pre-fix matrices):
-      1. apmcm26_v2_q2_blind_12  : Historical Q2 Blind archive           - 12 spins
-      2. apmcm26_v2_q3_anova_24  : Historical Q3 ANOVA archive           - 24 spins
-      3. apmcm26_v2_q3_submod_33 : Historical Q3 Submod archive          - 33 spins
-
-SDK inspection note (kaiwu==1.4.4):
-  `kaiwu.cim._client` does not exist in `kaiwu==1.4.4`; the compiled module is
-  `kaiwu.cim._cim_optimizer` (`CIMOptimizer`, `TaskMode`; endpoints
-  `CREATE_TASK_URL`, `GET_TASK_RESULT_URL`, `SIGN_OSS_URL`) alongside
-  `kaiwu.license` (`ensure_license`, `init`, `license_settings`, `track_data`,
-  `verify_license`). Neither `kaiwu.cim` nor `kaiwu.license` exposes a public
-  account credit/balance query API, so remaining SPQC-550 credits must be
-  checked via the QBoson cloud console and tracked carefully to preserve >= 5
-  unused credits.
-  The SDK signature `CIMOptimizer(..., interval=...)` defaults to `interval=6`
-  seconds (minimum SDK-enforced effective polling interval is `5` seconds).
-
-Credentials are read strictly from environment variables KAIWU_USER_ID and
-KAIWU_SDK_CODE (never hardcoded or logged). Supports --dry-run (writes ONLY to
-results/v2_spqc550_dryrun.json), --verify-only (strict bit-exact SHA-256 +
-algebraic QUBO-to-Ising recovery + full record-level comparison), and --run-spqc.
-"""
+"""Bose Quantum SPQC-550 execution, algebraic Ising recovery, and spin-record decoding utilities."""
 
 import argparse
 import copy
@@ -492,11 +461,7 @@ evaluate_hardware_samples = decode_raw_spins
 
 
 def build_tasks(task_set: str = "v3", task_filter=None):
-    """
-    Build active repaired 'v3' SPQC-550 task specifications.
-    Note: Legacy 'v2' archives use historical pre-fix formulations and are verified via
-    checkpoint-integrity audit ONLY rather than rebuilt from current v3 builders (R11).
-    """
+    """Build the four blind-pool SPQC-550 task specifications."""
     if task_set == "v2":
         return []
     q2b = pd.read_csv(os.path.join(RES_DIR, "v2_q2_blind_11.csv"))
@@ -574,10 +539,7 @@ def export_track_a_archive_summary(
     csv_path: str = DEFAULT_TRACK_A_CSV,
     out_path: str = DEFAULT_TRACK_A_SUMMARY,
 ) -> dict:
-    """
-    Parse Track A's historical SPQC-550 vs Classical CSV directly into a structured
-    JSON archive summary with zero hardcoded numerical rows (F22).
-    """
+    """Parse earlier full-grid SPQC-550 vs. classical CSV metrics into JSON."""
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(
             f"Track A CSV not found: {_safe_relative_path(csv_path, base_dir=REPO_ROOT, fallback_base=CUR_DIR)}"
@@ -783,12 +745,7 @@ def _update_credit_accounting(payload: dict):
 
 
 def verify_historical_v2_checkpoints_integrity(prior_archived: dict, ckpt_dir: str) -> list:
-    """
-    Historical checkpoint integrity audit ONLY (R11):
-    Verifies archived v2 matrix SHA length, raw .npy checkpoint existence, spin alphabet {-1,+1},
-    file/array SHA-256 digests (when present), array shape (n_samples, spins), and sample list count
-    without pretending to rebuild pre-fix v2 Hamiltonians from current v3 builders.
-    """
+    """Verify file integrity, spin alphabet, and array shapes for archived earlier checkpoints."""
     failures = []
     for h_tn, h_entry in prior_archived.items():
         h_spec = h_entry.get("hardware_spec", {})
@@ -853,10 +810,7 @@ def _finite_float_eq(a, b, tol: float = 1e-5) -> bool:
 
 
 def _compare_decoded_with_archived(tn: str, dec: dict, archived: dict) -> list:
-    """
-    Strictly compare freshly recomputed decode_raw_spins() output against archived spqc550 JSON (R10/T03).
-    Checks finite numeric values, full keyset equality, and all record fields including kAX.
-    """
+    """Compare freshly decoded spin records against archived SPQC-550 JSON results."""
     errs = []
     exact_keys = (
         "n_samples",

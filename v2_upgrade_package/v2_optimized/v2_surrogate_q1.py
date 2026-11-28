@@ -1,29 +1,5 @@
 #!/usr/bin/env python3
-"""
-v2 Upgraded Problem 1 Surrogate (Outer-(A,B)-GroupKFold Base Isolation + Pooled-OOF Meta-Layer):
-  Physics-Coupled Stage-0 Auxiliary DFT + Multi-Family Ensemble +
-  Calibrated Bayes-Optimal Mixture-Expectation Model.
-
-Strictly obeys Problem D evaluation rules and R01/R03 scoping:
-  - Outer (A,B)-GroupKFold base-pipeline isolation: inside EVERY outer fold (ti, vi),
-    Butler-Ginley Ridge weights, marginal target-encoding priors & inner-OOF stats,
-    Stage-0 DFT predictors, 4-family base models, and conditional semiconductor
-    gap models (using the exact same outer fold partition) are fitted strictly
-    on df_tr_fold ONLY.
-  - Pooled-OOF meta-layer: ensemble simplex weights, residual scales (sigma_ef, sigma_g),
-    and the 50/50 IsotonicRegression blend are subsequently fitted on the pooled
-    outer-OOF base predictions. Consequently, outer_oof_metrics_* are in-sample
-    pooled-OOF meta-fit development diagnostics, stage0_oof_metrics are inner-fold
-    development diagnostics (te_* encodings precede Stage-0's inner split), and
-    complete end-to-end generalization is evaluated on external 03_castelli_val.csv.
-  - Automated +100 label-perturbation isolation test verifies fit_fold_isolated_pipeline
-    (base feature/model path: max_feature_delta < 1e-12 and max_pred_delta < 1e-12).
-  - Fair baseline alignment loads M4_PIMT_Physics_Only and M5_PIMT_Hybrid_Ensemble
-    from reference_baselines/table1_surrogate_ablation.csv (bundled for standalone ZIP
-    reproducibility) alongside v1 baselines on the 02 -> 03 protocol.
-  - Dual holdout exports: v2_holdout_04_train02only.csv (frozen 02-only) and
-    v2_holdout_04.csv (02+03 refit), plus A=B sensitivity diagnostics.
-"""
+"""Problem 1 physics-coupled hurdle-Bayes surrogate with (A,B)-grouped cross-validation."""
 
 import hashlib
 import json
@@ -73,7 +49,7 @@ from v1_baseline import SimpleOneHotFM
 OUT_DIR = os.path.join(CUR_DIR, "results")
 os.makedirs(OUT_DIR, exist_ok=True)
 SEED = 2026
-N_JOBS = 2  # CPU throttling constraint (R6)
+N_JOBS = 2  # Limit worker threads
 
 
 def _sha256_file(path):
@@ -709,13 +685,7 @@ def fit_and_predict_v2(
 
 
 def evaluate_baselines_and_align(tr, va, m_v2_dir, m_v2_bayes):
-    """
-    Fair Baseline Alignment (F12):
-      - Recompute v1 simple baselines (v1_Direct_LGBM_V, v1_Direct_LGBM_log1pV, v1_OneHot_FM_k8)
-        on the exact 02 -> 03 protocol (including MAE_V_lt_1 and MAE_V_lt_0_5).
-      - Load M4_PIMT_Physics_Only and M5_PIMT_Hybrid_Ensemble from the original repository's
-        table1_surrogate_ablation.csv (resolved dynamically relative to REPO_ROOT).
-    """
+    """Evaluate baseline surrogates on 02 -> 03 and load archived multi-task reference metrics."""
     X_tr = build_basic_v1_features(tr)
     X_va = build_basic_v1_features(va)
     for col in ["A", "B", "X"]:
@@ -831,7 +801,7 @@ def evaluate_baselines_and_align(tr, va, m_v2_dir, m_v2_bayes):
 
 
 def _compute_holdout_lineage_diff(df_02only, df_02plus03):
-    """Compare frozen 02-only vs 02+03 refit predictions on 04_test_holdout (F25)."""
+    """Compare 02-only vs. 02+03 refit predictions on 04_test_holdout."""
     a = df_02only.sort_values("V_hat", ascending=True).reset_index(drop=True)
     b = df_02plus03.sort_values("V_hat", ascending=True).reset_index(drop=True)
     merged = a[["id", "formula", "V_hat", "P_hit"]].merge(
@@ -869,7 +839,7 @@ def _compute_holdout_lineage_diff(df_02only, df_02plus03):
 
 
 def _compute_a_eq_b_sensitivity(df_pool, name):
-    """Quantify retain vs exclude A=B (a_eq_b == 1) sensitivity on a scored pool (F26)."""
+    """Quantify retaining vs. excluding homonuclear (A == B) rows on a scored pool."""
     df_ret = df_pool.sort_values("V_hat", ascending=True).reset_index(drop=True)
     df_exc = df_ret[df_ret["a_eq_b"] == 0].reset_index(drop=True)
     df_eq = df_ret[df_ret["a_eq_b"] == 1].reset_index(drop=True)
@@ -993,7 +963,7 @@ def main():
     val_pred_path = os.path.join(OUT_DIR, "v2_val_predictions.csv")
     val_df.to_csv(val_pred_path, index=False)
 
-    # Export frozen 02-only holdout_04 predictions (F25)
+    # Export frozen 02-only holdout_04 predictions
     hold02_df = holdout[["id", "formula", "A", "B", "X", "a_eq_b"]].copy()
     for k in ["V_hat", "V_direct", "v_form", "v_gap_low", "v_gap_high", "v_vbm", "v_cbm",
               "P_hit", "mu_ef", "sigma_ef", "p_semi", "mu_gap", "sigma_gap", "ec_exact"]:
@@ -1043,7 +1013,7 @@ def main():
 
     dt_phase2 = time.perf_counter() - t1
 
-    # Dual holdout lineage comparison (F25) & A=B sensitivity (F26)
+    # Dual holdout lineage comparison & A=B sensitivity
     holdout_diff = _compute_holdout_lineage_diff(hold02_df, exported_dfs["holdout_04"])
     a_eq_b_sens = {
         "holdout_04_02plus03": _compute_a_eq_b_sensitivity(exported_dfs["holdout_04"], "04_holdout (02+03 refit)"),

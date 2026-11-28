@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""
-Deep Scientific Analysis for Problem D Paper (F06/F07/F10 Remediated):
-  1. In-Data Butler-Ginley Elemental Weight Extraction vs Mulliken Electronegativity
-  2. (A,B)-Group-Disjoint Mondrian Split-Conformal Uncertainty Calibration on 03_val
-     (200 group-disjoint 50/50 splits of 567 distinct (A,B) pairs, zero group overlap)
-  3. 03_val Semiconductor Residual Correlation (e_form - mu_ef vs gap - mu_gap)
-  4. Scoped Model Expectation Sum(P_hit) Analysis on 04_test_holdout (NOT true recall)
-  5. Publication-Grade Figure 8: Goldilocks Phase Diagram, Scoped Sum(P_hit) Curve,
-     and 4-Panel Predicted Band-Edge Audit of Top Blind Candidates.
-"""
+"""Band-center symmetry audit, Mondrian split-conformal calibration, and holdout screening plots."""
 
 import json
 import os
@@ -83,8 +74,8 @@ def run_deep_analysis():
     bg_mull_rho = float(spearmanr(chi_mull, wA).statistic)
 
     # 2. (A,B)-Group-Disjoint Mondrian Split-Conformal Calibration on 03_val (Frozen 02-only model)
-    #    Split the 567 distinct (A,B) groups 50/50 (283 cal / 284 test) across 200 permutations.
-    #    Strata are defined by predicted p_semi >= 0.20 (NOT ground-truth metal/semiconductor labels).
+    # Split the 567 distinct (A,B) groups 50/50 (283 cal / 284 test) across 200 permutations.
+    # Strata are defined by predicted p_semi >= 0.20 (NOT ground-truth metal/semiconductor labels).
     rng = np.random.default_rng(2026)
     groups = (val_df["A"].astype(str) + "_" + val_df["B"].astype(str)).values
     uniq_groups = np.unique(groups)
@@ -148,7 +139,7 @@ def run_deep_analysis():
             cov90_s1_l.append(float(np.mean(tst_err[m1] <= q90[1])))
             cov95_s1_l.append(float(np.mean(tst_err[m1] <= q95[1])))
 
-    # 3. 03_val Semiconductor (gap > 0) Residual Correlation Check (F06)
+    # 3. 03_val Semiconductor (gap > 0) Residual Correlation Check
     semi_val = val_df[val_df["gap"] > 0].copy()
     res_ef = semi_val["e_form"].values - semi_val["mu_ef"].values
     res_gap = semi_val["gap"].values - semi_val["mu_gap"].values

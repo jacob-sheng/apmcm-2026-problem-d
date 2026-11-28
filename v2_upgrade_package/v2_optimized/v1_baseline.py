@@ -1,20 +1,5 @@
 #!/usr/bin/env python3
-"""
-v1 Baseline Benchmark (Faithful Implementation of Teammate's Roadmap in
-ref_teammate/01_2026赛题与数据集/.../D题_中文精读与建模路线图.md).
-
-Because ref_teammate/ (commit 80f31c8) contains the modeling design document
-without pushed Python source files, this module faithfully implements every
-v1 modeling choice proposed in the teammate's roadmap so v1 vs v2 can be
-compared apples-to-apples on identical official data splits and Kaiwu solvers:
-  - v1 Q1: Direct LightGBM on V, Direct LightGBM on log1p(V), and standalone
-           2nd-order one-hot Factorization Machine (FM, rank k=8).
-  - v1 Q2: Naive 104-variable one-hot QUBO (52 A + 52 B) with fixed penalty
-           P=20 and naive 8-bit adjust_ising_matrix_precision(..., bit_width=8).
-  - v1 Q3: Standard 107-variable pairwise FM-QUBO + standard naive Rosenberg
-           3-body HOBO->QUBO reduction (52*52*3 = 8,112 cubic terms -> 2,704 aux
-           variables on full space, or active subset) + naive 8-bit quantization.
-"""
+"""Baseline surrogate models (LightGBM, one-hot FM) and unpruned 8-bit QUBO benchmarks."""
 
 import json
 import os

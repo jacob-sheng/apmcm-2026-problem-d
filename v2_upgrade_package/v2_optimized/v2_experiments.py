@@ -1,28 +1,5 @@
 #!/usr/bin/env python3
-"""
-v3 Remediated Closed-Loop Acquisition & Fair Multi-Axis Sensitivity Suite (M4A):
-  1. Closed-Loop Benchmark on 03_castelli_val.csv (F04, F14, F15):
-     - 20 paired random seeds (N=3,969; M=18 for V<0.5; M=27 for V<1.0)
-     - Exact analytical hypergeometric expectation baseline E[H(K)] = K * M / N
-     - Converged L-BFGS-B 2nd-order One-Hot FM (explicit scalar-V oracle budget)
-     - Composition-physics scalar-V LGBM ablation (isolating features under scalar-V)
-     - Side-by-side acquisition routes under multi-property oracle:
-         (a) v2_Classical_SeqRank (np.argsort)
-         (b) v2_Real_8Bit_QUBO (genuine per-round 8-bit Model 3A-Comp masked QUBO via Kaiwu SA)
-         and (c) v1_FM_LBFGS_SeqRank vs (d) v1_FM_LBFGS_QUBO (per-round 112-spin FM QUBO via Kaiwu SA)
-  2. Equal-Budget Solver Top-K Comparison (F13):
-     - Same budget (n_runs=50, 1 best shot/run -> 50 shots + unique Top-K) on frozen V_hat pools
-     - Compares v1 Naive, v2 Q2 Exact-8bit, v2 Q3 3A-Comp, 3A-HOBO, 3B-ANOVA (SA & Tabu)
-  3. Independent 4-12-Bit Quantization Sweep (F16):
-     - Independently searches maximal usable M_max(B) bounded by M_B = 2^(B-1)-1 for every B
-     - Full global ground-state certification + continuous regret + SA (n_runs=50, 1 best/run)
-  4. Refined Fixed-M_max=4 Penalty Sweep Around Phase Transition (F16) + C_cap Pareto Sweep:
-     - Fixes M_max=4 on Q2 Blind (12 spins) across alpha_P in [0.50 .. 3.00]
-     - Reports BOTH exact global enumeration feasibility AND SA empirical feasibility
-  5. Multi-Scale Surrogate Ranking Perturbation Stability (F17):
-     - n_trials=500 across scales [0.5, 1.0, 1.5, 2.0] for independent Gaussian AND
-       (A,B)-group-correlated + p_semi logit perturbation on Q2 & Q3 blind pools
-"""
+"""Closed-loop active discovery, equal-budget solver comparison, and four-axis sensitivity benchmarks."""
 
 import hashlib
 import json
@@ -77,7 +54,7 @@ def _ising_sha256(ising_mat):
 
 
 # ---------------------------------------------------------------------------
-# Converged 2nd-Order One-Hot Factorization Machine via L-BFGS-B (F15)
+# Converged 2nd-Order One-Hot Factorization Machine via L-BFGS-B
 # ---------------------------------------------------------------------------
 
 def fit_onehot_fm_lbfgs(
@@ -228,7 +205,7 @@ def build_fm_q3_qubo(fm_model, valid_ab_set, fully_queried_ab_set=None, penalty=
 
 
 # ---------------------------------------------------------------------------
-# Per-Round 8-Bit Masked Model 3A-Comp QUBO Builder for Closed-Loop (F04)
+# Per-Round 8-Bit Masked Model 3A-Comp QUBO Builder for Closed-Loop
 # ---------------------------------------------------------------------------
 
 def build_masked_8bit_comp_qubo_round(df_unq_sorted, val_trip_set, obs_triples, batch_size=10):
@@ -943,7 +920,7 @@ def run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_round
 
 
 # ---------------------------------------------------------------------------
-# Task 2: Fair Equal-Budget Solver Top-K Comparison (F13)
+# Task 2: Fair Equal-Budget Solver Top-K Comparison
 # ---------------------------------------------------------------------------
 
 def _eval_v1_naive_q2(sols, ground_sols, energies, all52, df_pool, lookup, declared_min_v):
@@ -1072,7 +1049,7 @@ def _eval_v1_fm107_q3(sols, ground_sols, all52, cols_X, df_pool, lookup, declare
 
 def run_equal_budget_solver_topk(n_runs=50):
     """
-    Fair Equal-Budget Top-K Solver Comparison (F13):
+    Equal-budget Top-K solver comparison across Problem 2 and Problem 3 formulations:
       - Fixed budget: n_runs=50, 1 best spin configuration per run -> 50 returned shots.
       - Frozen surrogate V_hat and identical P_declared evaluation pools.
       - Both SA and Tabu across:
@@ -1261,7 +1238,7 @@ def run_equal_budget_solver_topk(n_runs=50):
 
 
 # ---------------------------------------------------------------------------
-# Task 3: Independent 4-12-Bit Quantization Sweep (F16)
+# Task 3: Independent 4-12-Bit Quantization Sweep
 # ---------------------------------------------------------------------------
 
 def _build_q2_at_bitwidth(df_pool, bw, c_cap=2.5, penalty_mult=2.25):
@@ -1362,7 +1339,7 @@ def _build_q2_at_bitwidth(df_pool, bw, c_cap=2.5, penalty_mult=2.25):
 
 def run_bitwidth_sensitivity(n_runs=50):
     """
-    Independent 4-12-bit quantization sweep (F16) on Q2 Blind (11) vs v1 Naive 104-var QUBO.
+    Independent 4-12-bit quantization sweep on Q2 Blind (11) vs. unpruned 104-var QUBO.
     Each bitwidth B in [4, 5, 6, 7, 8, 10, 12] independently finds M_max(B) <= 2^(B-1)-1.
     """
     dfp = pd.read_csv(os.path.join(OUT_DIR, "v2_q2_blind_11.csv"))
@@ -1463,7 +1440,7 @@ def run_bitwidth_sensitivity(n_runs=50):
 
 
 # ---------------------------------------------------------------------------
-# Task 4: Refined Fixed-M_max Penalty Sweep & C_cap Pareto Sweep (F16)
+# Task 4: Refined Fixed-M_max Penalty Sweep & C_cap Pareto Sweep
 # ---------------------------------------------------------------------------
 
 def run_penalty_and_cap_sensitivity(n_runs=50):
@@ -1667,7 +1644,7 @@ def run_penalty_and_cap_sensitivity(n_runs=50):
 
 
 # ---------------------------------------------------------------------------
-# Task 5: Multi-Scale Surrogate Ranking Perturbation Stability (F17)
+# Task 5: Multi-Scale Surrogate Ranking Perturbation Stability
 # ---------------------------------------------------------------------------
 
 def _eval_mc_perturbation(df, scale, mode, n_trials, rng):
@@ -1782,10 +1759,7 @@ def _eval_mc_perturbation(df, scale, mode, n_trials, rng):
 
 
 def run_monte_carlo_robustness(n_trials=500):
-    """
-    Surrogate Ranking Perturbation Stability (F17) across scales [0.5, 1.0, 1.5, 2.0]
-    under BOTH independent Gaussian noise AND (A,B)-group-correlated + p_semi logit noise.
-    """
+    """Evaluate top-K ranking stability across noise scales [0.5, 1.0, 1.5, 2.0] under independent and correlated noise."""
     rng = np.random.default_rng(2026)
     scales = [0.5, 1.0, 1.5, 2.0]
     mc_out = {
@@ -1844,7 +1818,7 @@ def main():
     t_start = time.perf_counter()
     print("=== Running v3 Remediated Closed-Loop & Fair Multi-Axis Sensitivity Experiments (M4A) ===")
 
-    # 1. Closed-Loop 20-Seed Benchmark (F04, F14, F15)
+    # 1. Closed-Loop 20-Seed Benchmark
     fmqa_res = run_closed_loop_fmqa_benchmark(n_seeds=20, n_init=50, batch_size=10, n_rounds=15)
     print(f"\n[Experiment 1: Closed-Loop on 03_val (20 seeds, budget=200/3,969) in {fmqa_res['runtime_sec']}s]")
     hg = fmqa_res["analytical_hypergeometric"]
@@ -1857,13 +1831,13 @@ def main():
             f"V<1.0={d['final_mean_rare10']:5.2f}/27 ({d['final_recall10_pct']:5.2f}%)"
         )
 
-    # 2. Equal-Budget Solver Top-K Comparison (F13)
+    # 2. Equal-Budget Solver Top-K Comparison
     topk_res = run_equal_budget_solver_topk(n_runs=50)
     print(f"\n[Experiment 2: Equal-Budget Solver Top-K (n_runs=50, 1 best/run) in {topk_res['runtime_sec']}s]")
     df_topk = pd.DataFrame(topk_res["rows"])
     print(df_topk[["instance", "encoding", "solver", "spins", "strict_feasibility_pct", "unique_feasible_count", "best_V_hat", "continuous_regret_top1", "topk_hits"]].to_string(index=False))
 
-    # 3. Independent 4-12-Bit Quantization Sweep (F16)
+    # 3. Independent 4-12-Bit Quantization Sweep
     bw_res = run_bitwidth_sensitivity(n_runs=50)
     print("\n[Experiment 3: Independent 4..12-Bit Quantization Sweep (Q2 Blind 11)]")
     print(pd.DataFrame(bw_res)[[
@@ -1872,7 +1846,7 @@ def main():
         "v2_cert_regret_worst_gs", "v2_feas_pct", "v2_top10_hits"
     ]].to_string(index=False))
 
-    # 4. Refined Fixed-M_max=4 Penalty Sweep & C_cap Pareto Sweep (F16)
+    # 4. Refined Fixed-M_max=4 Penalty Sweep & C_cap Pareto Sweep
     pen_res, cap_res = run_penalty_and_cap_sensitivity(n_runs=50)
     print("\n[Experiment 4A: Fixed M_max=4 Penalty Sweep on Q2 Blind (12 spins)]")
     print(pd.DataFrame(pen_res)[[
@@ -1886,7 +1860,7 @@ def main():
         "q3_comp_spins", "q3_comp_feas_pct", "q3_comp_top15_hits"
     ]].to_string(index=False))
 
-    # 5. Multi-Scale Surrogate Ranking Perturbation Stability (F17)
+    # 5. Multi-Scale Surrogate Ranking Perturbation Stability
     mc_res = run_monte_carlo_robustness(n_trials=500)
     print("\n[Experiment 5: Surrogate Ranking Perturbation Stability (500 trials, 0.5..2.0 sigma)]")
     for mode_key in ["multi_scale_independent", "multi_scale_group_correlated_logit"]:

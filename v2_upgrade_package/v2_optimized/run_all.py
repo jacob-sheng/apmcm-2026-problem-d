@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
-"""
-Staged CLI Master Runner for v2_optimized (2026 APMCM Problem D).
-
-Stages (strictly local/offline; NEVER invokes paid --run-spqc cloud calls):
-  --verify-saved     Run dataset SHA-256 audit, check saved JSON/CSV artifacts,
-                     and run v2_spqc550_hardware.py --verify-only.
-  --retrain-q1       Run v1_baseline.py, v2_surrogate_q1.py, and
-                     v2_deep_physics_conformal.py.
-  --run-qubo         Run v2_qubo_q2_q3.py.
-  --run-experiments  Run v2_experiments.py.
-  --build-figures    Run generate_figures.py.
-  --all              Run all offline stages end-to-end (retrain-q1 -> run-qubo
-                     -> run-experiments -> build-figures -> verify-saved).
-"""
+"""Offline runner for surrogate training, QUBO/HOBO certification, benchmarks, and figure generation."""
 
 import argparse
 import json

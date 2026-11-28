@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""
-Publication-Grade (300 DPI, English-Only) Figure & Conceptual Schematic Generator.
-
-All quantitative data figures (fig01-fig07) read strictly from verified JSON/CSV
-outputs in v2_optimized/results/ with ZERO hardcoded hardware or experiment arrays,
-and anchor hardware energy spectra strictly to certified global ground states
-(cert_min_ising_energy). Also generates 3 clean conceptual/architectural schematics
-(schematic01-schematic03) into paper/schematics/ (.svg + .png) and v2_optimized/figures/ (.png).
-"""
+"""Figure and schematic generator reading directly from saved JSON and CSV results."""
 
 import json
 import os
@@ -497,7 +489,7 @@ def fig05_q3_compression_and_cost():
     ax.set_ylim(0, 17.5)
     ax.legend(loc="upper left", ncol=2, fontsize=7.4, frameon=True)
 
-    # Panel (c): Repaired Model 3B-ANOVA 3-Layer Error Decomposition & 6-Level Spectrum
+    # Panel (c): Model 3B-ANOVA 3-Layer Error Decomposition & 6-Level Spectrum
     ax = axes[1, 0]
     aed = v2["anova_error_decomposition"]
     stages = [
@@ -687,7 +679,7 @@ def fig07_spqc550_real_hardware():
     with open(track_a_path, "r", encoding="utf-8") as f:
         track_a = json.load(f)
 
-    # Load Track A strictly from JSON (zero hardcoded arrays)
+    # Load earlier full-grid archive strictly from JSON (loaded from JSON)
     track_a_label_map = {
         "kaiwu_skill_d_q2_uncap": "TA\nQ2 Uncap",
         "kaiwu_skill_d_q2_full": "TA\nQ2 Full",
@@ -718,7 +710,7 @@ def fig07_spqc550_real_hardware():
             "hit": hit_txt,
         })
 
-    # Load v3 re-verified tasks strictly from v2_spqc550_results.json
+    # Load blind-pool tasks strictly from v2_spqc550_results.json
     v3_order = [
         ("v3_q2_blind_12", "v3\nQ2 Blind"),
         ("v3_q3_comp_18", "v3\n3A-Comp"),
@@ -752,7 +744,7 @@ def fig07_spqc550_real_hardware():
 
     fig, axes = plt.subplots(1, 3, figsize=(17.6, 5.7))
 
-    # Panel A: Feasibility across Track A Historical Reference vs v3 Re-verified Runs
+    # Panel A: Feasibility across Earlier Full-Grid Runs vs Active-Subspace Runs
     ax = axes[0]
     x = np.arange(len(hw_rows))
     strict_vals = [r["strict_feas"] for r in hw_rows]
@@ -1068,7 +1060,7 @@ def schematic02_band_alignment_window():
             ha="center", va="top", fontsize=7.6, fontweight="bold", color=CRIMSON,
             bbox=dict(boxstyle="round,pad=0.25", facecolor="#FFF5F5", edgecolor=CRIMSON))
 
-    # Right Panel: Admissible (E_c, E_g) Corridor & Thermodynamic Gate
+    # Right Panel: Admissible (E_c, E_g) Corridor & Thermodynamic Window
     ax = axes[1]
     ec_grid = np.linspace(3.6, 6.6, 300)
     g_min = np.maximum.reduce([
@@ -1164,7 +1156,7 @@ def schematic03_qubo_ising_compilation():
         "Explicit 3-Layer Error Decomposition",
     ], fc="#FFF8F1", ec=ORANGE, title_fc=ORANGE)
 
-    # Middle Box: Exact Algebraic Ising Transformation & Int8 Gate
+    # Middle Box: Exact Algebraic Ising Transformation & Int8 Quantization
     y2, h2 = 0.345, 0.205
     _draw_box(ax, 0.08, y2, 0.84, h2, "Exact Algebraic QUBO-to-Ising Mapping & SPQC-550 Int8 Dynamic-Range Gate", [
         "Binary-to-Spin:  x_i = (1 + s_i * s_ref) / 2,   s_i, s_ref in {-1, +1}   |   Minimization:  E(s) = -s^T H s",
